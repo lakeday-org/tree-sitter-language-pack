@@ -16,8 +16,8 @@ metadata:
 
 <!--
 AI-RULEZ :: GENERATED FILE — DO NOT EDIT
-Content-Hash: blake3:b885cb53ba6a8671296fad73109ff3f4f2f089ce694b03c7e225594304f16789
-Source-Hash: blake3:dd7ffc17b38c6ccb91aa512b2e50d440da85284580827e0eebef9b5d1cc4bd02
+Content-Hash: blake3:5804679b14433e46f0c5db2759b40df83832f093304c222a026f06d6a6b8c4cf
+Source-Hash: blake3:adc7ce77416f062c3db198e5ced5da0a408443213bffd81b1592a018e44bcd49
 Schema-Version: v1
 -->
 
@@ -87,7 +87,6 @@ should call parsing directly as a tool.
 brew install xberg-io/tap/ts-pack
 # or run without a persistent install (the CLI proxy package self-installs the binary):
 npx @xberg-io/ts-pack-cli --help
-uvx --from ts-pack-cli ts-pack --help
 # or download a prebuilt binary from the latest GitHub release:
 #   https://github.com/xberg-io/tree-sitter-language-pack/releases/latest
 # or install from crates.io:

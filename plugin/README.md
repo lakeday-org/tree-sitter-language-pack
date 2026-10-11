@@ -21,7 +21,7 @@ Self-host:
 
 The bundled MCP launcher (`scripts/mcp-launch.sh`) resolves a `ts-pack` binary
 automatically on first run: it reuses one already on `PATH`, then tries
-`npx`/`uvx`, then Homebrew, then a prebuilt download from the tool's latest
+`npx`, then Homebrew, then a prebuilt download from the tool's latest
 GitHub release. No manual install is required to use the MCP server.
 
 To install the `ts-pack` CLI yourself:
@@ -30,7 +30,6 @@ To install the `ts-pack` CLI yourself:
 brew install xberg-io/tap/ts-pack
 # or run it without a persistent install (the CLI proxy package self-installs the binary):
 npx @xberg-io/ts-pack-cli --help
-uvx --from ts-pack-cli ts-pack --help
 # or download a prebuilt binary from the latest GitHub release:
 #   https://github.com/xberg-io/tree-sitter-language-pack/releases/latest
 # or install from crates.io (binary is installed as `ts-pack`):
@@ -95,7 +94,7 @@ discovery; a code-analysis prompt; and language-name completions.
 **Completions**: language-name autocomplete.
 
 The launcher auto-installs a binary on first run (override with
-`TS_PACK_LAUNCHER=auto|npx|uvx|brew|download`). The `mcp` subcommand ships in a
+`TS_PACK_LAUNCHER=auto|npx|brew|download`). The `mcp` subcommand ships in a
 recent release of the tool; an older binary on `PATH` may need an upgrade to
 expose it. See the **using-the-mcp-server** skill for details.
 

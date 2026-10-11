@@ -27,7 +27,7 @@ path = "src/main.rs"
 
 [features]
 # ~keep The MCP server ships in every build of the CLI so `ts-pack mcp` is always
-# ~keep available (cargo install, prebuilt release, brew, npx/uvx proxy). The plugin
+# ~keep available (cargo install, prebuilt release, brew, npx proxy). The plugin
 # ~keep launcher (xberg-io/plugins) and the published binaries rely on this.
 default = ["mcp"]
 mcp = ["dep:rmcp", "dep:tokio", "dep:schemars", "dep:serde", "dep:axum"]

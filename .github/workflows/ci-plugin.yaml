@@ -52,7 +52,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # Both, because the launcher probes the host for npx, uvx and brew and resolves a
+        # Both, because the launcher probes the host for npx and brew and resolves a
         # platform triple from `uname`. A Linux-only job would never execute the macOS arm of
         # either decision. ~keep
         os: [ubuntu-latest, macos-latest]

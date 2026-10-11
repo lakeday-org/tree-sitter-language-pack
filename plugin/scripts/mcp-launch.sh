@@ -3,7 +3,6 @@ set -euo pipefail
 
 REPO="xberg-io/tree-sitter-language-pack"
 NPM_PKG="@xberg-io/ts-pack-cli"
-PYPI_PKG="ts-pack-cli"
 
 log() { printf 'ts-pack-launch: %s\n' "$*" >&2; }
 die() {
@@ -13,8 +12,8 @@ die() {
 
 LAUNCHER="${TS_PACK_LAUNCHER:-auto}"
 case "$LAUNCHER" in
-auto | npx | uvx | brew | download) ;;
-*) die "invalid TS_PACK_LAUNCHER='$LAUNCHER' (expected auto|npx|uvx|brew|download)" ;;
+auto | npx | brew | download) ;;
+*) die "invalid TS_PACK_LAUNCHER='$LAUNCHER' (expected auto|npx|brew|download)" ;;
 esac
 
 want() { [ "$LAUNCHER" = "auto" ] || [ "$LAUNCHER" = "$1" ]; }
@@ -57,15 +56,6 @@ if want npx && have npx; then
   fi
   rm -rf "$scratch"
   log "npx $NPM_PKG not available (no CLI bin yet); falling through"
-fi
-
-if want uvx && have uvx; then
-  log "probing uvx --from $PYPI_PKG $BINARY_NAME ..."
-  if uvx --from "$PYPI_PKG" "$BINARY_NAME" --version >/dev/null 2>&1; then
-    log "launching via uvx --from $PYPI_PKG $BINARY_NAME"
-    exec uvx --from "$PYPI_PKG" "$BINARY_NAME" "$@"
-  fi
-  log "uvx $PYPI_PKG not available (no CLI entry point yet); falling through"
 fi
 
 if want brew && have brew; then

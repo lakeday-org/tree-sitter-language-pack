@@ -19,9 +19,9 @@ directly, with no CLI invocation or glue code.
 The plugin auto-registers the server. Its command is the bundled launcher
 `scripts/mcp-launch.sh`, which execs `ts-pack mcp`. On first run the launcher
 resolves a `ts-pack` binary: it reuses one already on `PATH` or cached in the
-plugin's `bin/`, then tries `npx`/`uvx`, then Homebrew, then downloads a prebuilt
+plugin's `bin/`, then tries `npx`, then Homebrew, then downloads a prebuilt
 from the tool's latest GitHub release. Override the channel with
-`TS_PACK_LAUNCHER=auto|npx|uvx|brew|download`.
+`TS_PACK_LAUNCHER=auto|npx|brew|download`.
 
 The `mcp` subcommand ships in a recent release of the tool. If an older
 `ts-pack` is already on `PATH`, it may not expose `mcp` yet — upgrade the binary

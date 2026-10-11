@@ -80,7 +80,6 @@ should call parsing directly as a tool.
 brew install xberg-io/tap/ts-pack
 # or run without a persistent install (the CLI proxy package self-installs the binary):
 npx @xberg-io/ts-pack-cli --help
-uvx --from ts-pack-cli ts-pack --help
 # or download a prebuilt binary from the latest GitHub release:
 #   https://github.com/xberg-io/tree-sitter-language-pack/releases/latest
 # or install from crates.io:
