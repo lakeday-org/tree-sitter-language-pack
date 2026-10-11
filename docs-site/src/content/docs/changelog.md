@@ -1484,7 +1484,7 @@ Stable release promoting 1.11.0-rc.2 (fully published). Version synced across al
   `read_only_hint`, `destructive_hint`, and `idempotent_hint` values.
 - **The CLI ships the MCP server by default.** `mcp` is now a default feature of `ts-pack-cli`, so
   `ts-pack mcp` is present in every distribution — `cargo install ts-pack-cli`, the prebuilt release
-  binary, Homebrew, and the `@kreuzberg/ts-pack-cli` / `ts-pack-cli` npx/uvx proxies. Previously the
+  binary, Homebrew, and the `@xberg-io/ts-pack-cli` npm proxy. Previously the
   feature was opt-in and absent from shipped binaries, which also broke the marketplace plugin
   launcher that invokes `ts-pack mcp`.
 
