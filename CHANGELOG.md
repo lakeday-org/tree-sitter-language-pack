@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.22.1] - 2026-10-12
+
+### Fixed
+
+- The Ruby gem build no longer fails on the Ruby 3.2 ABI. The development `steep` dependency, which needs Ruby 3.3,
+  is now declared only on Ruby 3.3 or newer, so Ruby gems can be published again after the 1.21.2 to 1.22.0 gaps.
+
 ## [1.22.0] - 2026-10-12
 
 ### Changed
