@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.22.0] - 2026-10-12
+
+### Changed
+
+- Updated 25 bundled grammars to their latest upstream revisions: abl, ada, al, asciidoc, cuda, desktop, dotenv,
+  editorconfig, erlang, gdscript, gnuplot, idl, lean, mlir, nix, perl, php, proto, rshtml, scss, slint, swift, templ,
+  wit and xresources. Parse results for these languages can change where upstream fixed or extended the grammar.
+- Updated dependencies, including `ext-php-rs` 0.16.2, `serde_json` 1.0.154 and `zstd` 0.14.2.
+
 ## [1.21.3] - 2026-10-10
 
 ### Fixed
