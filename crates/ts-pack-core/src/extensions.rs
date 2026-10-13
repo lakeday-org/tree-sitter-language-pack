@@ -97,6 +97,8 @@ pub fn detect_language_from_path(path: &str) -> Option<&'static str> {
 /// dot-free keys, so compound extensions live here.
 const COMPOUND_EXTENSIONS: &[(&str, &str)] = &[
     (".app.src", "erlang"),
+    // ~keep `.j2.sql` is Jinja-templated SQL: the `sql` grammar errors on `{{ }}` placeholders, so route to jinja2.
+    (".j2.sql", "jinja2"),
     // ~keep dotfiles and multi-dot names have no plain extension, so they only resolve here.
     (".rs.html", "rshtml"),
     ("kitty.conf", "kitty"),
@@ -287,6 +289,14 @@ mod tests {
         // dotenv files carry no plain extension.
         assert_eq!(detect_language_from_path(".env"), Some("dotenv"));
         assert_eq!(detect_language_from_path("service/.env"), Some("dotenv"));
+    }
+
+    #[test]
+    fn test_templated_sql_resolves_to_jinja2() {
+        assert_eq!(detect_language_from_path("etl/create_table.j2.sql"), Some("jinja2"));
+        assert_eq!(detect_language_from_path("CREATE_TABLE.J2.SQL"), Some("jinja2"));
+        assert_eq!(detect_language_from_path("create_table.sql.j2"), Some("jinja2"));
+        assert_eq!(detect_language_from_path("create_table.sql"), Some("sql"));
     }
 
     #[test]
