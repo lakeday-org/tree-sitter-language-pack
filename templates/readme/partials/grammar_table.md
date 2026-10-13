@@ -58,7 +58,7 @@
 | CSS | [tree-sitter/tree-sitter-css](https://github.com/tree-sitter/tree-sitter-css) | 14 | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | Cst | [tree-sitter-grammars/tree-sitter-cst](https://github.com/tree-sitter-grammars/tree-sitter-cst) | 14 | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | CSV | [amaanq/tree-sitter-csv](https://github.com/amaanq/tree-sitter-csv) | 14 | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| CUDA | [tree-sitter-grammars/tree-sitter-cuda](https://github.com/tree-sitter-grammars/tree-sitter-cuda) | 14 | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ |
+| CUDA | [tree-sitter-grammars/tree-sitter-cuda](https://github.com/tree-sitter-grammars/tree-sitter-cuda) | 15 | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | Cue | [eonpatapon/tree-sitter-cue](https://github.com/eonpatapon/tree-sitter-cue) | 14 | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ |
 | Cylc | [elliotfontaine/tree-sitter-cylc](https://github.com/elliotfontaine/tree-sitter-cylc) | 14 | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ |
 | Cypher | [taekwombo/tree-sitter-cypher](https://github.com/taekwombo/tree-sitter-cypher) | 14 | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |

@@ -63,7 +63,7 @@ tree-sitter-language-pack supports **372** languages.
 | CSS | `.css` | [tree-sitter/tree-sitter-css](https://github.com/tree-sitter/tree-sitter-css) | 14 |
 | Cst | `.cst` | [tree-sitter-grammars/tree-sitter-cst](https://github.com/tree-sitter-grammars/tree-sitter-cst) | 14 |
 | CSV | `.csv` | [amaanq/tree-sitter-csv](https://github.com/amaanq/tree-sitter-csv) | 14 |
-| CUDA | `.cu`, `.cuda` | [tree-sitter-grammars/tree-sitter-cuda](https://github.com/tree-sitter-grammars/tree-sitter-cuda) | 14 |
+| CUDA | `.cu`, `.cuda` | [tree-sitter-grammars/tree-sitter-cuda](https://github.com/tree-sitter-grammars/tree-sitter-cuda) | 15 |
 | Cue | `.cue` | [eonpatapon/tree-sitter-cue](https://github.com/eonpatapon/tree-sitter-cue) | 14 |
 | Cylc | `.cylc` | [elliotfontaine/tree-sitter-cylc](https://github.com/elliotfontaine/tree-sitter-cylc) | 14 |
 | Cypher | `.cypher`, `.cql` | [taekwombo/tree-sitter-cypher](https://github.com/taekwombo/tree-sitter-cypher) | 14 |
@@ -390,6 +390,7 @@ The following grammars ship at a higher ABI because their committed `parser.c` i
 - AL (ABI 15)
 - Cpp (ABI 15)
 - Csharp (ABI 15)
+- CUDA (ABI 15)
 - F# (ABI 15)
 - Fortran (ABI 15)
 - gnuplot (ABI 15)
