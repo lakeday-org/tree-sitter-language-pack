@@ -36,6 +36,14 @@ values = [
   "**/vendor/**",
   "**/Cargo.toml",
   "docs-site/src/snippets/generated/**",
+  "plugin/plugin.json",
+  "plugin/mcp.json",
+  "plugin/.pi/**",
+  "plugin/.github/**",
+  ".github/plugin/**",
+  ".cursor-plugin/marketplace.json",
+  ".ai-rulez/.generated-manifest.json",
+  "plugin/.ai-rulez/.generated-manifest.json",
   "scripts/tests/lib/**",
   "**/*.java",
   "**/fixtures/**",
@@ -86,6 +94,7 @@ values = [
   "crates/*-wasm/**",
   "crates/*-ffi/include/*.h",
   "packages/go/include/*.h",
+  "skills/**",
 ]
 
 [[entries]]
@@ -124,6 +133,14 @@ values = [
   "**/vendor/**",
   "**/Cargo.toml",
   "docs-site/src/snippets/generated/**",
+  "plugin/plugin.json",
+  "plugin/mcp.json",
+  "plugin/.pi/**",
+  "plugin/.github/**",
+  ".github/plugin/**",
+  ".cursor-plugin/marketplace.json",
+  ".ai-rulez/.generated-manifest.json",
+  "plugin/.ai-rulez/.generated-manifest.json",
   "scripts/tests/lib/**",
   "**/*.java",
   "**/fixtures/**",
@@ -174,6 +191,7 @@ values = [
   "crates/*-wasm/**",
   "crates/*-ffi/include/*.h",
   "packages/go/include/*.h",
+  "skills/**",
   ".alef-ownership.toml",
   "sources/grammar_notices.json",
 ]
@@ -204,6 +222,14 @@ values = [
   "**/vendor/**",
   "**/Cargo.toml",
   "docs-site/src/snippets/generated/**",
+  "plugin/plugin.json",
+  "plugin/mcp.json",
+  "plugin/.pi/**",
+  "plugin/.github/**",
+  ".github/plugin/**",
+  ".cursor-plugin/marketplace.json",
+  ".ai-rulez/.generated-manifest.json",
+  "plugin/.ai-rulez/.generated-manifest.json",
   "scripts/tests/lib/**",
   "**/*.java",
   "**/fixtures/**",
@@ -254,6 +280,7 @@ values = [
   "crates/*-wasm/**",
   "crates/*-ffi/include/*.h",
   "packages/go/include/*.h",
+  "skills/**",
 ]
 
 [[entries]]
@@ -282,6 +309,14 @@ values = [
   "**/vendor/**",
   "**/Cargo.toml",
   "docs-site/src/snippets/generated/**",
+  "plugin/plugin.json",
+  "plugin/mcp.json",
+  "plugin/.pi/**",
+  "plugin/.github/**",
+  ".github/plugin/**",
+  ".cursor-plugin/marketplace.json",
+  ".ai-rulez/.generated-manifest.json",
+  "plugin/.ai-rulez/.generated-manifest.json",
   "scripts/tests/lib/**",
   "**/*.java",
   "**/fixtures/**",
@@ -332,6 +367,7 @@ values = [
   "crates/*-wasm/**",
   "crates/*-ffi/include/*.h",
   "packages/go/include/*.h",
+  "skills/**",
 ]
 
 [[entries]]

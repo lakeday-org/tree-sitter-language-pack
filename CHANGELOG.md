@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.22.2] - 2026-10-14
+
+### Added
+
+- `.j2.sql` files are detected as `jinja2` instead of `sql`, which cannot parse Jinja placeholders (#205).
+
+### Fixed
+
+- Python `get_language()` and `get_parser()` release the GIL while a grammar downloads, so other threads and the
+  asyncio loop keep running. The 1.21.0 regeneration had dropped this fix; a contract test now guards it (#206).
+- The generated grammar tables list `cuda` at ABI 15 with its highlights query only, matching what ships. The tables
+  were stale since 1.22.0 and kept the grammar-table CI gate red.
+
+### Changed
+
+- Regenerated bindings with Alef 0.110.10.
+
 ## [1.22.1] - 2026-10-12
 
 ### Fixed

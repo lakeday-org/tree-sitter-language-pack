@@ -11,4 +11,4 @@
 # Do not hand-edit; it is rewritten by `alef generate`/`alef all` on every successful run.
 
 [crates]
-tree-sitter-language-pack = "ae6c1679524379d090291edd390bdf2e304b07749e4c1d3365d341e63460eb91"
+tree-sitter-language-pack = "d4b3b828bef72690a4484425d4133efbb0705af4d0a8d1543e03e787e47d5b62"
