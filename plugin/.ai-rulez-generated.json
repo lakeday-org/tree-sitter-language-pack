@@ -1,6 +1,6 @@
 {
   "schema_version": "v1",
-  "source_hash": "blake3:efae3727ca438503ba120a15b3d8deb4080d4ed07e4fd61500fcf321367b8183",
+  "source_hash": "blake3:f6af1693d7e3d301871730c180582f140a9c6aeee0d040ba3edbfb33b5d38409",
   "outputs": {
     ".claude-plugin/plugin.json": {
       "content_hash": "blake3:8367d7adb62a93412633392593cea1efd2f1d5c829a527d76368e361ca28348d",
@@ -75,7 +75,7 @@
       "mode": "0644"
     },
     ".hermes/package/pyproject.toml": {
-      "content_hash": "blake3:92cff71ea36752f752ff10d4558f7647c6a6d9975aca570574d50124da6d9b73",
+      "content_hash": "blake3:784108484897341d023821e92f59e0dd48c31b71c6dbca02dfc3a586eb032ea8",
       "mode": "0644"
     },
     ".hermes/package/src/tree_sitter_language_pack_hermes_plugin/__init__.py": {

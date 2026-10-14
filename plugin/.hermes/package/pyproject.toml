@@ -6,9 +6,14 @@ build-backend = 'hatchling.build'
 name = 'tree-sitter-language-pack-hermes-plugin'
 version = '1.22.2'
 description = 'Parse and extract code intelligence from 372 programming languages with tree-sitter — structure, imports, symbols, and syntax-aware chunking.'
+license = 'MIT'
 requires-python = '>=3.11'
 dependencies = ['mcp==1.28.1', 'PyYAML==6.0.3']
 keywords = ['tree-sitter', 'code-intelligence', 'parsing', 'chunking', 'static-analysis']
+
+[project.readme]
+content-type = 'text/markdown'
+text = "# tree-sitter-language-pack Hermes plugin\n\nParse and extract code intelligence from 372 programming languages with tree-sitter — structure, imports, symbols, and syntax-aware chunking.\n\nInstall this package in the same Python environment as Hermes Agent:\n\n```sh\npython -m pip install tree-sitter-language-pack-hermes-plugin\n```\n\nEnable the plugin through Hermes Agent's plugin configuration. Available registrations depend on the plugin's authored Hermes adapter.\n"
 
 [project.entry-points]
 [project.entry-points.'hermes_agent.plugins']
