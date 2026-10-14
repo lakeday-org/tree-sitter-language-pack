@@ -969,6 +969,9 @@ jobs:
       - name: Run E2E tests
         run: cd e2e/python && pip install -e . && pytest tests/ -v
 
+      - name: Run GIL-release contract test
+        run: pytest contract-tests/python-gil -v
+
   build-node:
     name: Build Node.js (${{ matrix.platform }})
     if: |
