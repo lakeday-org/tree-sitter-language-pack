@@ -6,7 +6,7 @@ name: tree-sitter-language-pack-extracting-code-structure
 <!--
 AI-RULEZ :: GENERATED FILE — DO NOT EDIT
 Content-Hash: blake3:134c19e688f04cc2315c2ffa5fc4c6a567c9166258bc1cc5b1f19f4acfcbddb7
-Source-Hash: blake3:3943dbd87fc16cef858ef879723581d4e6c392ea827fbdf825d1cbd7a304abc7
+Source-Hash: blake3:efae3727ca438503ba120a15b3d8deb4080d4ed07e4fd61500fcf321367b8183
 Schema-Version: v1
 -->
 

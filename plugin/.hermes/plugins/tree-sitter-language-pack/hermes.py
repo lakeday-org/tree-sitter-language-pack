@@ -1,6 +1,6 @@
 # AI-RULEZ :: GENERATED FILE — DO NOT EDIT
-# Content-Hash: blake3:2606338a8626cb3b08a1a5c0aa777f7aeb4fca0a48a2f561c327f4e282859be2
-# Source-Hash: blake3:3943dbd87fc16cef858ef879723581d4e6c392ea827fbdf825d1cbd7a304abc7
+# Content-Hash: blake3:02249c93f2d3aff17ad0f14af723a89b09e2d7818628be65ca00b70a1c354718
+# Source-Hash: blake3:efae3727ca438503ba120a15b3d8deb4080d4ed07e4fd61500fcf321367b8183
 # Schema-Version: v1
 
 """Register product skills and a local MCP tool bridge with Hermes."""
@@ -8,6 +8,7 @@
 from __future__ import annotations
 
 import asyncio
+import json
 import os
 import shutil
 from builtins import ExceptionGroup
@@ -69,6 +70,11 @@ async def call_tool(arguments: dict[str, object], **_kwargs: object) -> dict[str
         return {"error": f"{CLI_COMMAND} MCP request failed: {error_details(error)}"}
 
 
+async def handle_tool(arguments: dict[str, object], **kwargs: object) -> str:
+    """Return the native text contract while preserving structured MCP fields as JSON."""
+    return json.dumps(await call_tool(arguments, **kwargs), ensure_ascii=False)
+
+
 def register(ctx: PluginContext) -> None:
     """Register every bundled skill and one tool spanning the native MCP surface."""
     for path in sorted((Path(__file__).parent / "skills").glob("*/SKILL.md")):
@@ -90,4 +96,4 @@ def register(ctx: PluginContext) -> None:
             "additionalProperties": False,
         },
     }
-    ctx.register_tool(name=name, toolset=PLUGIN_NAME, schema=schema, handler=call_tool, is_async=True)
+    ctx.register_tool(name=name, toolset=PLUGIN_NAME, schema=schema, handler=handle_tool, is_async=True)

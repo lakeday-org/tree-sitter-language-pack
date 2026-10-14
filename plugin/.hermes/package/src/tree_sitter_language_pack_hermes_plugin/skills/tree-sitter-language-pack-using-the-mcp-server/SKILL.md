@@ -6,7 +6,7 @@ name: tree-sitter-language-pack-using-the-mcp-server
 <!--
 AI-RULEZ :: GENERATED FILE — DO NOT EDIT
 Content-Hash: blake3:32a9429c4f5c314cfb1deb3eca4cab52f4c96283e07d68ecf017e925486e72ac
-Source-Hash: blake3:3943dbd87fc16cef858ef879723581d4e6c392ea827fbdf825d1cbd7a304abc7
+Source-Hash: blake3:efae3727ca438503ba120a15b3d8deb4080d4ed07e4fd61500fcf321367b8183
 Schema-Version: v1
 -->
 
