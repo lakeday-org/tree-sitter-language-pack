@@ -1,0 +1,50 @@
+# ai-rulez.lock: pins remote includes, installed skills and authored content. Commit this file.
+# Refresh it with `ai-rulez lock`; `ai-rulez generate --locked` fails when it is stale.
+
+version = 1
+ai_rulez_version = '5.2.1'
+scope = 'all'
+outputs_pinned = true
+tree = 'sha256:7f6131717a879e567831ee7b7141da68e10d3fe45191480d57cad4398d2e81c2'
+
+[[item]]
+kind = 'skill'
+id = 'tree-sitter-language-pack'
+path = 'skills/tree-sitter-language-pack'
+digest = 'sha256:6d8b60d6189a56dc2ba63d2c446769599ac401801abe2f60ebf0ea6de5284430'
+
+[[item]]
+kind = 'skill'
+id = 'tree-sitter-language-pack-chunking-for-llms'
+path = 'skills/tree-sitter-language-pack-chunking-for-llms'
+digest = 'sha256:fb5e3790eaeefdd664b28ec008fbd3905ba91f092c3a9eff5b3ea634b81f16a2'
+
+[[item]]
+kind = 'skill'
+id = 'tree-sitter-language-pack-detecting-languages'
+path = 'skills/tree-sitter-language-pack-detecting-languages'
+digest = 'sha256:a0d64df5de8bd766851e90069e2ae207a675b49cdcc81418ce48310bda713bfb'
+
+[[item]]
+kind = 'skill'
+id = 'tree-sitter-language-pack-extracting-code-structure'
+path = 'skills/tree-sitter-language-pack-extracting-code-structure'
+digest = 'sha256:914d975cda6c2c6c0b5827567e635589452c592bc76002b6f0d5b1dac772c18c'
+
+[[item]]
+kind = 'skill'
+id = 'tree-sitter-language-pack-managing-parsers'
+path = 'skills/tree-sitter-language-pack-managing-parsers'
+digest = 'sha256:851919de0ac0454a7d602816260dc2c8e670d5ef2c9a9fc14afefe3df53d6acb'
+
+[[item]]
+kind = 'skill'
+id = 'tree-sitter-language-pack-parsing-source'
+path = 'skills/tree-sitter-language-pack-parsing-source'
+digest = 'sha256:9796d0cee83f5b805929432cc24670e2fd709f5c2f09d90b5fb2188ffed1f87c'
+
+[[item]]
+kind = 'skill'
+id = 'tree-sitter-language-pack-using-the-mcp-server'
+path = 'skills/tree-sitter-language-pack-using-the-mcp-server'
+digest = 'sha256:08105f61fa0489a8b6659261b6fc7e0f32ff913c6577101faf64fbaa6a0d7732'

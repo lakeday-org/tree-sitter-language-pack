@@ -1,9 +1,5 @@
-import { tool } from "@opencode-ai/plugin";
+import { registerBundledContent } from "../ai-rulez-content.js";
 import { spawn } from "node:child_process";
-
-const schema = tool.schema;
-
-const parseFormat = schema.enum(["sexp", "json"]).default("sexp").describe("Parse output format.");
 
 function hasValue(value) {
   return value !== undefined && value !== null && value !== "";
@@ -68,76 +64,54 @@ function runCli(args, context) {
   });
 }
 
-export const TreeSitterLanguagePackPlugin = async () => ({
-  tool: {
-    tspack_parse: tool({
-      description: "Parse a source file into a tree-sitter syntax tree with the ts-pack CLI.",
-      args: {
-        file: schema.string().min(1).describe("Path to the source file."),
-        language: schema
-          .string()
-          .min(1)
-          .optional()
-          .describe("Language override (auto-detected from extension if omitted)."),
-        format: parseFormat,
-      },
-      async execute(args, context) {
-        const cliArgs = ["parse", args.file, "--format", args.format];
-        pushOption(cliArgs, "--language", args.language);
-        return runCli(cliArgs, context);
-      },
-    }),
-    tspack_process: tool({
-      description:
-        "Extract code intelligence (structure, imports, exports, symbols, docstrings, comments, diagnostics) from a source file with the ts-pack CLI. Output is JSON.",
-      args: {
-        file: schema.string().min(1).describe("Path to the source file."),
-        language: schema
-          .string()
-          .min(1)
-          .optional()
-          .describe("Language override (auto-detected from extension if omitted)."),
-        all: schema.boolean().optional().describe("Enable all analysis features."),
-        structure: schema.boolean().optional().describe("Extract structure (functions, classes)."),
-        imports: schema.boolean().optional().describe("Extract imports."),
-        exports: schema.boolean().optional().describe("Extract exports."),
-        comments: schema.boolean().optional().describe("Extract comments."),
-        symbols: schema.boolean().optional().describe("Extract symbols."),
-        docstrings: schema.boolean().optional().describe("Extract docstrings."),
-        diagnostics: schema.boolean().optional().describe("Include syntax diagnostics."),
-        chunk_size: schema
-          .number()
-          .int()
-          .positive()
-          .optional()
-          .describe("Maximum chunk size in bytes (enables syntax-aware chunking)."),
-      },
-      async execute(args, context) {
-        const cliArgs = ["process", args.file];
-        pushOption(cliArgs, "--language", args.language);
-        pushFlag(cliArgs, "--all", args.all);
-        pushFlag(cliArgs, "--structure", args.structure);
-        pushFlag(cliArgs, "--imports", args.imports);
-        pushFlag(cliArgs, "--exports", args.exports);
-        pushFlag(cliArgs, "--comments", args.comments);
-        pushFlag(cliArgs, "--symbols", args.symbols);
-        pushFlag(cliArgs, "--docstrings", args.docstrings);
-        pushFlag(cliArgs, "--diagnostics", args.diagnostics);
-        pushOption(cliArgs, "--chunk-size", args.chunk_size);
-        return runCli(cliArgs, context);
-      },
-    }),
-    tspack_info: tool({
-      description:
-        "Show details about a language (whether it is known and cached) with the ts-pack CLI. Use to confirm a language is supported before parsing.",
-      args: {
-        language: schema.string().min(1).describe("Language name (e.g. python, rust, typescript)."),
-      },
-      async execute(args, context) {
-        return runCli(["info", args.language], context);
-      },
-    }),
+const file = { type: "string", minLength: 1, description: "Path to the source file." };
+const language = { type: "string", minLength: 1, description: "Language override; auto-detected if omitted." };
+const analysis = ["all", "structure", "imports", "exports", "comments", "symbols", "docstrings", "diagnostics"];
+
+function input(properties, required) {
+  return { type: "object", properties, required, additionalProperties: false };
+}
+
+export const TreeSitterLanguagePackPlugin = {
+  id: "tree-sitter-language-pack",
+  async setup(ctx) {
+    await registerBundledContent(ctx);
+    await ctx.tool.transform((editor) => {
+      editor.add({
+        name: "tspack_parse",
+        description: "Parse a source file into a tree-sitter syntax tree with ts-pack.",
+        input: input({ file, language, format: { type: "string", enum: ["sexp", "json"], default: "sexp" } }, ["file"]),
+        execute(args, context) {
+          const cliArgs = ["parse", args.file, "--format", args.format ?? "sexp"];
+          pushOption(cliArgs, "--language", args.language);
+          return runCli(cliArgs, { ...context, directory: ctx.location.directory });
+        },
+      });
+      const properties = { file, language, chunk_size: { type: "integer", minimum: 1 } };
+      for (const name of analysis) properties[name] = { type: "boolean" };
+      editor.add({
+        name: "tspack_process",
+        description:
+          "Extract code structure, imports, exports, symbols, docstrings, comments and diagnostics with ts-pack.",
+        input: input(properties, ["file"]),
+        execute(args, context) {
+          const cliArgs = ["process", args.file];
+          pushOption(cliArgs, "--language", args.language);
+          for (const name of analysis) pushFlag(cliArgs, "--" + name, args[name]);
+          pushOption(cliArgs, "--chunk-size", args.chunk_size);
+          return runCli(cliArgs, { ...context, directory: ctx.location.directory });
+        },
+      });
+      editor.add({
+        name: "tspack_info",
+        description: "Show whether a language is supported and cached before parsing.",
+        input: input({ language }, ["language"]),
+        execute(args, context) {
+          return runCli(["info", args.language], { ...context, directory: ctx.location.directory });
+        },
+      });
+    });
   },
-});
+};
 
 export default TreeSitterLanguagePackPlugin;

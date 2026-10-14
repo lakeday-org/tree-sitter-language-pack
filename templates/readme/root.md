@@ -275,7 +275,24 @@ For detailed setup, transport options, and tool reference, see the [MCP Server g
 
 ### AI Coding Assistants
 
-Install the tree-sitter-language-pack plugin from [`xberg-io/tree-sitter-language-pack`](https://github.com/xberg-io/tree-sitter-language-pack). It ships the tree-sitter-language-pack agent skills (parse and extract code intelligence from 372 languages) and works with every major coding agent — expand your harness below.
+Install the tree-sitter-language-pack plugin from [`xberg-io/tree-sitter-language-pack`](https://github.com/xberg-io/tree-sitter-language-pack). It ships the tree-sitter-language-pack agent skills (parse and extract code intelligence from 372 languages) — select your runtime below.
+
+The bundle targets Claude Code, Codex, Cursor, Gemini CLI, Kimi, OpenCode, Factory Droid,
+Hermes, Pi, Agent Plugins and GitHub Copilot CLI. Read [the plugin guide](https://github.com/xberg-io/tree-sitter-language-pack/blob/main/plugin/README.md)
+for runtime resources, CLI prerequisites and configuration. MCP-capable adapters expose the
+product's tools; Hermes uses a local stdio bridge and explicitly selected skills. Pi loads
+skills and prompt templates and requires the product CLI for executable operations.
+
+Install only the public [Agent Skills](https://github.com/xberg-io/tree-sitter-language-pack/tree/main/skills),
+without a plugin or MCP registration, using the [skills CLI](https://github.com/vercel-labs/skills):
+
+```sh
+npx skills add xberg-io/tree-sitter-language-pack --list
+npx skills add xberg-io/tree-sitter-language-pack
+```
+
+Choose the skills and target agents interactively. Installing instructions does not install the
+product CLI or configure provider credentials.
 
 <details open>
 <summary><strong>Claude Code</strong></summary>
@@ -308,9 +325,14 @@ Settings → Plugins → Add from URL → `https://github.com/xberg-io/tree-sitt
 <details>
 <summary><strong>Gemini CLI</strong></summary>
 
-```text
-gemini extensions install https://github.com/xberg-io/tree-sitter-language-pack
+From a checkout of this repository:
+
+```sh
+gemini extensions install ./plugin
 ```
+
+The manifest is inside `plugin/`. See the [Gemini extension reference](https://geminicli.com/docs/extensions/reference/)
+for local installation and updates.
 
 </details>
 

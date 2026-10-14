@@ -1,23 +1,17 @@
 ---
-name: tree-sitter-language-pack
-description: >-
-  Parse and extract code intelligence from 372 programming languages using
-  tree-sitter grammars. Use when writing code that parses source, extracts
-  structure/imports/exports/symbols/docstrings/comments, detects a language,
-  runs syntax diagnostics, or produces syntax-aware chunks for LLMs — in
-  Rust, Python, Node.js/TypeScript, or the ts-pack CLI. Covers installation,
-  the CLI surface, the SDK surface, and parser-cache management.
+description: Parse and extract code intelligence from 372 programming languages using tree-sitter grammars. Use when writing code that parses source, extracts structure/imports/exports/symbols/docstrings/comments, detects a language, runs syntax diagnostics, or produces syntax-aware chunks for LLMs — in Rust, Python, Node.js/TypeScript, or the ts-pack CLI. Covers installation, the CLI surface, the SDK surface, and parser-cache management.
 license: MIT
 metadata:
-  author: xberg-io
-  version: "0.1.0"
-  repository: https://github.com/xberg-io/tree-sitter-language-pack
+    author: xberg-io
+    version: "0.1.0"
+    repository: https://github.com/xberg-io/tree-sitter-language-pack
+name: tree-sitter-language-pack
 ---
 
 <!--
 AI-RULEZ :: GENERATED FILE — DO NOT EDIT
-Content-Hash: blake3:5804679b14433e46f0c5db2759b40df83832f093304c222a026f06d6a6b8c4cf
-Source-Hash: blake3:025d8c66faabe878b3b55566c7678566120205bf1f4d2fb2b87ef4dd2b4701bb
+Content-Hash: blake3:6d3b039552725cf0766102da5d5ca077c50d9d1edf566af974bbfccb22831c36
+Source-Hash: blake3:956eee21715c73b2a257f8565221b2b4dac42d74969805015891a34857163232
 Schema-Version: v1
 -->
 
@@ -73,7 +67,7 @@ documents (PDF, Office, HTML), use Xberg instead.
 - **MCP server (`ts-pack mcp`)** — exposes `parse`/`process`/`detect_language`
   (plus language and cache tools) as agent tools, so an MCP client can parse
   and analyze code directly with no shell-out.
-  This plugin auto-registers it; see the **using-the-mcp-server** skill.
+  This plugin auto-registers it; see the **tree-sitter-language-pack-using-the-mcp-server** skill.
 
 Prefer the CLI for ad-hoc work in an agent session; prefer the SDK when the
 result feeds back into a larger program; prefer the MCP server when the agent
@@ -210,17 +204,17 @@ ts-pack cache-dir                         # where the cache lives
 ts-pack clean --force                     # wipe the cache
 ```
 
-See the `managing-parsers` skill for the full cache workflow.
+See the `tree-sitter-language-pack-managing-parsers` skill for the full cache workflow.
 
 ## Related skills
 
-- `parsing-source` — parse a file into a syntax tree / s-expression.
-- `extracting-code-structure` — `process` with structure/imports/exports/
+- `tree-sitter-language-pack-parsing-source` — parse a file into a syntax tree / s-expression.
+- `tree-sitter-language-pack-extracting-code-structure` — `process` with structure/imports/exports/
   symbols/docstrings.
-- `chunking-for-llms` — `--chunk-size` syntax-aware splitting.
-- `detecting-languages` — detect by path, extension, or content.
-- `managing-parsers` — download/clean/list/info parser-cache management.
-- `using-the-mcp-server` — call `parse`/`process`/`detect_language` over MCP
+- `tree-sitter-language-pack-chunking-for-llms` — `--chunk-size` syntax-aware splitting.
+- `tree-sitter-language-pack-detecting-languages` — detect by path, extension, or content.
+- `tree-sitter-language-pack-managing-parsers` — download/clean/list/info parser-cache management.
+- `tree-sitter-language-pack-using-the-mcp-server` — call `parse`/`process`/`detect_language` over MCP
   instead of the CLI.
 
 Full documentation: <https://github.com/xberg-io/tree-sitter-language-pack>

@@ -58,12 +58,12 @@ Rust, Ruby, Go, Java, C#, PHP, Elixir, Dart, Kotlin (Android), Swift, Zig, and W
 | Skill | Trigger |
 |-------|---------|
 | **tree-sitter-language-pack** | Parse and extract code intelligence from 372 languages. Use when writing code that parses source, extracts structure/imports/exports/symbols/docstrings/comments, detects a language, runs diagnostics, or chunks code for LLMs — in Rust, Python, Node.js/TypeScript, or the ts-pack CLI. |
-| **parsing-source** | Use when the user wants a tree-sitter syntax tree for a source file — an s-expression dump or JSON tree. |
-| **extracting-code-structure** | Use when the user wants structured code metadata — functions, classes, imports, exports, symbols, docstrings, comments, or syntax diagnostics. |
-| **chunking-for-llms** | Use when splitting source code into chunks for an LLM context window without breaking syntax mid-construct. |
-| **detecting-languages** | Use when the user wants to know which programming language a file or snippet is — by path, extension, or content. |
-| **managing-parsers** | Use when managing the parser cache — prefetch for offline/CI, list downloaded languages, inspect a language, find the cache dir, or clean it. |
-| **using-the-mcp-server** | Use when parsing, processing, or detecting languages through the MCP server's `parse`/`process`/`detect_language` tools instead of the CLI. Covers the tool surface and the auto-installing launcher. |
+| **tree-sitter-language-pack-parsing-source** | Use when the user wants a tree-sitter syntax tree for a source file — an s-expression dump or JSON tree. |
+| **tree-sitter-language-pack-extracting-code-structure** | Use when the user wants structured code metadata — functions, classes, imports, exports, symbols, docstrings, comments, or syntax diagnostics. |
+| **tree-sitter-language-pack-chunking-for-llms** | Use when splitting source code into chunks for an LLM context window without breaking syntax mid-construct. |
+| **tree-sitter-language-pack-detecting-languages** | Use when the user wants to know which programming language a file or snippet is — by path, extension, or content. |
+| **tree-sitter-language-pack-managing-parsers** | Use when managing the parser cache — prefetch for offline/CI, list downloaded languages, inspect a language, find the cache dir, or clean it. |
+| **tree-sitter-language-pack-using-the-mcp-server** | Use when parsing, processing, or detecting languages through the MCP server's `parse`/`process`/`detect_language` tools instead of the CLI. Covers the tool surface and the auto-installing launcher. |
 
 ## MCP server
 
@@ -96,7 +96,7 @@ discovery; a code-analysis prompt; and language-name completions.
 The launcher auto-installs a binary on first run (override with
 `TS_PACK_LAUNCHER=auto|npx|brew|download`). The `mcp` subcommand ships in a
 recent release of the tool; an older binary on `PATH` may need an upgrade to
-expose it. See the **using-the-mcp-server** skill for details.
+expose it. See the **tree-sitter-language-pack-using-the-mcp-server** skill for details.
 
 ## CLI
 
@@ -187,3 +187,55 @@ MIT. The upstream [tree-sitter-language-pack](https://github.com/xberg-io/tree-s
 
 - **Marketplace**: this repo — `/plugin marketplace add xberg-io/tree-sitter-language-pack`
 - **Upstream**: [xberg-io/tree-sitter-language-pack](https://github.com/xberg-io/tree-sitter-language-pack)
+
+## Generated runtime bundles
+
+`plugin/.ai-rulez/config.toml` loads `config.plugins.toml` through the `plugins` layer;
+skills, commands and runtime adapters are authored alongside it. AI-Rulez 5.2.1 generates
+all eleven supported runtimes: Claude, Cursor, Codex, Gemini, Kimi, OpenCode, Factory,
+Hermes, Pi, Agent Plugins and Copilot. Codex ships both manifest layouts; repository-root
+Claude and Codex marketplace indexes point to the `plugin` bundle. Cursor also has a marketplace index.
+
+Pi packages skills and prompts without MCP integration. Copilot packages skills and MCP configuration, but does not package slash commands or hooks.
+Hermes includes a Python package under `.hermes/package`; OpenCode and Pi share the npm package.
+The Agent Plugins manifest uses the stable 1.0 specification. Runtime capabilities differ;
+install the CLI before using skills in a runtime without MCP registration.
+
+Run `ai-rulez generate --plugin` from the repository root to regenerate and
+`ai-rulez verify --plugin` to compare current source output and provenance.
+The release workflow packages every runtime into a deterministic archive, checksums,
+and marketplace metadata; npm and PyPI retain their existing publishing jobs.
+
+## Hermes runtime setup
+
+Install the product CLI with MCP support and put it on Hermes' PATH before using the plugin.
+The Hermes adapter registers every bundled skill under the product namespace and provides
+`tree_sitter_language_pack_call`, which calls the selected native MCP tool with `tool_arguments` through a local
+stdio session. Select `tool: "list_tools"` first to inspect the server's exact request schemas. Hermes skills are selected explicitly; they are not automatically appended to the
+system prompt. Enable the plugin in Hermes configuration; project plugins also require
+`HERMES_ENABLE_PROJECT_PLUGINS=true`.
+
+The bridge uses the installed CLI directly. The auto-installing launchers used by other MCP clients
+are not included in the Hermes Python wheel. Provider credentials are inherited from the environment,
+and are needed for provider-backed requests. Missing CLIs, unavailable tools and model preparation
+fail with an actionable request error. CLI result data remains untrusted document content.
+
+## Public Agent Skills
+
+The repository-root `skills/` directory contains the same generated skills and supporting
+resources as `plugin/skills/`. Install them independently of a plugin runtime:
+
+```sh
+npx skills add xberg-io/tree-sitter-language-pack --skill tree-sitter-language-pack
+```
+
+Edit `plugin/.ai-rulez/skills`, then run `task plugin:generate` to regenerate runtime
+bundles and synchronize the public export. `task plugin:verify` checks both projections;
+`task plugin:skills:test` verifies resource freshness, ownership and symlink protection.
+The public ownership manifest records SHA-256 hashes of every exported file.
+
+Download integrity: the launcher currently relies on HTTPS for direct binary downloads.
+Verify release checksums separately when available before manually installing an archive.
+
+Launcher and visual assets are authored in `plugin/.ai-rulez/scripts/` and
+`plugin/.ai-rulez/assets/`; `task plugin:generate` copies them into the runtime bundle.

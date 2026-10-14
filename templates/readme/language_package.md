@@ -53,6 +53,19 @@
 
 {% include 'partials/installation.md' %}
 
+## Coding-agent plugin
+
+Install the [tree-sitter-language-pack plugin](https://github.com/xberg-io/tree-sitter-language-pack/blob/main/plugin/README.md)
+for product skills and runtime integrations, or install [public skills](https://github.com/xberg-io/tree-sitter-language-pack/tree/main/skills)
+independently:
+
+```sh
+npx skills add xberg-io/tree-sitter-language-pack
+```
+
+Select the skills and target agents interactively. Install the product CLI separately for
+executable operations; the skill installer adds instructions only.
+
 ## Quick Start
 
 {% include 'partials/quick_start.md' %}
@@ -60,6 +73,7 @@
 ## Features
 
 {% if language == "wasm" %}
+
 - **Curated grammar subset** — a fixed set of common web and mainstream grammars is compiled into the bundle. A full 372-grammar wasm build is impractical: the parser sources total ~1.7 GB and the largest grammars exhaust the wasm32 clang backend.
 - **Self-contained bundle** — grammars ship inside the module. There is no runtime download and no local cache; wasm32 has no dynamic loading.
 {% else %}

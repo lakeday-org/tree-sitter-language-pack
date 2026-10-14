@@ -1,32 +1,80 @@
 {
-  "name": "@xberg-io/opencode-tree-sitter-language-pack",
-  "version": "1.22.1",
-  "description": "Parse and extract code intelligence from 372 programming languages with tree-sitter — structure, imports, symbols, and syntax-aware chunking.",
-  "keywords": [
-    "tree-sitter",
-    "code-intelligence",
-    "parsing",
-    "chunking",
-    "static-analysis"
-  ],
-  "homepage": "https://xberg.io",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/xberg-io/tree-sitter-language-pack"
+  "author": {
+    "email": "contact@xberg.io",
+    "name": "Kreuzberg, Inc.",
+    "url": "https://xberg.io"
   },
-  "license": "MIT",
-  "type": "module",
-  "main": ".opencode/plugins/tree-sitter-language-pack.js",
+  "dependencies": {
+    "@opencode/plugin": "^2.0.26"
+  },
+  "description": "Parse and extract code intelligence from 372 programming languages with tree-sitter — structure, imports, symbols, and syntax-aware chunking.",
   "exports": {
     ".": "./.opencode/plugins/tree-sitter-language-pack.js"
   },
   "files": [
-    ".opencode/",
-    "assets/",
+    ".opencode/ai-rulez-bundle.json",
+    ".opencode/ai-rulez-content.js",
+    ".opencode/plugins/tree-sitter-language-pack.js",
+    ".opencode/skills/tree-sitter-language-pack-chunking-for-llms/SKILL.md",
+    ".opencode/skills/tree-sitter-language-pack-chunking-for-llms/index.md",
+    ".opencode/skills/tree-sitter-language-pack-detecting-languages/SKILL.md",
+    ".opencode/skills/tree-sitter-language-pack-detecting-languages/index.md",
+    ".opencode/skills/tree-sitter-language-pack-extracting-code-structure/SKILL.md",
+    ".opencode/skills/tree-sitter-language-pack-extracting-code-structure/index.md",
+    ".opencode/skills/tree-sitter-language-pack-managing-parsers/SKILL.md",
+    ".opencode/skills/tree-sitter-language-pack-managing-parsers/index.md",
+    ".opencode/skills/tree-sitter-language-pack-parsing-source/SKILL.md",
+    ".opencode/skills/tree-sitter-language-pack-parsing-source/index.md",
+    ".opencode/skills/tree-sitter-language-pack-using-the-mcp-server/SKILL.md",
+    ".opencode/skills/tree-sitter-language-pack-using-the-mcp-server/index.md",
+    ".opencode/skills/tree-sitter-language-pack/SKILL.md",
+    ".opencode/skills/tree-sitter-language-pack/index.md",
+    ".pi/skills/tree-sitter-language-pack-chunking-for-llms/SKILL.md",
+    ".pi/skills/tree-sitter-language-pack-chunking-for-llms/index.md",
+    ".pi/skills/tree-sitter-language-pack-detecting-languages/SKILL.md",
+    ".pi/skills/tree-sitter-language-pack-detecting-languages/index.md",
+    ".pi/skills/tree-sitter-language-pack-extracting-code-structure/SKILL.md",
+    ".pi/skills/tree-sitter-language-pack-extracting-code-structure/index.md",
+    ".pi/skills/tree-sitter-language-pack-managing-parsers/SKILL.md",
+    ".pi/skills/tree-sitter-language-pack-managing-parsers/index.md",
+    ".pi/skills/tree-sitter-language-pack-parsing-source/SKILL.md",
+    ".pi/skills/tree-sitter-language-pack-parsing-source/index.md",
+    ".pi/skills/tree-sitter-language-pack-using-the-mcp-server/SKILL.md",
+    ".pi/skills/tree-sitter-language-pack-using-the-mcp-server/index.md",
+    ".pi/skills/tree-sitter-language-pack/SKILL.md",
+    ".pi/skills/tree-sitter-language-pack/index.md",
     "README.md",
+    "assets/",
     "scripts/"
   ],
-  "dependencies": {
-    "@opencode/plugin": "^2.0.20"
-  }
+  "homepage": "https://xberg.io",
+  "keywords": [
+    "chunking",
+    "code-intelligence",
+    "parsing",
+    "pi-package",
+    "static-analysis",
+    "tree-sitter"
+  ],
+  "license": "MIT",
+  "main": ".opencode/plugins/tree-sitter-language-pack.js",
+  "name": "@xberg-io/opencode-tree-sitter-language-pack",
+  "pi": {
+    "prompts": [],
+    "skills": [
+      "./.pi/skills/tree-sitter-language-pack-chunking-for-llms",
+      "./.pi/skills/tree-sitter-language-pack-detecting-languages",
+      "./.pi/skills/tree-sitter-language-pack-extracting-code-structure",
+      "./.pi/skills/tree-sitter-language-pack-managing-parsers",
+      "./.pi/skills/tree-sitter-language-pack-parsing-source",
+      "./.pi/skills/tree-sitter-language-pack-using-the-mcp-server",
+      "./.pi/skills/tree-sitter-language-pack"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/xberg-io/tree-sitter-language-pack"
+  },
+  "type": "module",
+  "version": "1.22.1"
 }

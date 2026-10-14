@@ -258,10 +258,14 @@ poly.local.toml
 # BEGIN ai-rulez (DO NOT EDIT - managed by ai-rulez)
 .ai-rulez/.generated-manifest.local.json
 .ai-rulez/local/
+.github/agents/
+.github/prompts/iterate.prompt.md
+.github/prompts/parallelize.prompt.md
 .opencode/agents/
 .opencode/commands/
 .pi/agents/
 .pi/mcp.json
 .pi/prompts/
+.vscode/mcp.json
 opencode.json
 # END ai-rulez
