@@ -2859,7 +2859,7 @@ jobs:
       - name: Install ai-rulez
         uses: xberg-io/actions/setup-ai-rulez@6b88aedd553b798d084927cc8a0feeb88b3f6f1b
         with:
-          source-revision: 8f764e95a161851c2c974beb1d23cb775ebdce32
+          source-revision: 02a8bf25768d37648d4dac35f049c3671c9f7308
       # The plugin has no test suite. `plugin:verify` is the only failable check
       # that exists for it: it re-derives every generated bundle from
       # plugin/.ai-rulez and compares byte content + BLAKE3 provenance, so it goes
@@ -5598,7 +5598,7 @@ jobs:
       - name: Install ai-rulez
         uses: xberg-io/actions/setup-ai-rulez@6b88aedd553b798d084927cc8a0feeb88b3f6f1b
         with:
-          source-revision: 8f764e95a161851c2c974beb1d23cb775ebdce32
+          source-revision: 02a8bf25768d37648d4dac35f049c3671c9f7308
       - name: Verify plugin source and generated artifacts
         uses: xberg-io/actions/verify-ai-rulez-plugin@6b88aedd553b798d084927cc8a0feeb88b3f6f1b
         with:
@@ -5663,7 +5663,7 @@ jobs:
       - name: Install ai-rulez
         uses: xberg-io/actions/setup-ai-rulez@6b88aedd553b798d084927cc8a0feeb88b3f6f1b
         with:
-          source-revision: 8f764e95a161851c2c974beb1d23cb775ebdce32
+          source-revision: 02a8bf25768d37648d4dac35f049c3671c9f7308
       - name: Verify plugin source and generated artifacts
         uses: xberg-io/actions/verify-ai-rulez-plugin@6b88aedd553b798d084927cc8a0feeb88b3f6f1b
         with:
@@ -5710,7 +5710,7 @@ jobs:
       - name: Install ai-rulez
         uses: xberg-io/actions/setup-ai-rulez@6b88aedd553b798d084927cc8a0feeb88b3f6f1b
         with:
-          source-revision: 8f764e95a161851c2c974beb1d23cb775ebdce32
+          source-revision: 02a8bf25768d37648d4dac35f049c3671c9f7308
       - name: Verify public skill exports
         run: python3 scripts/sync_public_skills.py --check
       - name: Package all supported plugin runtimes
