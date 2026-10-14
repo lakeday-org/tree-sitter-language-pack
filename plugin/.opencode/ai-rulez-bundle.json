@@ -1,4 +1,5 @@
 {
+  "plugin": "tree-sitter-language-pack",
   "mcp": {
     "tree-sitter-language-pack": {
       "type": "local",
