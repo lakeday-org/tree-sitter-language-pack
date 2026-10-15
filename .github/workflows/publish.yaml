@@ -3,9 +3,13 @@ name: Publish Release
 on:
   workflow_dispatch:
     inputs:
+      plugins-only:
+        description: "Publish only missing plugin registry versions from main"
+        type: boolean
+        default: false
       tag:
         description: "Release tag (e.g., v1.0.0-rc.2)"
-        required: true
+        required: false
         type: string
       dry_run:
         description: "Dry run without publishing"
@@ -46,7 +50,8 @@ permissions:
 jobs:
   recover-nuget-runtimes:
     name: Recover missing NuGet runtime packages
-    if: ${{ github.event_name == 'workflow_dispatch' && inputs.nuget_runtime_run_id != '' }}
+    if: >-
+      ${{ !inputs.plugins-only && (github.event_name == 'workflow_dispatch' && inputs.nuget_runtime_run_id != '') }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
@@ -160,9 +165,7 @@ jobs:
     # re-run, so it would ADMIT a duplicate when someone re-runs the bot's own recursive run.
     # `actor` is pinned to whoever initiated the original run and survives re-runs. ~keep
     if: >-
-      !inputs.nuget_runtime_run_id &&
-      (github.event_name != 'release' ||
-      github.actor != 'xberg-dev-publisher[bot]')
+      ${{ !inputs.plugins-only && (!inputs.nuget_runtime_run_id && (github.event_name != 'release' || github.actor != 'xberg-dev-publisher[bot]')) }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     outputs:
@@ -257,6 +260,7 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
 
   validate-versions:
+    if: ${{ !inputs.plugins-only }}
     name: Validate version consistency
     needs: prepare
     runs-on: ubuntu-latest
@@ -294,6 +298,7 @@ jobs:
         run: python3 scripts/sync_plugin_version.py --expect "${VERSION%%-dryrun-*}"
 
   check-registries:
+    if: ${{ !inputs.plugins-only }}
     name: Check registries
     needs: prepare
     uses: xberg-io/actions/.github/workflows/reusable-check-registries.yml@v1
@@ -372,6 +377,7 @@ jobs:
         ]
 
   clone-vendors-shard:
+    if: ${{ !inputs.plugins-only }}
     name: Clone vendors (shard ${{ matrix.shard }})
     needs: prepare
     runs-on: ubuntu-latest
@@ -432,6 +438,7 @@ jobs:
           retention-days: 3
 
   clone-vendors:
+    if: ${{ !inputs.plugins-only }}
     name: Clone vendors
     needs: [prepare, clone-vendors-shard]
     runs-on: ubuntu-latest
@@ -452,6 +459,7 @@ jobs:
           retention-days: 3
 
   build-parser-sources:
+    if: ${{ !inputs.plugins-only }}
     name: Build parser-sources bundle
     needs: [prepare, validate-versions, clone-vendors]
     runs-on: ubuntu-latest
@@ -515,6 +523,7 @@ jobs:
   # or any language missing a retained license text, fails the job before the release
   # is promoted. ~keep
   build-grammar-notices:
+    if: ${{ !inputs.plugins-only }}
     name: Build grammar redistribution notices
     needs: [prepare, validate-versions]
     runs-on: ubuntu-latest
@@ -565,6 +574,7 @@ jobs:
           token: ${{ steps.app-token.outputs.token }}
 
   build-parser-binaries:
+    if: ${{ !inputs.plugins-only }}
     name: Build parser binaries (${{ matrix.label }})
     needs: [prepare, validate-versions, clone-vendors]
     runs-on: ${{ matrix.os }}
@@ -680,7 +690,8 @@ jobs:
   build-python-wheels:
     name: Build Python wheel (${{ matrix.label }})
     needs: [prepare, validate-versions, clone-vendors]
-    if: needs.prepare.outputs.release_python == 'true'
+    if: >-
+      ${{ !inputs.plugins-only && (needs.prepare.outputs.release_python == 'true') }}
     runs-on: ${{ matrix.os }}
     timeout-minutes: 120
     strategy:
@@ -746,7 +757,8 @@ jobs:
     # resolves `tree-sitter-language-pack = "^<version>"` from crates.io — a
     # version that was never published — and burn its full retry budget on
     # `failed to select a version for the requirement` (#177). ~keep
-    if: ${{ !cancelled() && needs.publish-crates.result == 'success' && needs.prepare.outputs.release_python == 'true' }}
+    if: >-
+      ${{ !inputs.plugins-only && (!cancelled() && needs.publish-crates.result == 'success' && needs.prepare.outputs.release_python == 'true') }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -845,7 +857,8 @@ jobs:
   build-node-native:
     name: Build Node.js (${{ matrix.label }})
     needs: [prepare, validate-versions, clone-vendors]
-    if: needs.prepare.outputs.release_node == 'true'
+    if: >-
+      ${{ !inputs.plugins-only && (needs.prepare.outputs.release_node == 'true') }}
     runs-on: ${{ matrix.os }}
     timeout-minutes: 120
     strategy:
@@ -950,7 +963,8 @@ jobs:
     # SKIPPED publish-crates or upload-parser-binaries would otherwise let this
     # job build a gem against a crate that is not on crates.io and a parsers.json
     # that is not on the release. ~keep
-    if: ${{ !cancelled() && needs.publish-crates.result == 'success' && needs.upload-parser-binaries.result == 'success' && needs.prepare.outputs.release_ruby == 'true' }}
+    if: >-
+      ${{ !inputs.plugins-only && (!cancelled() && needs.publish-crates.result == 'success' && needs.upload-parser-binaries.result == 'success' && needs.prepare.outputs.release_ruby == 'true') }}
     runs-on: ${{ matrix.os }}
     timeout-minutes: 120
     env:
@@ -1171,7 +1185,8 @@ jobs:
   build-wasm:
     name: Build WASM package
     needs: [prepare, validate-versions, clone-vendors]
-    if: needs.prepare.outputs.release_wasm == 'true'
+    if: >-
+      ${{ !inputs.plugins-only && (needs.prepare.outputs.release_wasm == 'true') }}
     runs-on: ubuntu-latest
     timeout-minutes: 120
     steps:
@@ -1296,7 +1311,8 @@ jobs:
   build-go-ffi:
     name: Build Go FFI (${{ matrix.label }})
     needs: [prepare, validate-versions, clone-vendors]
-    if: needs.prepare.outputs.release_go == 'true'
+    if: >-
+      ${{ !inputs.plugins-only && (needs.prepare.outputs.release_go == 'true') }}
     runs-on: ${{ matrix.os }}
     timeout-minutes: 120
     strategy:
@@ -1383,7 +1399,8 @@ jobs:
   build-java-natives:
     name: Build Java natives (${{ matrix.label }})
     needs: [prepare, validate-versions, clone-vendors]
-    if: needs.prepare.outputs.release_java == 'true'
+    if: >-
+      ${{ !inputs.plugins-only && (needs.prepare.outputs.release_java == 'true') }}
     runs-on: ${{ matrix.os }}
     timeout-minutes: 120
     strategy:
@@ -1459,7 +1476,8 @@ jobs:
   build-java-package:
     name: Build Java package
     needs: [prepare, validate-versions, build-java-natives]
-    if: needs.prepare.outputs.release_java == 'true'
+    if: >-
+      ${{ !inputs.plugins-only && (needs.prepare.outputs.release_java == 'true') }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -1545,7 +1563,8 @@ jobs:
     # `== 'success'`, never `!= 'failure'` — see build-python-sdist. The NIF's
     # release build resolves the crate from crates.io, so a SKIPPED
     # publish-crates guarantees a resolver failure, not a usable NIF. ~keep
-    if: ${{ !cancelled() && needs.publish-crates.result == 'success' && needs.prepare.outputs.release_elixir == 'true' }}
+    if: >-
+      ${{ !inputs.plugins-only && (!cancelled() && needs.publish-crates.result == 'success' && needs.prepare.outputs.release_elixir == 'true') }}
     runs-on: ${{ matrix.os }}
     timeout-minutes: 120
     strategy:
@@ -1699,7 +1718,8 @@ jobs:
   build-c-ffi:
     name: Build C FFI (${{ matrix.label }})
     needs: [prepare, validate-versions, clone-vendors]
-    if: needs.prepare.outputs.release_c_ffi == 'true'
+    if: >-
+      ${{ !inputs.plugins-only && (needs.prepare.outputs.release_c_ffi == 'true') }}
     runs-on: ${{ matrix.os }}
     timeout-minutes: 120
     strategy:
@@ -1807,7 +1827,8 @@ jobs:
     # `== 'success'`, never `!= 'failure'` — see build-python-sdist. This matrix
     # is 18 jobs wide; a SKIPPED publish-crates used to fan the same crates.io
     # resolver failure out across all of them. ~keep
-    if: ${{ !cancelled() && needs.publish-crates.result == 'success' && needs.prepare.outputs.release_php == 'true' }}
+    if: >-
+      ${{ !inputs.plugins-only && (!cancelled() && needs.publish-crates.result == 'success' && needs.prepare.outputs.release_php == 'true') }}
     runs-on: ${{ matrix.platform.os }}
     timeout-minutes: 60
     permissions:
@@ -1922,7 +1943,8 @@ jobs:
   build-csharp-native:
     name: Build C# native (${{ matrix.label }})
     needs: [prepare, validate-versions, clone-vendors]
-    if: needs.prepare.outputs.release_csharp == 'true'
+    if: >-
+      ${{ !inputs.plugins-only && (needs.prepare.outputs.release_csharp == 'true') }}
     runs-on: ${{ matrix.os }}
     timeout-minutes: 120
     strategy:
@@ -2005,7 +2027,8 @@ jobs:
   build-csharp-package:
     name: Build C# NuGet package
     needs: [prepare, validate-versions, build-csharp-native]
-    if: needs.prepare.outputs.release_csharp == 'true'
+    if: >-
+      ${{ !inputs.plugins-only && (needs.prepare.outputs.release_csharp == 'true') }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -2071,10 +2094,8 @@ jobs:
     # edge that must actually gate has to be restated as an explicit
     # `== 'success'`. build-parser-binaries is deliberately NOT restated: the
     # manifest step below tolerates a partial platform matrix and warns. ~keep
-    if: |
-      always() &&
-      needs.validate-versions.result == 'success' &&
-      needs.prepare.outputs.dry_run != 'true'
+    if: >-
+      ${{ !inputs.plugins-only && (always() && needs.validate-versions.result == 'success' && needs.prepare.outputs.dry_run != 'true') }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -2251,13 +2272,8 @@ jobs:
   upload-go-release:
     name: Upload Go FFI to GitHub Release
     needs: [prepare, validate-versions, build-go-ffi, e2e-go]
-    if: |
-      always() &&
-      needs.validate-versions.result == 'success' &&
-      needs.prepare.outputs.dry_run != 'true' &&
-      needs.prepare.outputs.release_go == 'true' &&
-      needs.build-go-ffi.result == 'success' &&
-      needs.e2e-go.result == 'success'
+    if: >-
+      ${{ !inputs.plugins-only && (always() && needs.validate-versions.result == 'success' && needs.prepare.outputs.dry_run != 'true' && needs.prepare.outputs.release_go == 'true' && needs.build-go-ffi.result == 'success' && needs.e2e-go.result == 'success') }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -2299,13 +2315,8 @@ jobs:
   upload-c-ffi-release:
     name: Upload C FFI to GitHub Release
     needs: [prepare, validate-versions, build-c-ffi, e2e-c]
-    if: |
-      always() &&
-      needs.validate-versions.result == 'success' &&
-      needs.prepare.outputs.dry_run != 'true' &&
-      needs.prepare.outputs.release_c_ffi == 'true' &&
-      needs.build-c-ffi.result == 'success' &&
-      needs.e2e-c.result == 'success'
+    if: >-
+      ${{ !inputs.plugins-only && (always() && needs.validate-versions.result == 'success' && needs.prepare.outputs.dry_run != 'true' && needs.prepare.outputs.release_c_ffi == 'true' && needs.build-c-ffi.result == 'success' && needs.e2e-c.result == 'success') }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -2343,13 +2354,8 @@ jobs:
   upload-elixir-release:
     name: Upload Elixir NIFs to GitHub Release
     needs: [prepare, validate-versions, build-elixir-nifs, e2e-elixir]
-    if: |
-      always() &&
-      needs.validate-versions.result == 'success' &&
-      needs.prepare.outputs.dry_run != 'true' &&
-      needs.prepare.outputs.release_elixir == 'true' &&
-      needs.build-elixir-nifs.result == 'success' &&
-      needs.e2e-elixir.result == 'success'
+    if: >-
+      ${{ !inputs.plugins-only && (always() && needs.validate-versions.result == 'success' && needs.prepare.outputs.dry_run != 'true' && needs.prepare.outputs.release_elixir == 'true' && needs.build-elixir-nifs.result == 'success' && needs.e2e-elixir.result == 'success') }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -2406,7 +2412,8 @@ jobs:
   e2e-rust:
     name: E2E gate — Rust
     needs: [prepare, validate-versions, clone-vendors, build-parser-binaries]
-    if: ${{ needs.prepare.outputs.release_crates == 'true' }}
+    if: >-
+      ${{ !inputs.plugins-only && (needs.prepare.outputs.release_crates == 'true') }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
     env:
@@ -2437,7 +2444,8 @@ jobs:
   e2e-python:
     name: E2E gate — Python
     needs: [prepare, validate-versions, clone-vendors, build-parser-binaries]
-    if: ${{ needs.prepare.outputs.release_python == 'true' }}
+    if: >-
+      ${{ !inputs.plugins-only && (needs.prepare.outputs.release_python == 'true') }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
     env:
@@ -2485,7 +2493,8 @@ jobs:
   e2e-node:
     name: E2E gate — Node
     needs: [prepare, validate-versions, clone-vendors, build-parser-binaries]
-    if: ${{ needs.prepare.outputs.release_node == 'true' }}
+    if: >-
+      ${{ !inputs.plugins-only && (needs.prepare.outputs.release_node == 'true') }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
     env:
@@ -2525,7 +2534,8 @@ jobs:
   e2e-wasm:
     name: E2E gate — WASM
     needs: [prepare, validate-versions, clone-vendors]
-    if: ${{ needs.prepare.outputs.release_wasm == 'true' }}
+    if: >-
+      ${{ !inputs.plugins-only && (needs.prepare.outputs.release_wasm == 'true') }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
     env:
@@ -2562,7 +2572,8 @@ jobs:
   e2e-ruby:
     name: E2E gate — Ruby
     needs: [prepare, validate-versions, clone-vendors, build-parser-binaries]
-    if: ${{ needs.prepare.outputs.release_ruby == 'true' }}
+    if: >-
+      ${{ !inputs.plugins-only && (needs.prepare.outputs.release_ruby == 'true') }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
     env:
@@ -2607,7 +2618,8 @@ jobs:
   e2e-java:
     name: E2E gate — Java
     needs: [prepare, validate-versions, clone-vendors, build-parser-binaries]
-    if: ${{ needs.prepare.outputs.release_java == 'true' }}
+    if: >-
+      ${{ !inputs.plugins-only && (needs.prepare.outputs.release_java == 'true') }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
     env:
@@ -2647,7 +2659,8 @@ jobs:
   e2e-elixir:
     name: E2E gate — Elixir
     needs: [prepare, validate-versions, clone-vendors, build-parser-binaries]
-    if: ${{ needs.prepare.outputs.release_elixir == 'true' }}
+    if: >-
+      ${{ !inputs.plugins-only && (needs.prepare.outputs.release_elixir == 'true') }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
     env:
@@ -2685,7 +2698,8 @@ jobs:
   e2e-php:
     name: E2E gate — PHP
     needs: [prepare, validate-versions, clone-vendors, build-parser-binaries]
-    if: ${{ needs.prepare.outputs.release_php == 'true' }}
+    if: >-
+      ${{ !inputs.plugins-only && (needs.prepare.outputs.release_php == 'true') }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
     env:
@@ -2728,7 +2742,8 @@ jobs:
   e2e-csharp:
     name: E2E gate — C#
     needs: [prepare, validate-versions, clone-vendors, build-parser-binaries]
-    if: ${{ needs.prepare.outputs.release_csharp == 'true' }}
+    if: >-
+      ${{ !inputs.plugins-only && (needs.prepare.outputs.release_csharp == 'true') }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
     env:
@@ -2763,7 +2778,8 @@ jobs:
   e2e-go:
     name: E2E gate — Go
     needs: [prepare, validate-versions, clone-vendors, build-parser-binaries]
-    if: ${{ needs.prepare.outputs.release_go == 'true' }}
+    if: >-
+      ${{ !inputs.plugins-only && (needs.prepare.outputs.release_go == 'true') }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
     env:
@@ -2801,7 +2817,8 @@ jobs:
   e2e-cli:
     name: E2E gate — CLI
     needs: [prepare, validate-versions, clone-vendors]
-    if: ${{ needs.prepare.outputs.release_homebrew == 'true' }}
+    if: >-
+      ${{ !inputs.plugins-only && (needs.prepare.outputs.release_homebrew == 'true') }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
     env:
@@ -2843,7 +2860,8 @@ jobs:
   e2e-plugin:
     name: E2E gate — agent plugin bundles
     needs: [prepare]
-    if: ${{ needs.prepare.outputs.release_node == 'true' || needs.prepare.outputs.release_python == 'true' }}
+    if: >-
+      ${{ !inputs.plugins-only && (needs.prepare.outputs.release_node == 'true' || needs.prepare.outputs.release_python == 'true') }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
@@ -2871,7 +2889,8 @@ jobs:
   e2e-c:
     name: E2E gate — C FFI
     needs: [prepare, validate-versions, clone-vendors, build-parser-binaries]
-    if: ${{ needs.prepare.outputs.release_c_ffi == 'true' }}
+    if: >-
+      ${{ !inputs.plugins-only && (needs.prepare.outputs.release_c_ffi == 'true') }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
     env:
@@ -2920,15 +2939,8 @@ jobs:
       e2e-rust,
       finalize-github-release,
     ]
-    if: |
-      always() &&
-      needs.prepare.outputs.release_crates == 'true' &&
-      needs.e2e-rust.result == 'success' &&
-      needs.validate-versions.result == 'success' &&
-      needs.clone-vendors.result == 'success' &&
-      needs.build-parser-sources.result == 'success' &&
-      needs.finalize-github-release.outputs.promoted == 'true' &&
-      (fromJson(needs.check-registries.outputs.results).cratesio != 'true' || needs.prepare.outputs.force_republish == 'true')
+    if: >-
+      ${{ !inputs.plugins-only && (always() && needs.prepare.outputs.release_crates == 'true' && needs.e2e-rust.result == 'success' && needs.validate-versions.result == 'success' && needs.clone-vendors.result == 'success' && needs.build-parser-sources.result == 'success' && needs.finalize-github-release.outputs.promoted == 'true' && (fromJson(needs.check-registries.outputs.results).cratesio != 'true' || needs.prepare.outputs.force_republish == 'true')) }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
@@ -2963,14 +2975,8 @@ jobs:
   publish-pypi:
     name: Publish Python to PyPI
     needs: [prepare, validate-versions, check-registries, build-python-wheels, build-python-sdist, e2e-python]
-    if: |
-      always() &&
-      needs.prepare.outputs.release_python == 'true' &&
-      needs.validate-versions.result == 'success' &&
-      needs.build-python-wheels.result == 'success' &&
-      needs.e2e-python.result == 'success' &&
-      needs.build-python-sdist.result == 'success' &&
-      (fromJson(needs.check-registries.outputs.results).pypi != 'true' || needs.prepare.outputs.force_republish == 'true')
+    if: >-
+      ${{ !inputs.plugins-only && (always() && needs.prepare.outputs.release_python == 'true' && needs.validate-versions.result == 'success' && needs.build-python-wheels.result == 'success' && needs.e2e-python.result == 'success' && needs.build-python-sdist.result == 'success' && (fromJson(needs.check-registries.outputs.results).pypi != 'true' || needs.prepare.outputs.force_republish == 'true')) }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     environment: pypi
@@ -3015,13 +3021,8 @@ jobs:
   publish-node:
     name: Publish Node.js to npm
     needs: [prepare, validate-versions, check-registries, build-node-native, e2e-node]
-    if: |
-      always() &&
-      needs.prepare.outputs.release_node == 'true' &&
-      needs.validate-versions.result == 'success' &&
-      needs.build-node-native.result == 'success' &&
-      needs.e2e-node.result == 'success' &&
-      (fromJson(needs.check-registries.outputs.results).npm != 'true' || needs.prepare.outputs.force_republish == 'true')
+    if: >-
+      ${{ !inputs.plugins-only && (always() && needs.prepare.outputs.release_node == 'true' && needs.validate-versions.result == 'success' && needs.build-node-native.result == 'success' && needs.e2e-node.result == 'success' && (fromJson(needs.check-registries.outputs.results).npm != 'true' || needs.prepare.outputs.force_republish == 'true')) }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
@@ -3120,15 +3121,8 @@ jobs:
   publish-wasm:
     name: Publish WASM to npm
     needs: [prepare, validate-versions, check-registries, build-wasm, publish-node, e2e-wasm]
-    if: |
-      always() &&
-      needs.prepare.outputs.release_wasm == 'true' &&
-      needs.validate-versions.result == 'success' &&
-      needs.build-wasm.result == 'success' &&
-      needs.e2e-wasm.result == 'success' &&
-      needs.publish-node.result != 'failure' &&
-      needs.publish-node.result != 'cancelled' &&
-      (fromJson(needs.check-registries.outputs.results)['npm-wasm'] != 'true' || needs.prepare.outputs.force_republish == 'true')
+    if: >-
+      ${{ !inputs.plugins-only && (always() && needs.prepare.outputs.release_wasm == 'true' && needs.validate-versions.result == 'success' && needs.build-wasm.result == 'success' && needs.e2e-wasm.result == 'success' && needs.publish-node.result != 'failure' && needs.publish-node.result != 'cancelled' && (fromJson(needs.check-registries.outputs.results)['npm-wasm'] != 'true' || needs.prepare.outputs.force_republish == 'true')) }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
@@ -3194,13 +3188,8 @@ jobs:
   publish-rubygems:
     name: Publish Ruby gems
     needs: [prepare, validate-versions, check-registries, build-ruby-gem, e2e-ruby]
-    if: |
-      always() &&
-      needs.prepare.outputs.release_ruby == 'true' &&
-      needs.validate-versions.result == 'success' &&
-      needs.build-ruby-gem.result == 'success' &&
-      needs.e2e-ruby.result == 'success' &&
-      (fromJson(needs.check-registries.outputs.results).rubygems != 'true' || needs.prepare.outputs.force_republish == 'true')
+    if: >-
+      ${{ !inputs.plugins-only && (always() && needs.prepare.outputs.release_ruby == 'true' && needs.validate-versions.result == 'success' && needs.build-ruby-gem.result == 'success' && needs.e2e-ruby.result == 'success' && (fromJson(needs.check-registries.outputs.results).rubygems != 'true' || needs.prepare.outputs.force_republish == 'true')) }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
@@ -3281,13 +3270,8 @@ jobs:
   publish-maven:
     name: Publish Maven package
     needs: [prepare, validate-versions, check-registries, build-java-package, e2e-java]
-    if: |
-      always() &&
-      needs.prepare.outputs.release_java == 'true' &&
-      needs.validate-versions.result == 'success' &&
-      needs.build-java-package.result == 'success' &&
-      needs.e2e-java.result == 'success' &&
-      (fromJson(needs.check-registries.outputs.results).maven != 'true' || needs.prepare.outputs.force_republish == 'true')
+    if: >-
+      ${{ !inputs.plugins-only && (always() && needs.prepare.outputs.release_java == 'true' && needs.validate-versions.result == 'success' && needs.build-java-package.result == 'success' && needs.e2e-java.result == 'success' && (fromJson(needs.check-registries.outputs.results).maven != 'true' || needs.prepare.outputs.force_republish == 'true')) }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
@@ -3390,12 +3374,8 @@ jobs:
   publish-hex:
     name: Publish Elixir to Hex.pm
     needs: [prepare, validate-versions, check-registries, publish-crates, upload-elixir-release]
-    if: |
-      always() &&
-      needs.prepare.outputs.release_elixir == 'true' &&
-      needs.validate-versions.result == 'success' &&
-      needs.upload-elixir-release.result == 'success' &&
-      (fromJson(needs.check-registries.outputs.results).hex != 'true' || needs.prepare.outputs.force_republish == 'true')
+    if: >-
+      ${{ !inputs.plugins-only && (always() && needs.prepare.outputs.release_elixir == 'true' && needs.validate-versions.result == 'success' && needs.upload-elixir-release.result == 'success' && (fromJson(needs.check-registries.outputs.results).hex != 'true' || needs.prepare.outputs.force_republish == 'true')) }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     environment: hex
@@ -3493,13 +3473,8 @@ jobs:
   upload-php-pie-release:
     name: Upload PHP PIE binaries to GitHub Release
     needs: [prepare, validate-versions, build-php-extension, e2e-php]
-    if: |
-      always() &&
-      needs.validate-versions.result == 'success' &&
-      needs.prepare.outputs.dry_run != 'true' &&
-      needs.prepare.outputs.release_php == 'true' &&
-      needs.build-php-extension.result == 'success' &&
-      needs.e2e-php.result == 'success'
+    if: >-
+      ${{ !inputs.plugins-only && (always() && needs.validate-versions.result == 'success' && needs.prepare.outputs.dry_run != 'true' && needs.prepare.outputs.release_php == 'true' && needs.build-php-extension.result == 'success' && needs.e2e-php.result == 'success') }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
@@ -3532,13 +3507,8 @@ jobs:
   publish-packagist:
     name: Publish PHP to Packagist
     needs: [prepare, validate-versions, check-registries, build-php-extension, e2e-php]
-    if: |
-      always() &&
-      needs.prepare.outputs.release_php == 'true' &&
-      needs.validate-versions.result == 'success' &&
-      needs.build-php-extension.result == 'success' &&
-      needs.e2e-php.result == 'success' &&
-      (fromJson(needs.check-registries.outputs.results).packagist != 'true' || needs.prepare.outputs.force_republish == 'true')
+    if: >-
+      ${{ !inputs.plugins-only && (always() && needs.prepare.outputs.release_php == 'true' && needs.validate-versions.result == 'success' && needs.build-php-extension.result == 'success' && needs.e2e-php.result == 'success' && (fromJson(needs.check-registries.outputs.results).packagist != 'true' || needs.prepare.outputs.force_republish == 'true')) }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
@@ -3569,13 +3539,8 @@ jobs:
   publish-nuget:
     name: Publish C# to NuGet
     needs: [prepare, validate-versions, check-registries, build-csharp-package, e2e-csharp]
-    if: |
-      always() &&
-      needs.prepare.outputs.release_csharp == 'true' &&
-      needs.validate-versions.result == 'success' &&
-      needs.build-csharp-package.result == 'success' &&
-      needs.e2e-csharp.result == 'success' &&
-      (fromJson(needs.check-registries.outputs.results).nuget != 'true' || needs.prepare.outputs.force_republish == 'true')
+    if: >-
+      ${{ !inputs.plugins-only && (always() && needs.prepare.outputs.release_csharp == 'true' && needs.validate-versions.result == 'success' && needs.build-csharp-package.result == 'success' && needs.e2e-csharp.result == 'success' && (fromJson(needs.check-registries.outputs.results).nuget != 'true' || needs.prepare.outputs.force_republish == 'true')) }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
@@ -3621,7 +3586,8 @@ jobs:
   build-dart-native:
     name: Build Dart native library (${{ matrix.label }})
     needs: [prepare, validate-versions, clone-vendors, check-registries]
-    if: ${{ needs.prepare.outputs.release_dart == 'true' && (fromJson(needs.check-registries.outputs.results).pub != 'true' || needs.prepare.outputs.force_republish == 'true') }}
+    if: >-
+      ${{ !inputs.plugins-only && (needs.prepare.outputs.release_dart == 'true' && (fromJson(needs.check-registries.outputs.results).pub != 'true' || needs.prepare.outputs.force_republish == 'true')) }}
     runs-on: ${{ matrix.os }}
     timeout-minutes: 120
     strategy:
@@ -3692,7 +3658,8 @@ jobs:
     permissions:
       contents: write
     needs: [prepare, validate-versions, clone-vendors, check-registries, build-dart-native]
-    if: ${{ needs.prepare.outputs.release_dart == 'true' && (fromJson(needs.check-registries.outputs.results).pub != 'true' || needs.prepare.outputs.force_republish == 'true') }}
+    if: >-
+      ${{ !inputs.plugins-only && (needs.prepare.outputs.release_dart == 'true' && (fromJson(needs.check-registries.outputs.results).pub != 'true' || needs.prepare.outputs.force_republish == 'true')) }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -3772,7 +3739,8 @@ jobs:
   e2e-dart:
     name: E2E gate — Dart
     needs: [prepare, validate-versions, clone-vendors, check-registries, build-parser-binaries]
-    if: ${{ needs.prepare.outputs.release_dart == 'true' && (fromJson(needs.check-registries.outputs.results).pub != 'true' || needs.prepare.outputs.force_republish == 'true') }}
+    if: >-
+      ${{ !inputs.plugins-only && (needs.prepare.outputs.release_dart == 'true' && (fromJson(needs.check-registries.outputs.results).pub != 'true' || needs.prepare.outputs.force_republish == 'true')) }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
     env:
@@ -3804,11 +3772,8 @@ jobs:
   trigger-pubdev:
     name: Trigger pub.dev publish workflow
     needs: [prepare, check-registries, assemble-dart-package, e2e-dart]
-    if: |
-      needs.prepare.outputs.release_dart == 'true' &&
-      needs.assemble-dart-package.result == 'success' &&
-      needs.prepare.outputs.dry_run != 'true' &&
-      (fromJson(needs.check-registries.outputs.results).pub != 'true' || needs.prepare.outputs.force_republish == 'true')
+    if: >-
+      ${{ !inputs.plugins-only && (needs.prepare.outputs.release_dart == 'true' && needs.assemble-dart-package.result == 'success' && needs.prepare.outputs.dry_run != 'true' && (fromJson(needs.check-registries.outputs.results).pub != 'true' || needs.prepare.outputs.force_republish == 'true')) }}
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
@@ -3877,7 +3842,8 @@ jobs:
   build-swift-artifactbundle:
     name: Build Swift artifact bundle
     needs: [prepare, validate-versions, clone-vendors]
-    if: ${{ needs.prepare.outputs.release_swift == 'true' }}
+    if: >-
+      ${{ !inputs.plugins-only && (needs.prepare.outputs.release_swift == 'true') }}
     runs-on: macos-latest
     timeout-minutes: 30
     steps:
@@ -3913,7 +3879,8 @@ jobs:
   build-swift-package:
     name: Build Swift package
     needs: [prepare, validate-versions, clone-vendors]
-    if: ${{ needs.prepare.outputs.release_swift == 'true' }}
+    if: >-
+      ${{ !inputs.plugins-only && (needs.prepare.outputs.release_swift == 'true') }}
     runs-on: macos-latest
     timeout-minutes: 30
     steps:
@@ -3940,7 +3907,8 @@ jobs:
   e2e-swift:
     name: E2E gate — Swift
     needs: [prepare, validate-versions, clone-vendors, build-parser-binaries]
-    if: ${{ needs.prepare.outputs.release_swift == 'true' }}
+    if: >-
+      ${{ !inputs.plugins-only && (needs.prepare.outputs.release_swift == 'true') }}
     runs-on: macos-latest
     timeout-minutes: 60
     env:
@@ -3974,7 +3942,8 @@ jobs:
   update-swift-package-manifest:
     name: Update Swift Package.swift manifest with version and checksum
     needs: [prepare, build-swift-artifactbundle, e2e-swift]
-    if: ${{ needs.prepare.outputs.release_swift == 'true' }}
+    if: >-
+      ${{ !inputs.plugins-only && (needs.prepare.outputs.release_swift == 'true') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/create-github-app-token@v3
@@ -4073,7 +4042,8 @@ jobs:
   build-zig-package:
     name: Build Zig package (${{ matrix.label }})
     needs: [prepare, validate-versions, clone-vendors, check-registries]
-    if: ${{ needs.prepare.outputs.release_zig == 'true' && (fromJson(needs.check-registries.outputs.results).zig != 'true' || needs.prepare.outputs.force_republish == 'true') }}
+    if: >-
+      ${{ !inputs.plugins-only && (needs.prepare.outputs.release_zig == 'true' && (fromJson(needs.check-registries.outputs.results).zig != 'true' || needs.prepare.outputs.force_republish == 'true')) }}
     runs-on: ${{ matrix.os }}
     timeout-minutes: 120
     strategy:
@@ -4150,7 +4120,8 @@ jobs:
   e2e-zig:
     name: E2E gate — Zig
     needs: [prepare, validate-versions, clone-vendors, check-registries, build-parser-binaries]
-    if: ${{ needs.prepare.outputs.release_zig == 'true' && (fromJson(needs.check-registries.outputs.results).zig != 'true' || needs.prepare.outputs.force_republish == 'true') }}
+    if: >-
+      ${{ !inputs.plugins-only && (needs.prepare.outputs.release_zig == 'true' && (fromJson(needs.check-registries.outputs.results).zig != 'true' || needs.prepare.outputs.force_republish == 'true')) }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
     env:
@@ -4185,7 +4156,8 @@ jobs:
   publish-zig:
     name: Publish Zig package metadata to GitHub Release
     needs: [prepare, check-registries, build-zig-package, e2e-zig]
-    if: ${{ needs.prepare.outputs.release_zig == 'true' && needs.prepare.outputs.dry_run != 'true' && (fromJson(needs.check-registries.outputs.results).zig != 'true' || needs.prepare.outputs.force_republish == 'true') }}
+    if: >-
+      ${{ !inputs.plugins-only && (needs.prepare.outputs.release_zig == 'true' && needs.prepare.outputs.dry_run != 'true' && (fromJson(needs.check-registries.outputs.results).zig != 'true' || needs.prepare.outputs.force_republish == 'true')) }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -4217,12 +4189,8 @@ jobs:
   refresh-zig-package-hashes:
     name: Refresh test_apps/zig package hashes from the published tarballs
     needs: [prepare, publish-zig, finalize-github-release]
-    if: |
-      always() &&
-      needs.prepare.outputs.release_zig == 'true' &&
-      needs.prepare.outputs.dry_run != 'true' &&
-      needs.finalize-github-release.outputs.promoted == 'true' &&
-      needs.publish-zig.result == 'success'
+    if: >-
+      ${{ !inputs.plugins-only && (always() && needs.prepare.outputs.release_zig == 'true' && needs.prepare.outputs.dry_run != 'true' && needs.finalize-github-release.outputs.promoted == 'true' && needs.publish-zig.result == 'success') }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     # A Zig package hash is a digest of the tarball, so it cannot be derived from a version
@@ -4339,7 +4307,8 @@ jobs:
   build-kotlin-android-natives:
     name: Build kotlin-android natives (${{ matrix.abi }})
     needs: [prepare, check-registries, clone-vendors]
-    if: ${{ needs.prepare.outputs.release_kotlin_android == 'true' && (fromJson(needs.check-registries.outputs.results).maven-kotlin-android != 'true' || needs.prepare.outputs.force_republish == 'true') }}
+    if: >-
+      ${{ !inputs.plugins-only && (needs.prepare.outputs.release_kotlin_android == 'true' && (fromJson(needs.check-registries.outputs.results).maven-kotlin-android != 'true' || needs.prepare.outputs.force_republish == 'true')) }}
     runs-on: ubuntu-latest
     timeout-minutes: 45
     strategy:
@@ -4383,7 +4352,8 @@ jobs:
   e2e-kotlin-android:
     name: E2E gate — Kotlin Android
     needs: [prepare, check-registries, clone-vendors, build-parser-binaries]
-    if: ${{ needs.prepare.outputs.release_kotlin_android == 'true' && (fromJson(needs.check-registries.outputs.results).maven-kotlin-android != 'true' || needs.prepare.outputs.force_republish == 'true') }}
+    if: >-
+      ${{ !inputs.plugins-only && (needs.prepare.outputs.release_kotlin_android == 'true' && (fromJson(needs.check-registries.outputs.results).maven-kotlin-android != 'true' || needs.prepare.outputs.force_republish == 'true')) }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
     env:
@@ -4421,7 +4391,8 @@ jobs:
   publish-kotlin-android:
     name: Publish kotlin-android (Maven Central via Gradle)
     needs: [prepare, check-registries, build-kotlin-android-natives, e2e-kotlin-android]
-    if: ${{ needs.prepare.outputs.release_kotlin_android == 'true' && needs.prepare.outputs.dry_run != 'true' && (fromJson(needs.check-registries.outputs.results).maven-kotlin-android != 'true' || needs.prepare.outputs.force_republish == 'true') }}
+    if: >-
+      ${{ !inputs.plugins-only && (needs.prepare.outputs.release_kotlin_android == 'true' && needs.prepare.outputs.dry_run != 'true' && (fromJson(needs.check-registries.outputs.results).maven-kotlin-android != 'true' || needs.prepare.outputs.force_republish == 'true')) }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -4457,7 +4428,8 @@ jobs:
   build-cli:
     name: Build CLI (${{ matrix.label }})
     needs: [prepare, validate-versions, clone-vendors]
-    if: needs.prepare.outputs.release_homebrew == 'true'
+    if: >-
+      ${{ !inputs.plugins-only && (needs.prepare.outputs.release_homebrew == 'true') }}
     runs-on: ${{ matrix.os }}
     timeout-minutes: 120
     strategy:
@@ -4552,10 +4524,8 @@ jobs:
   upload-cli-release:
     name: Upload CLI binaries to GitHub Release
     needs: [prepare, build-cli, e2e-cli]
-    if: |
-      needs.prepare.outputs.dry_run != 'true' &&
-      needs.build-cli.result == 'success' &&
-      needs.e2e-cli.result == 'success'
+    if: >-
+      ${{ !inputs.plugins-only && (needs.prepare.outputs.dry_run != 'true' && needs.build-cli.result == 'success' && needs.e2e-cli.result == 'success') }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -4604,7 +4574,8 @@ jobs:
     # resumes at this job -- skipping it before this `if:` is ever evaluated, even with every
     # upstream leg green. Diagnosed on html-to-markdown runs 33491693123/33494806766/33495781759,
     # fixed there in 98d4537c41. Every need that must have succeeded is named explicitly below.
-    if: ${{ !cancelled() && needs.prepare.outputs.dry_run != 'true' && needs.upload-cli-release.result == 'success' && needs.finalize-github-release.outputs.promoted == 'true' }}
+    if: >-
+      ${{ !inputs.plugins-only && (!cancelled() && needs.prepare.outputs.dry_run != 'true' && needs.upload-cli-release.result == 'success' && needs.finalize-github-release.outputs.promoted == 'true') }}
     uses: xberg-io/actions/.github/workflows/reusable-binstall-verify.yml@v1
     with:
       package-name: ts-pack-cli
@@ -4622,14 +4593,8 @@ jobs:
   publish-homebrew-formula:
     name: Update Homebrew formula
     needs: [prepare, check-registries, upload-cli-release, upload-c-ffi-release, finalize-github-release]
-    if: |
-      always() &&
-      needs.prepare.outputs.release_homebrew == 'true' &&
-      needs.prepare.outputs.dry_run != 'true' &&
-      needs.finalize-github-release.outputs.promoted == 'true' &&
-      needs.upload-cli-release.result == 'success' &&
-      needs.upload-c-ffi-release.result == 'success' &&
-      (fromJson(needs.check-registries.outputs.results).homebrew != 'true' || needs.prepare.outputs.force_republish == 'true')
+    if: >-
+      ${{ !inputs.plugins-only && (always() && needs.prepare.outputs.release_homebrew == 'true' && needs.prepare.outputs.dry_run != 'true' && needs.finalize-github-release.outputs.promoted == 'true' && needs.upload-cli-release.result == 'success' && needs.upload-c-ffi-release.result == 'success' && (fromJson(needs.check-registries.outputs.results).homebrew != 'true' || needs.prepare.outputs.force_republish == 'true')) }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -4710,7 +4675,8 @@ jobs:
     # resumes at this job -- skipping it before this `if:` is ever evaluated, even with every
     # upstream leg green. Diagnosed on html-to-markdown runs 33491693123/33494806766/33495781759,
     # fixed there in 98d4537c41. Every need that must have succeeded is named explicitly below.
-    if: ${{ !cancelled() && needs.prepare.outputs.release_scoop == 'true' && needs.upload-cli-release.result == 'success' && needs.finalize-github-release.outputs.promoted == 'true' }}
+    if: >-
+      ${{ !inputs.plugins-only && (!cancelled() && needs.prepare.outputs.release_scoop == 'true' && needs.upload-cli-release.result == 'success' && needs.finalize-github-release.outputs.promoted == 'true') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/create-github-app-token@v3
@@ -4786,10 +4752,8 @@ jobs:
   homebrew-bottles:
     name: Build Homebrew bottle (${{ matrix.bottle_tag }})
     needs: [prepare, publish-homebrew-formula]
-    if: |
-      always() &&
-      needs.prepare.outputs.dry_run != 'true' &&
-      needs.publish-homebrew-formula.result == 'success'
+    if: >-
+      ${{ !inputs.plugins-only && (always() && needs.prepare.outputs.dry_run != 'true' && needs.publish-homebrew-formula.result == 'success') }}
     runs-on: ${{ matrix.os }}
     timeout-minutes: 90
     strategy:
@@ -4855,11 +4819,8 @@ jobs:
   publish-homebrew-bottles:
     name: Merge Homebrew bottle DSL
     needs: [prepare, publish-homebrew-formula, homebrew-bottles]
-    if: |
-      always() &&
-      needs.prepare.outputs.dry_run != 'true' &&
-      needs.publish-homebrew-formula.result == 'success' &&
-      needs.homebrew-bottles.result == 'success'
+    if: >-
+      ${{ !inputs.plugins-only && (always() && needs.prepare.outputs.dry_run != 'true' && needs.publish-homebrew-formula.result == 'success' && needs.homebrew-bottles.result == 'success') }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -4938,10 +4899,8 @@ jobs:
   stage-go-ffi-libraries:
     name: Stage Go FFI libraries for Go module distribution
     needs: [prepare, build-go-ffi]
-    if: |
-      always() &&
-      needs.prepare.outputs.release_go == 'true' &&
-      needs.build-go-ffi.result == 'success'
+    if: >-
+      ${{ !inputs.plugins-only && (always() && needs.prepare.outputs.release_go == 'true' && needs.build-go-ffi.result == 'success') }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -5102,10 +5061,8 @@ jobs:
       - update-swift-package-manifest
       - stage-go-ffi-libraries
       - upload-cli-release
-    if: |
-      always() &&
-      needs.prepare.outputs.dry_run != 'true' &&
-      needs.validate-versions.result == 'success'
+    if: >-
+      ${{ !inputs.plugins-only && (always() && needs.prepare.outputs.dry_run != 'true' && needs.validate-versions.result == 'success') }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     # Every consumer of this job reads `outputs.promoted`, never
@@ -5256,7 +5213,8 @@ jobs:
       - trigger-pubdev
       - publish-zig
       - publish-kotlin-android
-    if: always() && !inputs.nuget_runtime_run_id && (github.event_name != 'release' || github.actor != 'xberg-dev-publisher[bot]')
+    if: >-
+      ${{ !inputs.plugins-only && (always() && !inputs.nuget_runtime_run_id && (github.event_name != 'release' || github.actor != 'xberg-dev-publisher[bot]')) }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -5540,12 +5498,8 @@ jobs:
       - upload-php-pie-release
       - upload-cli-release
       - release-finalize
-    if: |
-      always() &&
-      !cancelled() &&
-      needs.prepare.outputs.dry_run != 'true' &&
-      needs.release-finalize.result == 'success' &&
-      !contains(needs.*.result, 'failure')
+    if: >-
+      ${{ !inputs.plugins-only && (always() && !cancelled() && needs.prepare.outputs.dry_run != 'true' && needs.release-finalize.result == 'success' && !contains(needs.*.result, 'failure')) }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -5558,7 +5512,8 @@ jobs:
 
   cli-proxy:
     name: Publish CLI proxy package (npm)
-    if: ${{ github.event_name == 'release' && startsWith(github.event.release.tag_name, 'cli-proxy-v') }}
+    if: >-
+      ${{ !inputs.plugins-only && (github.event_name == 'release' && startsWith(github.event.release.tag_name, 'cli-proxy-v')) }}
     runs-on: ubuntu-latest
     permissions:
       id-token: write
@@ -5585,7 +5540,8 @@ jobs:
     # ~keep `!cancelled()` opts out of automatic failure propagation, so the `needs:` edge on
     # validate-versions gates nothing by itself -- the explicit result check below is what stops
     # a bundle whose version the release already rejected from reaching npm.
-    if: ${{ !cancelled() && needs.validate-versions.result == 'success' && needs.prepare.outputs.release_node == 'true' && needs.e2e-plugin.result == 'success' }}
+    if: >-
+      ${{ !inputs.plugins-only && (!cancelled() && needs.validate-versions.result == 'success' && needs.prepare.outputs.release_node == 'true' && needs.e2e-plugin.result == 'success') }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
@@ -5651,7 +5607,8 @@ jobs:
     # ~keep `!cancelled()` opts out of automatic failure propagation, so the `needs:` edge on
     # validate-versions gates nothing by itself -- the explicit result check below is what stops
     # a bundle whose version the release already rejected from reaching PyPI.
-    if: ${{ !cancelled() && needs.validate-versions.result == 'success' && needs.prepare.outputs.release_python == 'true' && needs.e2e-plugin.result == 'success' }}
+    if: >-
+      ${{ !inputs.plugins-only && (!cancelled() && needs.validate-versions.result == 'success' && needs.prepare.outputs.release_python == 'true' && needs.e2e-plugin.result == 'success') }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     environment: pypi
@@ -5705,7 +5662,8 @@ jobs:
     permissions:
       contents: write
     needs: [prepare, release-finalize]
-    if: ${{ !cancelled() && needs.prepare.outputs.dry_run != 'true' && needs.release-finalize.result == 'success' }}
+    if: >-
+      ${{ !inputs.plugins-only && (!cancelled() && needs.prepare.outputs.dry_run != 'true' && needs.release-finalize.result == 'success') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -5749,7 +5707,8 @@ jobs:
   plugin-release-report:
     name: Verify all plugin distribution jobs succeeded
     needs: [prepare, publish-plugin-artifacts, publish-plugin-opencode, publish-plugin-hermes]
-    if: always() && needs.prepare.outputs.dry_run != 'true' && startsWith(needs.prepare.outputs.tag, 'v')
+    if: >-
+      ${{ !inputs.plugins-only && (always() && needs.prepare.outputs.dry_run != 'true' && startsWith(needs.prepare.outputs.tag, 'v')) }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -5771,3 +5730,121 @@ jobs:
               raise SystemExit(f"Incomplete plugin distribution: {', '.join(failed)}")
           print('Verified preparation and 3/3 plugin distribution jobs succeeded')
           PYTHON
+
+  dispatch-plugin-npm:
+    name: Publish missing npm plugin version
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.plugins-only && github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
+      - name: Install reviewed ai-rulez
+        uses: xberg-io/actions/setup-ai-rulez@98adf87f1ed4c62a57ff56f9010d62faf42d4db6
+        with:
+          ai-rulez-version: "5.3.0"
+          source-revision: "bdabc8a6e9211de60ca1e4ad76225ac92fcf218f"
+      - name: Verify plugin versions and generated resources
+        uses: xberg-io/actions/verify-ai-rulez-plugin@98adf87f1ed4c62a57ff56f9010d62faf42d4db6
+        with:
+          version-sync-script: scripts/sync_plugin_version.py
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          registry-url: https://registry.npmjs.org
+      - uses: pnpm/action-setup@v6
+        with:
+          version: "12.11.2"
+          run_install: false
+      - name: Read and check the exact npm version
+        id: package
+        shell: bash
+        run: |
+          python3 - <<'PYTHON'
+          import json
+          import os
+          import urllib.error
+          import urllib.parse
+          import urllib.request
+          from pathlib import Path
+
+          package = json.loads(Path('plugin/package.json').read_text())
+          name, version = package['name'], package['version']
+          if not name or not version:
+              raise SystemExit('Missing plugin package identity')
+          url = 'https://registry.npmjs.org/' + urllib.parse.quote(name, safe='')
+          url += '/' + urllib.parse.quote(version, safe='')
+          try:
+              with urllib.request.urlopen(url, timeout=30) as response:
+                  published = json.load(response)
+              if published['name'] != name or published['version'] != version:
+                  raise SystemExit('Registry returned an unexpected package identity')
+              exists = True
+          except urllib.error.HTTPError as error:
+              if error.code != 404:
+                  raise
+              exists = False
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
+              output.write(f"version={version}\nexists={str(exists).lower()}\n")
+              output.write(f"tag={'next' if '-' in version else 'latest'}\n")
+          print(f"{name}@{version}: {'already published; skipping' if exists else 'not published'}")
+          PYTHON
+      - name: Publish missing npm version with trusted publishing
+        if: steps.package.outputs.exists != 'true'
+        uses: xberg-io/actions/publish-npm@v1
+        with:
+          package-dir: plugin
+          expected-version: ${{ steps.package.outputs.version }}
+          npm-tag: ${{ steps.package.outputs.tag }}
+          access: public
+          provenance: "true"
+
+  dispatch-plugin-hermes:
+    name: Publish missing Hermes plugin version
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.plugins-only && github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
+      - name: Install reviewed ai-rulez
+        uses: xberg-io/actions/setup-ai-rulez@98adf87f1ed4c62a57ff56f9010d62faf42d4db6
+        with:
+          ai-rulez-version: "5.3.0"
+          source-revision: "bdabc8a6e9211de60ca1e4ad76225ac92fcf218f"
+      - name: Verify plugin versions and generated resources
+        uses: xberg-io/actions/verify-ai-rulez-plugin@98adf87f1ed4c62a57ff56f9010d62faf42d4db6
+        with:
+          version-sync-script: scripts/sync_plugin_version.py
+      - uses: astral-sh/setup-uv@v10.3.0
+        with:
+          python-version: "3.13"
+      - name: Read the verified Hermes version
+        id: package
+        shell: bash
+        run: |
+          python3 - <<'PYTHON'
+          import os
+          import tomllib
+          from pathlib import Path
+
+          package = tomllib.loads(Path('plugin/.hermes/package/pyproject.toml').read_text())['project']
+          if not package['name'].endswith('-hermes-plugin') or not package['version']:
+              raise SystemExit('Missing or unexpected Hermes package identity')
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
+              output.write(f"version={package['version']}\n")
+          PYTHON
+      - name: Build verified Hermes wheel
+        run: uv build --wheel --out-dir dist-hermes plugin/.hermes/package
+      - name: Publish missing Hermes version with trusted publishing
+        uses: xberg-io/actions/publish-pypi@v1
+        with:
+          packages-dir: dist-hermes
+          expected-version: ${{ steps.package.outputs.version }}
