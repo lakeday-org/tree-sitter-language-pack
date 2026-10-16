@@ -10,3 +10,8 @@ tasks:
     dir: contract-tests/jvm-capsule
     cmds:
       - mvn test
+
+  release-dry-mutations:
+    desc: Verify release dry runs preserve validation without publishing
+    cmds:
+      - uv run --no-sync python -m unittest scripts.ci.test_release_dry_mutations -v

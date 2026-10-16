@@ -56,6 +56,9 @@ jobs:
         with:
           python-version: "3.14"
           install-command: "uv sync --no-install-project --no-install-workspace"
+      - uses: xberg-io/actions/install-task@9fdb51630009c221ceb85488f70cb6aa3891ada1
+      - name: Test release dry-run mutation guards
+        run: task contract-tests:release-dry-mutations
       - name: Test NuGet packing workflow
         run: |
           uv run --no-sync python scripts/ci/test_nuget_pack.py

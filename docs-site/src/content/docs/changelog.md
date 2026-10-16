@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Release dry runs validate Swift artifacts without pushing tags or triggering plugin publication.
 - SQL parses Hive/Athena array types, SerDe row formats, and paired input/output storage formats without error recovery (#205).
 - SQL retains external-table declarations in structured analysis (#205).
 - Jinja2 parses bare variables in SQL templates and nested call/container expressions as identifier nodes (#205).

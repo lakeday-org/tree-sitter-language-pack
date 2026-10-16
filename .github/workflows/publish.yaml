@@ -4000,6 +4000,7 @@ jobs:
           head -40 Package.swift
 
       - name: Commit and push Package.swift
+        if: ${{ needs.prepare.outputs.dry_run != true && needs.prepare.outputs.dry_run != 'true' }}
         run: |
           git config user.name "xberg-dev-publisher[bot]"
           git config user.email "291994444+xberg-dev-publisher[bot]@users.noreply.github.com"
@@ -5733,7 +5734,7 @@ jobs:
 
   dispatch-plugin-npm:
     name: Publish missing npm plugin version
-    if: ${{ github.event_name == 'workflow_dispatch' && inputs.plugins-only && github.ref == 'refs/heads/main' }}
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.plugins-only && inputs.dry_run != true && inputs.dry_run != 'true' && github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -5804,7 +5805,7 @@ jobs:
 
   dispatch-plugin-hermes:
     name: Publish missing Hermes plugin version
-    if: ${{ github.event_name == 'workflow_dispatch' && inputs.plugins-only && github.ref == 'refs/heads/main' }}
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.plugins-only && inputs.dry_run != true && inputs.dry_run != 'true' && github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
     environment: pypi
     permissions:
