@@ -30,11 +30,35 @@ def allows_mutation(condition: str, variable: str, value: bool | str) -> bool:
     return True
 
 
+def undefined_dispatch_inputs(workflow: dict) -> set[str]:
+    events = workflow.get("on", workflow.get(True))
+    declared = set(events["workflow_dispatch"]["inputs"])
+    expressions = re.findall(r"\$\{\{(.*?)\}\}", yaml.safe_dump(workflow), re.DOTALL)
+    referenced = {name for expression in expressions for name in re.findall(r"(?<![\w.])inputs\.([\w-]+)", expression)}
+    return referenced - declared
+
+
 class ReleaseDryMutationTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         cls.jobs = yaml.safe_load((ROOT / ".github/workflows/publish.yaml").read_text())["jobs"]
         cls.source_version = runpy.run_path(str(ROOT / "scripts/check_test_app_pins.py"))["read_release_version"]()
+
+    def test_publish_expressions_reference_only_declared_dispatch_inputs(self) -> None:
+        workflow = yaml.safe_load((ROOT / ".github/workflows/publish.yaml").read_text())
+        events = workflow.get("on", workflow.get(True))
+        assert len(events["workflow_dispatch"]["inputs"]) == 6
+        assert undefined_dispatch_inputs(workflow) == set(), undefined_dispatch_inputs(workflow)
+
+    def test_dispatch_input_check_rejects_an_undefined_property(self) -> None:
+        workflow = yaml.safe_load((ROOT / ".github/workflows/publish.yaml").read_text())
+        step = next(
+            step
+            for step in workflow["jobs"]["validate-versions"]["steps"]
+            if step.get("name") == "Check test-app pins match the release being published"
+        )
+        step["env"]["RELEASE_REF"] = "${{ inputs.not_declared }}"
+        assert undefined_dispatch_inputs(workflow) == {"not_declared"}
 
     def test_or_mutation_is_rejected_instead_of_mistaken_for_a_guard(self) -> None:
         unsafe = f"{INPUT_DRY} != true || {INPUT_DRY} != 'true'"
@@ -99,7 +123,6 @@ class ReleaseDryMutationTests(unittest.TestCase):
         release: str,
         dry: str,
         stale: bool = False,
-        ref: str = "",
         tag: str = "",
         source_sha: str = "b111c8c371f57b3af1deb279eb107ca016ac5482",
     ) -> subprocess.CompletedProcess[str]:
@@ -134,7 +157,6 @@ class ReleaseDryMutationTests(unittest.TestCase):
                 "needs.prepare.outputs.version": release,
                 "needs.prepare.outputs.dry_run": dry,
                 "github.sha": source_sha,
-                "inputs.ref": ref,
                 "inputs.tag": tag,
             }
 
@@ -184,14 +206,31 @@ class ReleaseDryMutationTests(unittest.TestCase):
                 assert result.returncode != 0
                 assert "Cargo.toml" in result.stdout + result.stderr
 
-    def test_explicit_ref_or_tag_does_not_normalize_virtual_version(self) -> None:
-        for metadata in [{"ref": "main"}, {"tag": f"v{self.source_version}"}]:
-            with self.subTest(metadata=metadata):
-                result = self.run_test_app_pin_step(
-                    release=f"{self.source_version}-dryrun-b111c8c", dry="true", **metadata
-                )
-                assert result.returncode != 0
-                assert "Cargo.toml [workspace.package].version:" in result.stdout + result.stderr
+    def test_explicit_tag_does_not_normalize_virtual_version(self) -> None:
+        result = self.run_test_app_pin_step(
+            release=f"{self.source_version}-dryrun-b111c8c", dry="true", tag=f"v{self.source_version}"
+        )
+        assert result.returncode != 0
+        assert "Cargo.toml [workspace.package].version:" in result.stdout + result.stderr
+
+    def test_checker_explicit_ref_does_not_normalize_virtual_version(self) -> None:
+        main = runpy.run_path(str(ROOT / "scripts/check_test_app_pins.py"))["main"]
+        argv = [
+            "checker",
+            "--release",
+            f"{self.source_version}-dryrun-b111c8c",
+            "--dry-run",
+            "true",
+            "--source-sha",
+            "b111c8c371f57b3af1deb279eb107ca016ac5482",
+            "--ref",
+            "main",
+        ]
+        output = io.StringIO()
+        with patch.object(sys, "argv", argv), contextlib.redirect_stdout(output):
+            result = main()
+        assert result != 0
+        assert "Cargo.toml [workspace.package].version:" in output.getvalue()
 
     def test_virtual_dry_release_requires_a_full_hex_source_sha(self) -> None:
         for sha in ["b111c8c", "b111c8c" + "x" * 33]:

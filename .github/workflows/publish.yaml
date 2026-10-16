@@ -286,7 +286,7 @@ jobs:
           RELEASE_VERSION: ${{ needs.prepare.outputs.version }}
           RELEASE_DRY_RUN: ${{ needs.prepare.outputs.dry_run }}
           RELEASE_SOURCE_SHA: ${{ github.sha }}
-          RELEASE_REF: ${{ inputs.ref }}
+          RELEASE_REF: ""
           RELEASE_TAG: ${{ inputs.tag }}
         run: task test-apps:check-release-pins
 
