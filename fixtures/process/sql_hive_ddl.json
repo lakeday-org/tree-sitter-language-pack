@@ -1,0 +1,48 @@
+{
+  "id": "process_sql_hive_ddl",
+  "description": "Parse Hive DDL without recovery",
+  "category": "process",
+  "tags": [
+    "regression",
+    "sql",
+    "template"
+  ],
+  "input": {
+    "source_code": "CREATE EXTERNAL TABLE t(`a` string, `b` array<string>)\nPARTITIONED BY (`p` string)\nROW FORMAT SERDE 'org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe'\nSTORED AS INPUTFORMAT 'x' OUTPUTFORMAT 'y'\nLOCATION 's3://{{bucket}}/t/'\nTBLPROPERTIES ('k'='v');",
+    "config": {
+      "language": "sql"
+    }
+  },
+  "assertions": [
+    {
+      "type": "equals",
+      "field": "language",
+      "value": "sql"
+    },
+    {
+      "type": "equals",
+      "field": "metrics.error_count",
+      "value": 0
+    },
+    {
+      "type": "equals",
+      "field": "metrics.total_bytes",
+      "value": 259
+    },
+    {
+      "type": "count_min",
+      "field": "structure",
+      "value": 1
+    },
+    {
+      "type": "contains",
+      "field": "structure[].name",
+      "value": "t"
+    }
+  ],
+  "docs": {
+    "topic": "process",
+    "stem": "process_sql_hive_ddl",
+    "title": "Hive DDL parsing"
+  }
+}

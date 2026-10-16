@@ -64,6 +64,18 @@ extensions return `None`. With the `serde` feature enabled, `extension_ambiguity
 same information as a JSON object with `assigned` and `alternatives` fields. These lookups use the
 complete language registry and do not require downloaded parsers.
 
+## SQL dialects and Jinja templates
+
+Select a registered language explicitly with `get_parser("sql")` or `ProcessConfig::new("sql")` when
+processing rendered SQL. The `sql` grammar accepts Hive/Athena `array<T>` types, `ROW FORMAT SERDE`,
+and paired `STORED AS INPUTFORMAT 'reader' OUTPUTFORMAT 'writer'` clauses. Other registered SQL
+grammars include `sql_bigquery` and `tsql`; selecting one does not make every SQL dialect valid.
+
+Both `.j2.sql` and `.sql.j2` paths are detected as `jinja2`. This grammar recognizes bare variables,
+function calls, literals, lists, and dictionaries inside Jinja delimiters. It treats surrounding SQL
+as text, so an error-free template parse does not validate the SQL dialect. General arithmetic,
+dotted property access, and filters remain unsupported by this simplified Jinja grammar.
+
 ## The syntax tree
 
 Every parse returns a `Tree` with a single root node. Its kind is the top-level grammar node for the language: `module` for Python, `program` for JavaScript, `source_file` for Rust and Go.

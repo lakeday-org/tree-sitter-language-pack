@@ -21,6 +21,8 @@
   "Freed-Wu/tree-sitter-tmux": "MIT",
   "FuelLabs/tree-sitter-sway": "Apache-2.0",
   "Fymyte/tree-sitter-rasi": "MIT",
+  "Goldziher/tree-sitter-jinja2": "Apache-2.0",
+  "Goldziher/tree-sitter-sql": "MIT",
   "GoodNotes/tree-sitter-rtf": "MIT",
   "GordianDziwis/tree-sitter-sparql": "MIT",
   "GordianDziwis/tree-sitter-turtle": "MIT",

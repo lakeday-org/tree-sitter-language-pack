@@ -945,6 +945,9 @@ abi_compatible = true
 [crates.java]
 package = "io.xberg.treesitterlanguagepack"
 
+[crates.java.dependency_versions]
+"maven:central-publishing-maven-plugin" = "0.12.0"
+
 [crates.java.capsule_types.Language]
 host_type = "io.github.treesitter.jtreesitter.Language"
 package = "io.github.tree-sitter:jtreesitter"

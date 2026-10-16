@@ -2,7 +2,7 @@ version: "3"
 
 vars:
   DEV_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"
-  TEST_LANGUAGES: "baml,c,cedar,dockerfile,dotenv,elixir,go,hcl,java,javascript,json,just,kdl,kotlin,properties,python,ruby,rust,sql,swift,terraform,toml,tsx,typescript,typoscript,typst,xml,yaml"
+  TEST_LANGUAGES: "baml,c,cedar,dockerfile,dotenv,elixir,go,hcl,java,javascript,jinja2,json,just,kdl,kotlin,properties,python,ruby,rust,sql,swift,terraform,toml,tsx,typescript,typoscript,typst,xml,yaml"
   LINK_MODE: "dynamic"
 
 tasks:

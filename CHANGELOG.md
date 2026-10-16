@@ -12,6 +12,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update Rustls to 0.23.46 to address TLS session secret exposure and handshake/certificate handling advisories
   (RUSTSEC-2026-0346, RUSTSEC-2026-0347, RUSTSEC-2026-0348, RUSTSEC-2026-0349).
 
+### Fixed
+
+- SQL parses Hive/Athena array types, SerDe row formats, and paired input/output storage formats without error recovery (#205).
+- SQL retains external-table declarations in structured analysis (#205).
+- Jinja2 parses bare variables in SQL templates and nested call/container expressions as identifier nodes (#205).
+
 ## [1.22.2] - 2026-10-14
 
 ### Added

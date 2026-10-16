@@ -15,6 +15,86 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update Rustls to 0.23.46 to address TLS session secret exposure and handshake/certificate handling advisories
   (RUSTSEC-2026-0346, RUSTSEC-2026-0347, RUSTSEC-2026-0348, RUSTSEC-2026-0349).
 
+### Fixed
+
+- SQL parses Hive/Athena array types, SerDe row formats, and paired input/output storage formats without error recovery (#205).
+- SQL retains external-table declarations in structured analysis (#205).
+- Jinja2 parses bare variables in SQL templates and nested call/container expressions as identifier nodes (#205).
+
+## [1.22.2] - 2026-10-14
+
+### Added
+
+- `.j2.sql` files are detected as `jinja2` instead of `sql`, which cannot parse Jinja placeholders (#205).
+
+### Fixed
+
+- Python `get_language()` and `get_parser()` release the GIL while a grammar downloads, so other threads and the
+  asyncio loop keep running. The 1.21.0 regeneration had dropped this fix; a contract test now guards it (#206).
+- The generated grammar tables list `cuda` at ABI 15 with its highlights query only, matching what ships. The tables
+  were stale since 1.22.0 and kept the grammar-table CI gate red.
+
+### Changed
+
+- Regenerated bindings with Alef 0.110.10.
+
+## [1.22.1] - 2026-10-12
+
+### Fixed
+
+- The Ruby gem build no longer fails on the Ruby 3.2 ABI. The development `steep` dependency, which needs Ruby 3.3,
+  is now declared only on Ruby 3.3 or newer, so Ruby gems can be published again after the 1.21.2 to 1.22.0 gaps.
+
+## [1.22.0] - 2026-10-12
+
+### Changed
+
+- Updated 25 bundled grammars to their latest upstream revisions: abl, ada, al, asciidoc, cuda, desktop, dotenv,
+  editorconfig, erlang, gdscript, gnuplot, idl, lean, mlir, nix, perl, php, proto, rshtml, scss, slint, swift, templ,
+  wit and xresources. Parse results for these languages can change where upstream fixed or extended the grammar.
+- Updated dependencies, including `ext-php-rs` 0.16.2, `serde_json` 1.0.154 and `zstd` 0.14.2.
+
+## [1.21.3] - 2026-10-10
+
+### Fixed
+
+- Coding-agent plugin bundles are now generated and verified from the plugin-specific configuration,
+  including the Claude marketplace manifest.
+
+## [1.21.2] - 2026-10-10
+
+### Fixed
+
+- `split_code` no longer filters every split point of a depth level for each region it splits. The
+  per-level points are sorted, so each region's boundaries are now a binary-searched slice. Splitting a
+  file with many nodes larger than `chunk_max_size` was quadratic (2.7 MB at 20-byte chunks: 10.3 s, now
+  0.08 s).
+- Chunk metadata collection checks a node's byte bounds before calling `Node::parent`, which walks down
+  from the root. Deeply nested input that overlaps many chunks no longer pays a depth-sized lookup per
+  node per chunk (1 KB of `[[[...]]]`, depth 500, 100-byte chunks: 1.7 s, now 16 ms). Output is unchanged.
+
+### Changed
+
+- `split_code` and `process` chunking now rebalance region edges. A short head or tail left over from
+  splitting an oversized unit is merged into its neighbour when the union fits `chunk_max_size`, or the
+  three chunks around it are re-cut into two at a line boundary. Output changes for such inputs: chunk
+  boundaries move and the chunk count only ever decreases (`fn a() {..}\nfn b() {}` at 36 bytes: 3 chunks
+  with a 7-byte head, now 2). Chunks that were not adjacent to a tiny chunk are untouched, and the pass is
+  linear in the source length.
+- A comment or docstring that straddles a chunk boundary is now reported, with its full text, in
+  `ChunkContext::comments` / `ChunkContext::docstrings` of the chunk containing its first byte. It previously
+  appeared in no chunk because both required full containment.
+
+### Added
+
+- Splitter test and benchmark coverage: seeded generators for many oversized siblings (Rust, Python,
+  JavaScript, C, Go, Java), large and deeply nested JSON, YAML, CSV, Markdown, TOML, single-line, CJK/emoji
+  and CRLF input (`tests/support/shapes.rs`); an oracle test that compares `split_code` with a verbatim copy
+  of the pre-index algorithm; property tests for contiguity, size, UTF-8 and line numbers; optimality tests
+  for packing, boundary quality, chunk count, orphans and metadata attribution; a `process()` scaling
+  regression test (`tests/split_scaling.rs`, run in CI via `task rust:test:split-scaling`); and a `splitting`
+  criterion bench at 1x to 8x.
+
 ## [1.21.1] - 2026-10-10
 
 ### Fixed

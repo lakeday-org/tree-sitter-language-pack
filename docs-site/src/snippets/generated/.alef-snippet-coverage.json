@@ -101,6 +101,7 @@
     "c/process/kotlin_package_class_process.md",
     "c/process/process_javascript_exports_count.md",
     "c/process/process_javascript_exports_detail.md",
+    "c/process/process_jinja_sql_variables.md",
     "c/process/process_python_all_features.md",
     "c/process/process_python_comments.md",
     "c/process/process_python_docstrings.md",
@@ -108,6 +109,7 @@
     "c/process/process_python_metrics_detail.md",
     "c/process/process_python_symbols.md",
     "c/process/process_rust_structure_name.md",
+    "c/process/process_sql_hive_ddl.md",
     "c/process/python_chunking_medium.md",
     "c/process/python_chunking_process_detail.md",
     "c/process/python_class_with_methods_process.md",
@@ -623,6 +625,7 @@
     "csharp/process/kotlin_package_class_process.md",
     "csharp/process/process_javascript_exports_count.md",
     "csharp/process/process_javascript_exports_detail.md",
+    "csharp/process/process_jinja_sql_variables.md",
     "csharp/process/process_python_all_features.md",
     "csharp/process/process_python_comments.md",
     "csharp/process/process_python_docstrings.md",
@@ -630,6 +633,7 @@
     "csharp/process/process_python_metrics_detail.md",
     "csharp/process/process_python_symbols.md",
     "csharp/process/process_rust_structure_name.md",
+    "csharp/process/process_sql_hive_ddl.md",
     "csharp/process/python_chunking_medium.md",
     "csharp/process/python_chunking_process_detail.md",
     "csharp/process/python_class_with_methods_process.md",
@@ -1145,6 +1149,7 @@
     "dart/process/kotlin_package_class_process.md",
     "dart/process/process_javascript_exports_count.md",
     "dart/process/process_javascript_exports_detail.md",
+    "dart/process/process_jinja_sql_variables.md",
     "dart/process/process_python_all_features.md",
     "dart/process/process_python_comments.md",
     "dart/process/process_python_docstrings.md",
@@ -1152,6 +1157,7 @@
     "dart/process/process_python_metrics_detail.md",
     "dart/process/process_python_symbols.md",
     "dart/process/process_rust_structure_name.md",
+    "dart/process/process_sql_hive_ddl.md",
     "dart/process/python_chunking_medium.md",
     "dart/process/python_chunking_process_detail.md",
     "dart/process/python_class_with_methods_process.md",
@@ -1667,6 +1673,7 @@
     "elixir/process/kotlin_package_class_process.md",
     "elixir/process/process_javascript_exports_count.md",
     "elixir/process/process_javascript_exports_detail.md",
+    "elixir/process/process_jinja_sql_variables.md",
     "elixir/process/process_python_all_features.md",
     "elixir/process/process_python_comments.md",
     "elixir/process/process_python_docstrings.md",
@@ -1674,6 +1681,7 @@
     "elixir/process/process_python_metrics_detail.md",
     "elixir/process/process_python_symbols.md",
     "elixir/process/process_rust_structure_name.md",
+    "elixir/process/process_sql_hive_ddl.md",
     "elixir/process/python_chunking_medium.md",
     "elixir/process/python_chunking_process_detail.md",
     "elixir/process/python_class_with_methods_process.md",
@@ -2189,6 +2197,7 @@
     "go/process/kotlin_package_class_process.md",
     "go/process/process_javascript_exports_count.md",
     "go/process/process_javascript_exports_detail.md",
+    "go/process/process_jinja_sql_variables.md",
     "go/process/process_python_all_features.md",
     "go/process/process_python_comments.md",
     "go/process/process_python_docstrings.md",
@@ -2196,6 +2205,7 @@
     "go/process/process_python_metrics_detail.md",
     "go/process/process_python_symbols.md",
     "go/process/process_rust_structure_name.md",
+    "go/process/process_sql_hive_ddl.md",
     "go/process/python_chunking_medium.md",
     "go/process/python_chunking_process_detail.md",
     "go/process/python_class_with_methods_process.md",
@@ -2711,6 +2721,7 @@
     "java/process/kotlin_package_class_process.md",
     "java/process/process_javascript_exports_count.md",
     "java/process/process_javascript_exports_detail.md",
+    "java/process/process_jinja_sql_variables.md",
     "java/process/process_python_all_features.md",
     "java/process/process_python_comments.md",
     "java/process/process_python_docstrings.md",
@@ -2718,6 +2729,7 @@
     "java/process/process_python_metrics_detail.md",
     "java/process/process_python_symbols.md",
     "java/process/process_rust_structure_name.md",
+    "java/process/process_sql_hive_ddl.md",
     "java/process/python_chunking_medium.md",
     "java/process/python_chunking_process_detail.md",
     "java/process/python_class_with_methods_process.md",
@@ -3223,6 +3235,7 @@
     "kotlin-android/process/kotlin_package_class_process.md",
     "kotlin-android/process/process_javascript_exports_count.md",
     "kotlin-android/process/process_javascript_exports_detail.md",
+    "kotlin-android/process/process_jinja_sql_variables.md",
     "kotlin-android/process/process_python_all_features.md",
     "kotlin-android/process/process_python_comments.md",
     "kotlin-android/process/process_python_docstrings.md",
@@ -3230,6 +3243,7 @@
     "kotlin-android/process/process_python_metrics_detail.md",
     "kotlin-android/process/process_python_symbols.md",
     "kotlin-android/process/process_rust_structure_name.md",
+    "kotlin-android/process/process_sql_hive_ddl.md",
     "kotlin-android/process/python_chunking_medium.md",
     "kotlin-android/process/python_chunking_process_detail.md",
     "kotlin-android/process/python_class_with_methods_process.md",
@@ -3745,6 +3759,7 @@
     "php/process/kotlin_package_class_process.md",
     "php/process/process_javascript_exports_count.md",
     "php/process/process_javascript_exports_detail.md",
+    "php/process/process_jinja_sql_variables.md",
     "php/process/process_python_all_features.md",
     "php/process/process_python_comments.md",
     "php/process/process_python_docstrings.md",
@@ -3752,6 +3767,7 @@
     "php/process/process_python_metrics_detail.md",
     "php/process/process_python_symbols.md",
     "php/process/process_rust_structure_name.md",
+    "php/process/process_sql_hive_ddl.md",
     "php/process/python_chunking_medium.md",
     "php/process/python_chunking_process_detail.md",
     "php/process/python_class_with_methods_process.md",
@@ -4267,6 +4283,7 @@
     "python/process/kotlin_package_class_process.md",
     "python/process/process_javascript_exports_count.md",
     "python/process/process_javascript_exports_detail.md",
+    "python/process/process_jinja_sql_variables.md",
     "python/process/process_python_all_features.md",
     "python/process/process_python_comments.md",
     "python/process/process_python_docstrings.md",
@@ -4274,6 +4291,7 @@
     "python/process/process_python_metrics_detail.md",
     "python/process/process_python_symbols.md",
     "python/process/process_rust_structure_name.md",
+    "python/process/process_sql_hive_ddl.md",
     "python/process/python_chunking_medium.md",
     "python/process/python_chunking_process_detail.md",
     "python/process/python_class_with_methods_process.md",
@@ -4789,6 +4807,7 @@
     "ruby/process/kotlin_package_class_process.md",
     "ruby/process/process_javascript_exports_count.md",
     "ruby/process/process_javascript_exports_detail.md",
+    "ruby/process/process_jinja_sql_variables.md",
     "ruby/process/process_python_all_features.md",
     "ruby/process/process_python_comments.md",
     "ruby/process/process_python_docstrings.md",
@@ -4796,6 +4815,7 @@
     "ruby/process/process_python_metrics_detail.md",
     "ruby/process/process_python_symbols.md",
     "ruby/process/process_rust_structure_name.md",
+    "ruby/process/process_sql_hive_ddl.md",
     "ruby/process/python_chunking_medium.md",
     "ruby/process/python_chunking_process_detail.md",
     "ruby/process/python_class_with_methods_process.md",
@@ -5311,6 +5331,7 @@
     "rust/process/kotlin_package_class_process.md",
     "rust/process/process_javascript_exports_count.md",
     "rust/process/process_javascript_exports_detail.md",
+    "rust/process/process_jinja_sql_variables.md",
     "rust/process/process_python_all_features.md",
     "rust/process/process_python_comments.md",
     "rust/process/process_python_docstrings.md",
@@ -5318,6 +5339,7 @@
     "rust/process/process_python_metrics_detail.md",
     "rust/process/process_python_symbols.md",
     "rust/process/process_rust_structure_name.md",
+    "rust/process/process_sql_hive_ddl.md",
     "rust/process/python_chunking_medium.md",
     "rust/process/python_chunking_process_detail.md",
     "rust/process/python_class_with_methods_process.md",
@@ -5833,6 +5855,7 @@
     "swift/process/kotlin_package_class_process.md",
     "swift/process/process_javascript_exports_count.md",
     "swift/process/process_javascript_exports_detail.md",
+    "swift/process/process_jinja_sql_variables.md",
     "swift/process/process_python_all_features.md",
     "swift/process/process_python_comments.md",
     "swift/process/process_python_docstrings.md",
@@ -5840,6 +5863,7 @@
     "swift/process/process_python_metrics_detail.md",
     "swift/process/process_python_symbols.md",
     "swift/process/process_rust_structure_name.md",
+    "swift/process/process_sql_hive_ddl.md",
     "swift/process/python_chunking_medium.md",
     "swift/process/python_chunking_process_detail.md",
     "swift/process/python_class_with_methods_process.md",
@@ -6355,6 +6379,7 @@
     "typescript/process/kotlin_package_class_process.md",
     "typescript/process/process_javascript_exports_count.md",
     "typescript/process/process_javascript_exports_detail.md",
+    "typescript/process/process_jinja_sql_variables.md",
     "typescript/process/process_python_all_features.md",
     "typescript/process/process_python_comments.md",
     "typescript/process/process_python_docstrings.md",
@@ -6362,6 +6387,7 @@
     "typescript/process/process_python_metrics_detail.md",
     "typescript/process/process_python_symbols.md",
     "typescript/process/process_rust_structure_name.md",
+    "typescript/process/process_sql_hive_ddl.md",
     "typescript/process/python_chunking_medium.md",
     "typescript/process/python_chunking_process_detail.md",
     "typescript/process/python_class_with_methods_process.md",
@@ -6867,6 +6893,7 @@
     "wasm/process/kotlin_package_class_process.md",
     "wasm/process/process_javascript_exports_count.md",
     "wasm/process/process_javascript_exports_detail.md",
+    "wasm/process/process_jinja_sql_variables.md",
     "wasm/process/process_python_all_features.md",
     "wasm/process/process_python_comments.md",
     "wasm/process/process_python_docstrings.md",
@@ -6874,6 +6901,7 @@
     "wasm/process/process_python_metrics_detail.md",
     "wasm/process/process_python_symbols.md",
     "wasm/process/process_rust_structure_name.md",
+    "wasm/process/process_sql_hive_ddl.md",
     "wasm/process/python_chunking_medium.md",
     "wasm/process/python_chunking_process_detail.md",
     "wasm/process/python_class_with_methods_process.md",
@@ -7389,6 +7417,7 @@
     "zig/process/kotlin_package_class_process.md",
     "zig/process/process_javascript_exports_count.md",
     "zig/process/process_javascript_exports_detail.md",
+    "zig/process/process_jinja_sql_variables.md",
     "zig/process/process_python_all_features.md",
     "zig/process/process_python_comments.md",
     "zig/process/process_python_docstrings.md",
@@ -7396,6 +7425,7 @@
     "zig/process/process_python_metrics_detail.md",
     "zig/process/process_python_symbols.md",
     "zig/process/process_rust_structure_name.md",
+    "zig/process/process_sql_hive_ddl.md",
     "zig/process/python_chunking_medium.md",
     "zig/process/python_chunking_process_detail.md",
     "zig/process/python_class_with_methods_process.md",
@@ -9015,6 +9045,18 @@
     },
     {
       "key": {
+        "fixture_id": "process_jinja_sql_variables",
+        "language": "ffi"
+      },
+      "path": "c/process/process_jinja_sql_variables.md",
+      "language": "c",
+      "target": "ffi",
+      "session": "ffi",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "process_python_all_features",
         "language": "ffi"
       },
@@ -9091,6 +9133,18 @@
         "language": "ffi"
       },
       "path": "c/process/process_rust_structure_name.md",
+      "language": "c",
+      "target": "ffi",
+      "session": "ffi",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "process_sql_hive_ddl",
+        "language": "ffi"
+      },
+      "path": "c/process/process_sql_hive_ddl.md",
       "language": "c",
       "target": "ffi",
       "session": "ffi",
@@ -15279,6 +15333,18 @@
     },
     {
       "key": {
+        "fixture_id": "process_jinja_sql_variables",
+        "language": "csharp"
+      },
+      "path": "csharp/process/process_jinja_sql_variables.md",
+      "language": "csharp",
+      "target": "csharp",
+      "session": "csharp",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "process_python_all_features",
         "language": "csharp"
       },
@@ -15355,6 +15421,18 @@
         "language": "csharp"
       },
       "path": "csharp/process/process_rust_structure_name.md",
+      "language": "csharp",
+      "target": "csharp",
+      "session": "csharp",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "process_sql_hive_ddl",
+        "language": "csharp"
+      },
+      "path": "csharp/process/process_sql_hive_ddl.md",
       "language": "csharp",
       "target": "csharp",
       "session": "csharp",
@@ -21543,6 +21621,18 @@
     },
     {
       "key": {
+        "fixture_id": "process_jinja_sql_variables",
+        "language": "dart"
+      },
+      "path": "dart/process/process_jinja_sql_variables.md",
+      "language": "dart",
+      "target": "dart",
+      "session": "dart",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "process_python_all_features",
         "language": "dart"
       },
@@ -21619,6 +21709,18 @@
         "language": "dart"
       },
       "path": "dart/process/process_rust_structure_name.md",
+      "language": "dart",
+      "target": "dart",
+      "session": "dart",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "process_sql_hive_ddl",
+        "language": "dart"
+      },
+      "path": "dart/process/process_sql_hive_ddl.md",
       "language": "dart",
       "target": "dart",
       "session": "dart",
@@ -27807,6 +27909,18 @@
     },
     {
       "key": {
+        "fixture_id": "process_jinja_sql_variables",
+        "language": "elixir"
+      },
+      "path": "elixir/process/process_jinja_sql_variables.md",
+      "language": "elixir",
+      "target": "elixir",
+      "session": "elixir",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "process_python_all_features",
         "language": "elixir"
       },
@@ -27883,6 +27997,18 @@
         "language": "elixir"
       },
       "path": "elixir/process/process_rust_structure_name.md",
+      "language": "elixir",
+      "target": "elixir",
+      "session": "elixir",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "process_sql_hive_ddl",
+        "language": "elixir"
+      },
+      "path": "elixir/process/process_sql_hive_ddl.md",
       "language": "elixir",
       "target": "elixir",
       "session": "elixir",
@@ -34071,6 +34197,18 @@
     },
     {
       "key": {
+        "fixture_id": "process_jinja_sql_variables",
+        "language": "go"
+      },
+      "path": "go/process/process_jinja_sql_variables.md",
+      "language": "go",
+      "target": "go",
+      "session": "go",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "process_python_all_features",
         "language": "go"
       },
@@ -34147,6 +34285,18 @@
         "language": "go"
       },
       "path": "go/process/process_rust_structure_name.md",
+      "language": "go",
+      "target": "go",
+      "session": "go",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "process_sql_hive_ddl",
+        "language": "go"
+      },
+      "path": "go/process/process_sql_hive_ddl.md",
       "language": "go",
       "target": "go",
       "session": "go",
@@ -40335,6 +40485,18 @@
     },
     {
       "key": {
+        "fixture_id": "process_jinja_sql_variables",
+        "language": "java"
+      },
+      "path": "java/process/process_jinja_sql_variables.md",
+      "language": "java",
+      "target": "java",
+      "session": "java",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "process_python_all_features",
         "language": "java"
       },
@@ -40411,6 +40573,18 @@
         "language": "java"
       },
       "path": "java/process/process_rust_structure_name.md",
+      "language": "java",
+      "target": "java",
+      "session": "java",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "process_sql_hive_ddl",
+        "language": "java"
+      },
+      "path": "java/process/process_sql_hive_ddl.md",
       "language": "java",
       "target": "java",
       "session": "java",
@@ -46479,6 +46653,18 @@
     },
     {
       "key": {
+        "fixture_id": "process_jinja_sql_variables",
+        "language": "kotlin_android"
+      },
+      "path": "kotlin-android/process/process_jinja_sql_variables.md",
+      "language": "kotlin",
+      "target": "kotlin_android",
+      "session": "kotlin_android",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "process_python_all_features",
         "language": "kotlin_android"
       },
@@ -46555,6 +46741,18 @@
         "language": "kotlin_android"
       },
       "path": "kotlin-android/process/process_rust_structure_name.md",
+      "language": "kotlin",
+      "target": "kotlin_android",
+      "session": "kotlin_android",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "process_sql_hive_ddl",
+        "language": "kotlin_android"
+      },
+      "path": "kotlin-android/process/process_sql_hive_ddl.md",
       "language": "kotlin",
       "target": "kotlin_android",
       "session": "kotlin_android",
@@ -52743,6 +52941,18 @@
     },
     {
       "key": {
+        "fixture_id": "process_jinja_sql_variables",
+        "language": "php"
+      },
+      "path": "php/process/process_jinja_sql_variables.md",
+      "language": "php",
+      "target": "php",
+      "session": "php",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "process_python_all_features",
         "language": "php"
       },
@@ -52819,6 +53029,18 @@
         "language": "php"
       },
       "path": "php/process/process_rust_structure_name.md",
+      "language": "php",
+      "target": "php",
+      "session": "php",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "process_sql_hive_ddl",
+        "language": "php"
+      },
+      "path": "php/process/process_sql_hive_ddl.md",
       "language": "php",
       "target": "php",
       "session": "php",
@@ -59007,6 +59229,18 @@
     },
     {
       "key": {
+        "fixture_id": "process_jinja_sql_variables",
+        "language": "python"
+      },
+      "path": "python/process/process_jinja_sql_variables.md",
+      "language": "python",
+      "target": "python",
+      "session": "python",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "process_python_all_features",
         "language": "python"
       },
@@ -59083,6 +59317,18 @@
         "language": "python"
       },
       "path": "python/process/process_rust_structure_name.md",
+      "language": "python",
+      "target": "python",
+      "session": "python",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "process_sql_hive_ddl",
+        "language": "python"
+      },
+      "path": "python/process/process_sql_hive_ddl.md",
       "language": "python",
       "target": "python",
       "session": "python",
@@ -65271,6 +65517,18 @@
     },
     {
       "key": {
+        "fixture_id": "process_jinja_sql_variables",
+        "language": "ruby"
+      },
+      "path": "ruby/process/process_jinja_sql_variables.md",
+      "language": "ruby",
+      "target": "ruby",
+      "session": "ruby",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "process_python_all_features",
         "language": "ruby"
       },
@@ -65347,6 +65605,18 @@
         "language": "ruby"
       },
       "path": "ruby/process/process_rust_structure_name.md",
+      "language": "ruby",
+      "target": "ruby",
+      "session": "ruby",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "process_sql_hive_ddl",
+        "language": "ruby"
+      },
+      "path": "ruby/process/process_sql_hive_ddl.md",
       "language": "ruby",
       "target": "ruby",
       "session": "ruby",
@@ -71677,6 +71947,20 @@
     },
     {
       "key": {
+        "fixture_id": "process_jinja_sql_variables",
+        "language": "rust"
+      },
+      "path": "rust/process/process_jinja_sql_variables.md",
+      "language": "rust",
+      "target": "rust",
+      "session": "rust",
+      "requires": [
+        "crate:serde_json"
+      ],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "process_python_all_features",
         "language": "rust"
       },
@@ -71765,6 +72049,20 @@
         "language": "rust"
       },
       "path": "rust/process/process_rust_structure_name.md",
+      "language": "rust",
+      "target": "rust",
+      "session": "rust",
+      "requires": [
+        "crate:serde_json"
+      ],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "process_sql_hive_ddl",
+        "language": "rust"
+      },
+      "path": "rust/process/process_sql_hive_ddl.md",
       "language": "rust",
       "target": "rust",
       "session": "rust",
@@ -78735,6 +79033,18 @@
     },
     {
       "key": {
+        "fixture_id": "process_jinja_sql_variables",
+        "language": "swift"
+      },
+      "path": "swift/process/process_jinja_sql_variables.md",
+      "language": "swift",
+      "target": "swift",
+      "session": "swift",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "process_python_all_features",
         "language": "swift"
       },
@@ -78811,6 +79121,18 @@
         "language": "swift"
       },
       "path": "swift/process/process_rust_structure_name.md",
+      "language": "swift",
+      "target": "swift",
+      "session": "swift",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "process_sql_hive_ddl",
+        "language": "swift"
+      },
+      "path": "swift/process/process_sql_hive_ddl.md",
       "language": "swift",
       "target": "swift",
       "session": "swift",
@@ -84999,6 +85321,18 @@
     },
     {
       "key": {
+        "fixture_id": "process_jinja_sql_variables",
+        "language": "node"
+      },
+      "path": "typescript/process/process_jinja_sql_variables.md",
+      "language": "typescript",
+      "target": "node",
+      "session": "node",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "process_python_all_features",
         "language": "node"
       },
@@ -85075,6 +85409,18 @@
         "language": "node"
       },
       "path": "typescript/process/process_rust_structure_name.md",
+      "language": "typescript",
+      "target": "node",
+      "session": "node",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "process_sql_hive_ddl",
+        "language": "node"
+      },
+      "path": "typescript/process/process_sql_hive_ddl.md",
       "language": "typescript",
       "target": "node",
       "session": "node",
@@ -91143,6 +91489,18 @@
     },
     {
       "key": {
+        "fixture_id": "process_jinja_sql_variables",
+        "language": "wasm"
+      },
+      "path": "wasm/process/process_jinja_sql_variables.md",
+      "language": "typescript",
+      "target": "wasm",
+      "session": "wasm",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "process_python_all_features",
         "language": "wasm"
       },
@@ -91219,6 +91577,18 @@
         "language": "wasm"
       },
       "path": "wasm/process/process_rust_structure_name.md",
+      "language": "typescript",
+      "target": "wasm",
+      "session": "wasm",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "process_sql_hive_ddl",
+        "language": "wasm"
+      },
+      "path": "wasm/process/process_sql_hive_ddl.md",
       "language": "typescript",
       "target": "wasm",
       "session": "wasm",
@@ -97407,6 +97777,18 @@
     },
     {
       "key": {
+        "fixture_id": "process_jinja_sql_variables",
+        "language": "zig"
+      },
+      "path": "zig/process/process_jinja_sql_variables.md",
+      "language": "zig",
+      "target": "zig",
+      "session": "zig",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "process_python_all_features",
         "language": "zig"
       },
@@ -97483,6 +97865,18 @@
         "language": "zig"
       },
       "path": "zig/process/process_rust_structure_name.md",
+      "language": "zig",
+      "target": "zig",
+      "session": "zig",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "process_sql_hive_ddl",
+        "language": "zig"
+      },
+      "path": "zig/process/process_sql_hive_ddl.md",
       "language": "zig",
       "target": "zig",
       "session": "zig",
@@ -109232,6 +109626,66 @@
       "language": "zig"
     },
     {
+      "fixture_id": "process_jinja_sql_variables",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "process_jinja_sql_variables",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "process_jinja_sql_variables",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "process_jinja_sql_variables",
+      "language": "ffi"
+    },
+    {
+      "fixture_id": "process_jinja_sql_variables",
+      "language": "go"
+    },
+    {
+      "fixture_id": "process_jinja_sql_variables",
+      "language": "java"
+    },
+    {
+      "fixture_id": "process_jinja_sql_variables",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "process_jinja_sql_variables",
+      "language": "node"
+    },
+    {
+      "fixture_id": "process_jinja_sql_variables",
+      "language": "php"
+    },
+    {
+      "fixture_id": "process_jinja_sql_variables",
+      "language": "python"
+    },
+    {
+      "fixture_id": "process_jinja_sql_variables",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "process_jinja_sql_variables",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "process_jinja_sql_variables",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "process_jinja_sql_variables",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "process_jinja_sql_variables",
+      "language": "zig"
+    },
+    {
       "fixture_id": "process_python_all_features",
       "language": "csharp"
     },
@@ -109649,6 +110103,66 @@
     },
     {
       "fixture_id": "process_rust_structure_name",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "process_sql_hive_ddl",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "process_sql_hive_ddl",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "process_sql_hive_ddl",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "process_sql_hive_ddl",
+      "language": "ffi"
+    },
+    {
+      "fixture_id": "process_sql_hive_ddl",
+      "language": "go"
+    },
+    {
+      "fixture_id": "process_sql_hive_ddl",
+      "language": "java"
+    },
+    {
+      "fixture_id": "process_sql_hive_ddl",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "process_sql_hive_ddl",
+      "language": "node"
+    },
+    {
+      "fixture_id": "process_sql_hive_ddl",
+      "language": "php"
+    },
+    {
+      "fixture_id": "process_sql_hive_ddl",
+      "language": "python"
+    },
+    {
+      "fixture_id": "process_sql_hive_ddl",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "process_sql_hive_ddl",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "process_sql_hive_ddl",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "process_sql_hive_ddl",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "process_sql_hive_ddl",
       "language": "zig"
     },
     {
@@ -140474,6 +140988,66 @@
       "language": "zig"
     },
     {
+      "fixture_id": "process_jinja_sql_variables",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "process_jinja_sql_variables",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "process_jinja_sql_variables",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "process_jinja_sql_variables",
+      "language": "ffi"
+    },
+    {
+      "fixture_id": "process_jinja_sql_variables",
+      "language": "go"
+    },
+    {
+      "fixture_id": "process_jinja_sql_variables",
+      "language": "java"
+    },
+    {
+      "fixture_id": "process_jinja_sql_variables",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "process_jinja_sql_variables",
+      "language": "node"
+    },
+    {
+      "fixture_id": "process_jinja_sql_variables",
+      "language": "php"
+    },
+    {
+      "fixture_id": "process_jinja_sql_variables",
+      "language": "python"
+    },
+    {
+      "fixture_id": "process_jinja_sql_variables",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "process_jinja_sql_variables",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "process_jinja_sql_variables",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "process_jinja_sql_variables",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "process_jinja_sql_variables",
+      "language": "zig"
+    },
+    {
       "fixture_id": "process_python_all_features",
       "language": "csharp"
     },
@@ -140891,6 +141465,66 @@
     },
     {
       "fixture_id": "process_rust_structure_name",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "process_sql_hive_ddl",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "process_sql_hive_ddl",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "process_sql_hive_ddl",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "process_sql_hive_ddl",
+      "language": "ffi"
+    },
+    {
+      "fixture_id": "process_sql_hive_ddl",
+      "language": "go"
+    },
+    {
+      "fixture_id": "process_sql_hive_ddl",
+      "language": "java"
+    },
+    {
+      "fixture_id": "process_sql_hive_ddl",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "process_sql_hive_ddl",
+      "language": "node"
+    },
+    {
+      "fixture_id": "process_sql_hive_ddl",
+      "language": "php"
+    },
+    {
+      "fixture_id": "process_sql_hive_ddl",
+      "language": "python"
+    },
+    {
+      "fixture_id": "process_sql_hive_ddl",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "process_sql_hive_ddl",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "process_sql_hive_ddl",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "process_sql_hive_ddl",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "process_sql_hive_ddl",
       "language": "zig"
     },
     {

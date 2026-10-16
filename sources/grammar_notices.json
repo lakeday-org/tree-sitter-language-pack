@@ -1,5 +1,5 @@
 {
-  "definitions_sha256": "4cd09a5abea66ba4e766c56f107a3ce1c94f465d3e44c33958f700ad44822915",
+  "definitions_sha256": "9954970581db65813fd5f3d340f07dfb5a44761e29492cdb6f2b57a9d017b93c",
   "languages": {
     "abl": {
       "branch": null,
@@ -2528,9 +2528,9 @@
         }
       ],
       "local": null,
-      "repo": "https://github.com/dbt-labs/tree-sitter-jinja2",
+      "repo": "https://github.com/Goldziher/tree-sitter-jinja2",
       "resolution": "github-license",
-      "rev": "a82ed374f4cb58a1358dd6b26a7157bde1bca3b7",
+      "rev": "baa1f57d116cce3a89c1742d6563520678faea13",
       "spdx": "Apache-2.0",
       "spdx_source": "detected"
     },
@@ -4764,9 +4764,9 @@
         }
       ],
       "local": null,
-      "repo": "https://github.com/DerekStride/tree-sitter-sql",
+      "repo": "https://github.com/Goldziher/tree-sitter-sql",
       "resolution": "github-license",
-      "rev": "97614d051eebfd3bc5d97c0bdb5a1638719ca811",
+      "rev": "973122dcccea5777a3703abf7d0735c75bef01ff",
       "spdx": "MIT",
       "spdx_source": "detected"
     },

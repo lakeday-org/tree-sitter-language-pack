@@ -129,6 +129,7 @@ fn read_head(leaves: &[Node<'_>], start: usize, source: &str) -> Option<Head> {
             | "keyword_or"
             | "keyword_replace"
             | "keyword_unique"
+            | "keyword_external"
             | "keyword_temp"
             | "keyword_temporary"
             | "keyword_materialized"

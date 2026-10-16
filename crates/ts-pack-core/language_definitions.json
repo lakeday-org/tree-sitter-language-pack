@@ -874,8 +874,8 @@
   "jinja2": {
     "extensions": ["j2", "jinja2"],
     "generate": true,
-    "repo": "https://github.com/dbt-labs/tree-sitter-jinja2",
-    "rev": "a82ed374f4cb58a1358dd6b26a7157bde1bca3b7"
+    "repo": "https://github.com/Goldziher/tree-sitter-jinja2",
+    "rev": "baa1f57d116cce3a89c1742d6563520678faea13"
   },
   "jq": {
     "extensions": ["jq"],
@@ -1566,8 +1566,8 @@
   "sql": {
     "extensions": ["sql"],
     "generate": true,
-    "repo": "https://github.com/DerekStride/tree-sitter-sql",
-    "rev": "97614d051eebfd3bc5d97c0bdb5a1638719ca811"
+    "repo": "https://github.com/Goldziher/tree-sitter-sql",
+    "rev": "973122dcccea5777a3703abf7d0735c75bef01ff"
   },
   "sql_bigquery": {
     "extensions": ["bq"],
