@@ -10,6 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Security
+
+- Update Rustls to 0.23.46 to address TLS session secret exposure and handshake/certificate handling advisories
+  (RUSTSEC-2026-0346, RUSTSEC-2026-0347, RUSTSEC-2026-0348, RUSTSEC-2026-0349).
+
 ## [1.21.1] - 2026-10-10
 
 ### Fixed
