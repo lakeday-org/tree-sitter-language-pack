@@ -1,11 +1,17 @@
 """Keep release dry runs read-only while retaining artifact validation."""
 
+import contextlib
+import io
 import os
 import re
+import runpy
+import shutil
 import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 import yaml
 
@@ -28,6 +34,7 @@ class ReleaseDryMutationTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         cls.jobs = yaml.safe_load((ROOT / ".github/workflows/publish.yaml").read_text())["jobs"]
+        cls.source_version = runpy.run_path(str(ROOT / "scripts/check_test_app_pins.py"))["read_release_version"]()
 
     def test_or_mutation_is_rejected_instead_of_mistaken_for_a_guard(self) -> None:
         unsafe = f"{INPUT_DRY} != true || {INPUT_DRY} != 'true'"
@@ -85,6 +92,139 @@ class ReleaseDryMutationTests(unittest.TestCase):
         assert tasks["release-dry-mutations"]["cmds"] == [
             "uv run --no-sync python -m unittest scripts.ci.test_release_dry_mutations -v"
         ]
+
+    def run_test_app_pin_step(
+        self,
+        *,
+        release: str,
+        dry: str,
+        stale: bool = False,
+        ref: str = "",
+        tag: str = "",
+        source_sha: str = "b111c8c371f57b3af1deb279eb107ca016ac5482",
+    ) -> subprocess.CompletedProcess[str]:
+        steps = self.jobs["validate-versions"]["steps"]
+        step = next(
+            item for item in steps if item.get("name") == "Check test-app pins match the release being published"
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            checker = ROOT / "scripts/check_test_app_pins.py"
+            pins = runpy.run_path(str(checker))["PINS"]
+            paths = {"Cargo.toml", "alef.toml", "Taskfile.yml", *(pin.path for pin in pins)}
+            assert len(paths) == 20
+            for name in paths:
+                destination = root / name
+                destination.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(ROOT / name, destination)
+            shutil.copytree(ROOT / ".task", root / ".task")
+            (root / "scripts").mkdir(exist_ok=True)
+            shutil.copy2(ROOT / "scripts/check_test_app_pins.py", root / "scripts/check_test_app_pins.py")
+            if stale:
+                manifest = root / "test_apps/node/package.json"
+                original = manifest.read_text()
+                assert self.source_version != "0.0.1"
+                source_pin = f'"{self.source_version}"'
+                assert original.count(source_pin) == 1
+                changed = original.replace(source_pin, '"0.0.1"')
+                assert changed != original
+                assert changed.count('"0.0.1"') == 1
+                manifest.write_text(changed)
+            values = {
+                "needs.prepare.outputs.version": release,
+                "needs.prepare.outputs.dry_run": dry,
+                "github.sha": source_sha,
+                "inputs.ref": ref,
+                "inputs.tag": tag,
+            }
+
+            def expand(text: str) -> str:
+                for expression, value in values.items():
+                    text = text.replace("${{ " + expression + " }}", value)
+                assert "${{" not in text, text
+                return text
+
+            environment = dict(os.environ)
+            environment.update({name: expand(str(value)) for name, value in step.get("env", {}).items()})
+            environment["PATH"] = str(Path(sys.executable).parent) + os.pathsep + environment["PATH"]
+            return subprocess.run(
+                ["bash", "-eu", "-c", expand(step["run"])],
+                cwd=root,
+                env=environment,
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+
+    def test_real_release_validates_real_source_pins(self) -> None:
+        result = self.run_test_app_pin_step(release=self.source_version, dry="false")
+        assert result.returncode == 0, result.stdout + result.stderr
+
+    def test_virtual_dry_release_validates_real_source_pins(self) -> None:
+        result = self.run_test_app_pin_step(release=f"{self.source_version}-dryrun-b111c8c", dry="true")
+        assert result.returncode == 0, result.stdout + result.stderr
+
+    def test_virtual_dry_release_still_rejects_a_stale_test_app_pin(self) -> None:
+        result = self.run_test_app_pin_step(release=f"{self.source_version}-dryrun-b111c8c", dry="true", stale=True)
+        assert result.returncode != 0
+        output = result.stdout + result.stderr
+        findings = [line.strip() for line in output.splitlines() if line.startswith("  ")]
+        assert findings == [f"test_apps/node/package.json: pinned to 0.0.1, expected {self.source_version}"], output
+        assert "Cargo.toml [workspace.package].version:" not in output
+
+    def test_real_release_does_not_accept_a_synthetic_version(self) -> None:
+        result = self.run_test_app_pin_step(release=f"{self.source_version}-dryrun-b111c8c", dry="false")
+        assert result.returncode != 0
+        assert "Cargo.toml" in result.stdout + result.stderr
+
+    def test_virtual_dry_release_does_not_accept_wrong_source_or_sha(self) -> None:
+        for version in ["0.0.1-dryrun-b111c8c", f"{self.source_version}-dryrun-0000000"]:
+            with self.subTest(version=version):
+                result = self.run_test_app_pin_step(release=version, dry="true")
+                assert result.returncode != 0
+                assert "Cargo.toml" in result.stdout + result.stderr
+
+    def test_explicit_ref_or_tag_does_not_normalize_virtual_version(self) -> None:
+        for metadata in [{"ref": "main"}, {"tag": f"v{self.source_version}"}]:
+            with self.subTest(metadata=metadata):
+                result = self.run_test_app_pin_step(
+                    release=f"{self.source_version}-dryrun-b111c8c", dry="true", **metadata
+                )
+                assert result.returncode != 0
+                assert "Cargo.toml [workspace.package].version:" in result.stdout + result.stderr
+
+    def test_virtual_dry_release_requires_a_full_hex_source_sha(self) -> None:
+        for sha in ["b111c8c", "b111c8c" + "x" * 33]:
+            with self.subTest(sha=sha):
+                result = self.run_test_app_pin_step(
+                    release=f"{self.source_version}-dryrun-b111c8c", dry="true", source_sha=sha
+                )
+                assert result.returncode != 0
+                assert "Cargo.toml [workspace.package].version:" in result.stdout + result.stderr
+
+    def test_real_prerelease_version_is_preserved_exactly(self) -> None:
+        checker = runpy.run_path(str(ROOT / "scripts/check_test_app_pins.py"))
+        main = checker["main"]
+        source = "1.22.2-rc.1-dryrun-b111c8c"
+        with patch.dict(
+            main.__globals__,
+            {
+                "read_release_version": lambda: source,
+                "check_go_module": lambda **_: ([], False),
+                "registry_pins": lambda *_, **__: ([], False),
+                "PINS": (),
+            },
+        ):
+            for released, expected in [(source, 0), ("1.22.2-rc.1", 1)]:
+                with self.subTest(released=released), patch.object(sys, "argv", ["checker", "--release", released]):
+                    output = io.StringIO()
+                    with contextlib.redirect_stdout(output):
+                        actual = main()
+                    assert actual == expected, output.getvalue()
+                    if expected:
+                        assert f"{source}, expected {released}" in output.getvalue()
+                    else:
+                        assert f"({source})" in output.getvalue()
 
     def test_every_remote_shell_mutation_has_a_dry_guard(self) -> None:
         found = []

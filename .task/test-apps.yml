@@ -97,6 +97,19 @@ tasks:
     cmds:
       - python3 scripts/check_test_app_pins.py
 
+  check-release-pins:
+    desc: Validate test-app pins against real or exact virtual dry-release metadata
+    requires:
+      vars: [RELEASE_VERSION, RELEASE_DRY_RUN, RELEASE_SOURCE_SHA]
+    cmds:
+      - >-
+        python3 scripts/check_test_app_pins.py
+        --release "$RELEASE_VERSION"
+        --dry-run "$RELEASE_DRY_RUN"
+        --source-sha "$RELEASE_SOURCE_SHA"
+        --ref "$RELEASE_REF"
+        --tag "$RELEASE_TAG"
+
   fix-pins:
     desc: Repin every test_app to the version in Cargo.toml
     cmds:

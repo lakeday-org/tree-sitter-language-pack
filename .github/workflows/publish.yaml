@@ -278,8 +278,17 @@ jobs:
 
       # A registry-mode test app pinned to an older release still installs and still passes, so it
       # gates nothing. Five were up to six releases behind before this check existed. ~keep
+      - name: Setup Task
+        uses: xberg-io/actions/install-task@9fdb51630009c221ceb85488f70cb6aa3891ada1
+
       - name: Check test-app pins match the release being published
-        run: python3 scripts/check_test_app_pins.py --release "${{ needs.prepare.outputs.version }}"
+        env:
+          RELEASE_VERSION: ${{ needs.prepare.outputs.version }}
+          RELEASE_DRY_RUN: ${{ needs.prepare.outputs.dry_run }}
+          RELEASE_SOURCE_SHA: ${{ github.sha }}
+          RELEASE_REF: ${{ inputs.ref }}
+          RELEASE_TAG: ${{ inputs.tag }}
+        run: task test-apps:check-release-pins
 
       # The coding-agent plugin under plugin/ carries its own version source
       # (plugin/.ai-rulez/config.toml [plugin].version) that the shared

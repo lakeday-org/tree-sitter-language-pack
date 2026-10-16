@@ -223,6 +223,10 @@ def main() -> int:
     # ~keep The publish workflow knows the release it is cutting; passing it makes this gate catch
     # a Cargo.toml that itself disagrees with the tag, which deriving the version cannot.
     parser.add_argument("--release", help="version being released (defaults to [workspace.package].version)")
+    parser.add_argument("--dry-run", choices=("true", "false"), default="false")
+    parser.add_argument("--source-sha", default="")
+    parser.add_argument("--ref", default="")
+    parser.add_argument("--tag", default="")
     args = parser.parse_args()
 
     if args.release and args.fix:
@@ -230,6 +234,15 @@ def main() -> int:
 
     declared = read_release_version()
     release = args.release.lstrip("v") if args.release else declared
+    # ~keep Only a virtual dry tag synthesized for this exact source can represent the Cargo version.
+    if (
+        args.dry_run == "true"
+        and not args.ref
+        and not args.tag
+        and re.fullmatch(r"[0-9a-f]{40}", args.source_sha)
+        and release == f"{declared}-dryrun-{args.source_sha[:7]}"
+    ):
+        release = declared
 
     findings: list[Finding] = []
     fixed: list[str] = []
