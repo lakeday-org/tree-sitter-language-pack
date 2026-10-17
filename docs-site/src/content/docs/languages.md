@@ -163,7 +163,7 @@ tree-sitter-language-pack supports **372** languages.
 | Java | `.java` | [tree-sitter/tree-sitter-java](https://github.com/tree-sitter/tree-sitter-java) | 14 |
 | Javadoc | — | [rmuir/tree-sitter-javadoc](https://github.com/rmuir/tree-sitter-javadoc) | 14 |
 | JavaScript | `.js`, `.jsx`, `.mjs`, `.cjs` | [tree-sitter/tree-sitter-javascript](https://github.com/tree-sitter/tree-sitter-javascript) | 14 |
-| Jinja2 | `.j2`, `.jinja2` | [dbt-labs/tree-sitter-jinja2](https://github.com/dbt-labs/tree-sitter-jinja2) | 14 |
+| Jinja2 | `.j2`, `.jinja2` | [Goldziher/tree-sitter-jinja2](https://github.com/Goldziher/tree-sitter-jinja2) | 14 |
 | Jjdescription | `.jjdescription` | [ribru17/tree-sitter-jjdescription](https://github.com/ribru17/tree-sitter-jjdescription) | 14 |
 | Jq | `.jq` | [flurie/tree-sitter-jq](https://github.com/flurie/tree-sitter-jq) | 14 |
 | Jsdoc | — | [tree-sitter/tree-sitter-jsdoc](https://github.com/tree-sitter/tree-sitter-jsdoc) | 14 |
@@ -302,7 +302,7 @@ tree-sitter-language-pack supports **372** languages.
 | Sourcepawn | `.sp`, `.inc` | [nilshelmig/tree-sitter-sourcepawn](https://github.com/nilshelmig/tree-sitter-sourcepawn) | 14 |
 | Sparql | `.sparql` | [GordianDziwis/tree-sitter-sparql](https://github.com/GordianDziwis/tree-sitter-sparql) | 14 |
 | Spicedb | `.zed` | [jzelinskie/tree-sitter-spicedb](https://github.com/jzelinskie/tree-sitter-spicedb) | 14 |
-| SQL | `.sql` | [DerekStride/tree-sitter-sql](https://github.com/DerekStride/tree-sitter-sql) | 14 |
+| SQL | `.sql` | [Goldziher/tree-sitter-sql](https://github.com/Goldziher/tree-sitter-sql) | 14 |
 | Sql Bigquery | `.bq` | [takegue/tree-sitter-sql-bigquery](https://github.com/takegue/tree-sitter-sql-bigquery) | 14 |
 | Squirrel | `.squirrel`, `.nut` | [tree-sitter-grammars/tree-sitter-squirrel](https://github.com/tree-sitter-grammars/tree-sitter-squirrel) | 14 |
 | Ssh Config | — | [ObserverOfTime/tree-sitter-ssh-config](https://github.com/ObserverOfTime/tree-sitter-ssh-config) | 14 |

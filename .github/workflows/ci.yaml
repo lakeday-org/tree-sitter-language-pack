@@ -271,10 +271,14 @@ jobs:
             echo "::error::packages/ or crates/ is missing — the freshness gate below would be a no-op."
             exit 1
           }
+          test -f README.md && git ls-files --error-unmatch README.md >/dev/null 2>&1 || {
+            echo "::error::root README.md is missing or untracked; the freshness gate would be incomplete."
+            exit 1
+          }
           alef readme
           # Ignore whitespace-only diffs — markdown formatter (rumdl) collapses
           # blank lines and table column padding that alef emits.
-          git diff -w --ignore-blank-lines --exit-code -- packages/*/README.md crates/*/README.md || {
+          git diff -w --ignore-blank-lines --exit-code -- README.md packages/*/README.md crates/*/README.md || {
             echo "::error::READMEs are out of date. Run 'alef readme' and commit."
             exit 1
           }
