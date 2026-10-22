@@ -26,7 +26,6 @@ deps/
 .venv
 .coverage
 coverage.xml
-.mypy_cache
 .pytest_cache
 .ruff_cache
 .python-version

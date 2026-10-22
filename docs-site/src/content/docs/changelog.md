@@ -2039,7 +2039,7 @@ Stable release promoting 1.11.0-rc.2 (fully published). Version synced across al
 ### Fixed
 
 - Node: `getLanguage(name)` now returns a real `tree-sitter` `Language` that `new Parser().setLanguage(lang)` accepts at runtime. The previous capsule shim used `napi::bindgen_prelude::External::new` (rejected by `node-tree-sitter`'s `UnwrapLanguage`), wrote the External to `__parser`, and did not type-tag the value. Adopts alef [v0.15.49](https://github.com/xberg-io/alef/releases/tag/v0.15.49) where the napi capsule codegen emits raw `napi_create_external` + `napi_type_tag_object` and reads `property_name`/`type_tag` from `[crates.node.capsule_types]`.
-- Python: `PackConfig` and `ProcessConfig` type hints now resolve to the `.options` dataclasses, fixing `mypy --strict` errors at every `init(...)` / `process(...)` call site (adopts alef [#72](https://github.com/xberg-io/alef/issues/72)).
+- Python: `PackConfig` and `ProcessConfig` type hints now resolve to the `.options` dataclasses, fixing strict type checking errors at every `init(...)` / `process(...)` call site (adopts alef [#72](https://github.com/xberg-io/alef/issues/72)).
 
 - Python: restore `SupportedLanguage` as `Literal[...]` of all 306 grammars at `tree_sitter_language_pack.SupportedLanguage`. The symbol was dropped during the alef 0.15.x codegen migration and re-importing it raised `ImportError` in 1.8.0 (#121).
 - Python: `get_parser("python").parse(b"...")` returns a real `tree_sitter.Tree` again instead of raising `AttributeError`. `get_parser` / `get_language` now return native `tree_sitter.Parser` / `tree_sitter.Language` instances via PyO3 capsule pass-through (alef v0.15.39 wires `capsule_types` through `gen_bindings`) (#121).
