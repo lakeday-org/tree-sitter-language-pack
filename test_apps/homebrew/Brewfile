@@ -1,3 +1,5 @@
-tap "xberg-io/homebrew-tap"
-brew "xberg-io/homebrew-tap/ts-pack"
-brew "xberg-io/homebrew-tap/libts-pack"
+# Brewfile — managed by alef. DO NOT EDIT.
+# alef:hash:1b1aee85fc309138ca61a77b2de539dedbe558f2a8c2451b308c1cca2c41da03
+tap 'xberg-io/homebrew-tap'
+brew 'xberg-io/homebrew-tap/ts-pack'
+brew 'xberg-io/homebrew-tap/libts-pack'

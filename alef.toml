@@ -1,5 +1,5 @@
 [workspace]
-alef_version = "0.110.10"
+alef_version = "0.115.5"
 languages = [
   "python",
   "node",
@@ -18,10 +18,10 @@ languages = [
   "jni",
 ]
 
-# ~keep These five are create-once seeds whose alef template has since diverged from the copy we
+# ~keep These are create-once seeds whose alef template has since diverged from the copy we
 # maintain by hand. `alef verify` reports each under "frozen path(s) DRIFTED" every run, and
 # `task version:sync` greps that heading and treats a hit as fatal -- so leaving them undeclared
-# blocks every release. In all five cases the on-disk copy is the correct one and adopting the
+# blocks every release. In these cases the on-disk copy is the correct one and adopting the
 # template would be a regression, which is why this is `user_owned` and not `alef adopt`:
 #
 #   test_apps/dart/pubspec.yaml, e2e/dart/pubspec.yaml
@@ -39,13 +39,15 @@ languages = [
 #     Only differs pre-publish: alef omits the five `.hash` lines because the v1.16.2 release
 #     assets do not exist yet (it logs "zig hash skipped -- ... regen after release"), while our
 #     copy still carries the v1.16.1 hashes. REVISIT THIS ENTRY AFTER v1.16.2 PUBLISHES -- unlike
-#     the other four this one is expected to self-resolve, and once the hashes regenerate against
+#     the other entries this one is expected to self-resolve, and once the hashes regenerate against
 #     a real release the declaration should come back out rather than mask genuine drift.
 [workspace.ownership]
 user_owned = [
   "e2e/dart/pubspec.yaml",
   "e2e/kotlin_android/build.gradle.kts",
   "test_apps/dart/pubspec.yaml",
+  # ~keep Retain documentation of the consumer-owned languages_smoke.c check.
+  "test_apps/homebrew/README.md",
   "test_apps/kotlin_android/build.gradle.kts",
   "test_apps/zig/build.zig.zon",
 ]
@@ -1236,6 +1238,25 @@ pkg_config = true
 cmake_config = true
 
 [crates.e2e]
+languages = [
+  "python",
+  "node",
+  "ruby",
+  "php",
+  "c",
+  "go",
+  "java",
+  "csharp",
+  "elixir",
+  "wasm",
+  "dart",
+  "kotlin_android",
+  "swift",
+  "zig",
+  "jni",
+  "rust",
+  "homebrew",
+]
 fixtures = "fixtures"
 output = "e2e"
 fields_array = ["chunks", "imports", "structure"]
@@ -1902,6 +1923,32 @@ version = "1.22.2"
 [crates.e2e.registry.packages.kotlin_android]
 name = "io.xberg.tslp.android:tree-sitter-language-pack-android"
 version = "1.22.2"
+
+[crates.e2e.registry.packages.homebrew]
+tap = "xberg-io/homebrew-tap"
+cli_formula = "ts-pack"
+ffi_formula = "libts-pack"
+
+[[crates.e2e.registry.packages.homebrew.cli_tests]]
+name = "cli-version"
+command = '$CLI_FORMULA --version | grep -Fxq "$CLI_FORMULA $VERSION" && printf "%s" "version-match"'
+expect_contains = "version-match"
+
+[[crates.e2e.registry.packages.homebrew.cli_tests]]
+name = "cli-help"
+command = "$CLI_FORMULA --help"
+expect_contains = "ts-pack"
+
+[[crates.e2e.registry.packages.homebrew.cli_tests]]
+name = "ffi-language-list"
+command = """
+prefix=$(brew --prefix "$TAP/libts-pack")
+scratch=$(mktemp -d)
+trap 'rm -rf "$scratch"' EXIT
+cc -I"$prefix/include" -L"$prefix/lib" -o "$scratch/languages_smoke" "$SCRIPT_DIR/languages_smoke.c" -lts_pack_core_ffi
+"$scratch/languages_smoke"
+"""
+expect_contains = "PASS: ts_pack_available_languages returned:"
 
 [crates.e2e.registry.run.jni]
 precondition = "command -v gradle >/dev/null 2>&1"

@@ -21,6 +21,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Manage the Homebrew consumer suite with Alef and Bats while retaining the FFI language-list smoke check.
+
 - Grammar source links for Jinja2 and SQL point to the maintained repositories used by the bundled parsers.
 - Release dry runs validate Swift artifacts without pushing tags or triggering plugin publication.
 - SQL parses Hive/Athena array types, SerDe row formats, and paired input/output storage formats without error recovery (#205).
