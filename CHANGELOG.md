@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
+- Update ctutils, Tokio, and Zstandard dependencies to resolve six security advisories
+  (RUSTSEC-2026-0385, RUSTSEC-2026-0386, RUSTSEC-2026-0391, RUSTSEC-2026-0398,
+  RUSTSEC-2026-0403, RUSTSEC-2026-0410).
+
 - Update TLS certificate validation and bundled roots to reject distrusted emSign intermediates
   (RUSTSEC-2026-0381, RUSTSEC-2026-0382, RUSTSEC-2026-0383).
 
