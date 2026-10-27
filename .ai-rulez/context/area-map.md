@@ -16,9 +16,9 @@ tree-sitter-language-pack is a Rust grammar pack and code-intelligence library w
 - `crates/ts-pack-cli/` — command-line binary
 - `crates/ts-pack-core-{py,node,php,wasm,ffi}/`, `crates/tree-sitter-language-pack-jni/` — binding crates
 - `sources/` — language definitions and grammar notices (`language-management` rule)
-- `grammars/`, `patches/`, `query-overlays/` — vendored grammars, patches, query overrides
-- `packages/<lang>/` — generated language packages
-- `e2e/<lang>/`, `fixtures/` — generated e2e suites and fixtures
+- `grammars/` — the 8 in-repo (`local`) grammars; the rest are cloned into gitignored `parsers/` by `task clone`
+- `patches/`, `query-overlays/` — grammar patches, query overrides
+- `packages/`, `e2e/`: standard alef layout (`binding-architecture` skill); `fixtures/` e2e inputs
 - `test_apps/<lang>/`, `contract-tests/` — published-package suites, binding contract tests
 - `docs-site/`, `templates/` — docs site and templates
 - `skills/`, `plugin/` — published skills, agent plugin
