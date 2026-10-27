@@ -15,11 +15,8 @@ x-ai-rulez:
     priority: high
 ---
 
-- The pack compiles 372 tree-sitter grammars into one Rust crate; `crates/ts-pack-core/build.rs` and `build_support/` compile the C sources with the `cc` crate.
-- Grammar-to-C uses `tree-sitter generate`; validate the `parser.c` output before inclusion.
-- Pin each grammar to a commit or tag; ABI target is version 14.
-- Compile `scanner.c` (external scanner) when a grammar has one; include only the C sources needed, to keep binary size down.
-- Each parser exports uniquely prefixed C symbols; avoid collisions between grammars and keep symbol visibility correct.
-- Handle allocation and deallocation correctly across the FFI boundary; test parser loading and unloading for leaks.
-- Builds and compiled libraries (.so/.dylib/.dll) must work on Linux, macOS and Windows, including cross-compilation.
-- Keep compiled parser artifacts out of version control; regenerate in CI.
+- Grammars are not in git: `task clone` / `task clone:if-missing` (`scripts/clone_vendors.py`) fetch every pinned `rev` into gitignored `parsers/`, and `crates/ts-pack-core/build.rs` compiles from there with `cc`. `grammars/` holds only the 8 `local` grammars.
+- Pin `rev` to a full 40-hex commit SHA; `scripts/clone_vendors.py` rejects tags and branches. `abi_version` (generation target) defaults to 14; loaded grammars must fall in ABI 13-15.
+- `generate: true` runs upstream `grammar.js` under Node with your privileges: review its diff before bumping that pin (`clone_vendors.py` header).
+- A full build compiles all 372 grammars. Iterate with `task rust:build:dev` / `task rust:test:quick` (a small `TSLP_LANGUAGES` list), or set `TSLP_LANGUAGES=a,b` yourself. `TSLP_LINK_MODE` (default `dynamic`) selects linking; `TSLP_ALLOW_FAILED_GRAMMARS=1` is for local debugging only.
+- `scanner.c` is compiled when the grammar's `src/` has one. Each parser exports uniquely prefixed C symbols (`c_symbol` overrides the name).

@@ -17,10 +17,7 @@ x-ai-rulez:
     priority: high
 ---
 
-- Each language entry specifies its grammar repo, commit or tag, and whether it has an external scanner.
-- The language registry lists every supported language and its metadata; document language-specific quirks and known parsing limits.
-- Adding a language: add the grammar source, update the definitions, regenerate parsers, update the registry, and expose it in every binding.
-- Every grammar has at least one test file with representative syntax; test source -> tree -> node types and structure.
-- Test error recovery: invalid input still yields a partial tree.
-- Grammar version bumps run the full test suite against real source files; CI tests all parsers on Linux, macOS and Windows.
-- Versioning: breaking grammar updates (ABI changes, removed languages) are major, new languages minor, grammar fixes patch; keep the version in sync across all binding manifests.
+- Entries in `sources/language_definitions.json` carry `repo` + `rev` (required unless `local`) and `extensions`, plus optional `branch`, `directory`, `ambiguous`, `c_symbol`, `generate`, `abi_version`, `license`. `rev` is a full 40-hex commit SHA; field table: `docs-site/src/content/docs/contributing.md`.
+- Add a language: the entry (permissive licence only), then `task lint:licenses:check`, `task notices`, `task clone:if-missing`, `TSLP_LANGUAGES=<lang> task rust:build:dev`, a fixture under `fixtures/smoke/`, `task e2e:generate`, `task docs:generate:languages`.
+- `crates/ts-pack-core/language_definitions.json` is the crate-local copy `build_support/definitions.rs` reads when `sources/` is absent (crates.io builds). It is byte-identical to `sources/` today and no task syncs it: change both.
+- Versioning: breaking grammar updates (ABI changes, removed languages) are major, new languages minor, grammar fixes patch.
