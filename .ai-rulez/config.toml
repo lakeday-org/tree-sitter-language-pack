@@ -6,7 +6,13 @@ description = 'Tree-sitter grammar pack and code-intelligence library with activ
 gitignore = true
 default = 'full'
 presets = ["claude", "codex", "opencode"]
-builtins = ["!agent-delegation", "!git-workflow", "!testing/test-alongside-code", "default-commands"]
+builtins = [
+  "!agent-delegation",
+  "!ai-governance/agent-workflow",
+  "!git-workflow",
+  "!testing/test-alongside-code",
+  "default-commands",
+]
 
 compact = true
 [header]
