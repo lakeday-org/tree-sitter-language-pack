@@ -43,8 +43,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      # Pinned to the ai-rulez version that generated the committed bundles;
-      # bump in lockstep. ~keep
+      # ai-rulez is the latest release; a release that changes bundle bytes turns this red
+      # until `task plugin:generate` is rerun. ~keep
       - name: Install ai-rulez
         uses: xberg-io/actions/setup-ai-rulez@v1
         with:
