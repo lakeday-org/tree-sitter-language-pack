@@ -279,7 +279,7 @@ jobs:
       # A registry-mode test app pinned to an older release still installs and still passes, so it
       # gates nothing. Five were up to six releases behind before this check existed. ~keep
       - name: Setup Task
-        uses: xberg-io/actions/install-task@9fdb51630009c221ceb85488f70cb6aa3891ada1
+        uses: xberg-io/actions/install-task@v1
 
       - name: Check test-app pins match the release being published
         env:
@@ -1020,7 +1020,7 @@ jobs:
           lang: ruby
 
       - name: Setup Ruby 3.2
-        uses: ruby/setup-ruby@v1
+        uses: ruby/setup-ruby@v1.335.0
         with:
           ruby-version: "3.2"
           bundler: none
@@ -1035,7 +1035,7 @@ jobs:
           CARGO_TARGET_DIR: ${{ github.workspace }}/packages/ruby/target
 
       - name: Setup Ruby 3.3
-        uses: ruby/setup-ruby@v1
+        uses: ruby/setup-ruby@v1.335.0
         with:
           ruby-version: "3.3"
           bundler: none
@@ -1050,7 +1050,7 @@ jobs:
           CARGO_TARGET_DIR: ${{ github.workspace }}/packages/ruby/target
 
       - name: Setup Ruby 3.4
-        uses: ruby/setup-ruby@v1
+        uses: ruby/setup-ruby@v1.335.0
         with:
           ruby-version: "3.4"
           bundler: none
@@ -1065,7 +1065,7 @@ jobs:
           CARGO_TARGET_DIR: ${{ github.workspace }}/packages/ruby/target
 
       - name: Setup Ruby 3.5
-        uses: ruby/setup-ruby@v1
+        uses: ruby/setup-ruby@v1.335.0
         with:
           ruby-version: "3.5"
           bundler: none
@@ -1080,7 +1080,7 @@ jobs:
           CARGO_TARGET_DIR: ${{ github.workspace }}/packages/ruby/target
 
       - name: Setup Ruby 4.0
-        uses: ruby/setup-ruby@v1
+        uses: ruby/setup-ruby@v1.335.0
         with:
           ruby-version: "4.0"
           bundler: none
@@ -1107,7 +1107,7 @@ jobs:
           ruby -e 'require "tree_sitter_language_pack"; abort("parse failed") unless TreeSitterLanguagePack.get_parser("json").parse("{}").root_node.kind == "document"'
 
       - name: Setup Ruby 3.5 for platform gem verification
-        uses: ruby/setup-ruby@v1
+        uses: ruby/setup-ruby@v1.335.0
         with:
           ruby-version: "3.5"
           bundler: none
@@ -1119,7 +1119,7 @@ jobs:
           ruby -e 'require "tree_sitter_language_pack"; abort("parse failed") unless TreeSitterLanguagePack.get_parser("json").parse("{}").root_node.kind == "document"'
 
       - name: Setup Ruby 3.4 for platform gem verification
-        uses: ruby/setup-ruby@v1
+        uses: ruby/setup-ruby@v1.335.0
         with:
           ruby-version: "3.4"
           bundler: none
@@ -1131,7 +1131,7 @@ jobs:
           ruby -e 'require "tree_sitter_language_pack"; abort("parse failed") unless TreeSitterLanguagePack.get_parser("json").parse("{}").root_node.kind == "document"'
 
       - name: Setup Ruby 3.3 for platform gem verification
-        uses: ruby/setup-ruby@v1
+        uses: ruby/setup-ruby@v1.335.0
         with:
           ruby-version: "3.3"
           bundler: none
@@ -1143,7 +1143,7 @@ jobs:
           ruby -e 'require "tree_sitter_language_pack"; abort("parse failed") unless TreeSitterLanguagePack.get_parser("json").parse("{}").root_node.kind == "document"'
 
       - name: Setup Ruby 3.2 for platform gem verification
-        uses: ruby/setup-ruby@v1
+        uses: ruby/setup-ruby@v1.335.0
         with:
           ruby-version: "3.2"
           bundler: none
@@ -2481,7 +2481,7 @@ jobs:
       - uses: actions/setup-python@v7
         with:
           python-version: "3.13"
-      - uses: astral-sh/setup-uv@v10.3.0
+      - uses: astral-sh/setup-uv@v10.3.2
       # `task python:e2e:test` goes through `alef test --lang python --e2e`, whose
       # `[crates.test.python]` precondition needs `ruff` and whose `before` hook runs
       # `maturin develop` — and `maturin develop` refuses to run outside a virtualenv.
@@ -2606,7 +2606,7 @@ jobs:
       - uses: xberg-io/actions/setup-rust@v1
         with:
           cache-key-prefix: publish-e2e-ruby
-      - uses: ruby/setup-ruby@v1
+      - uses: ruby/setup-ruby@v1.335.0
         with:
           ruby-version: "3.4"
       # `[crates.test.ruby]`'s `before` hook runs `bundle exec rake compile` in
@@ -3210,7 +3210,7 @@ jobs:
           ref: ${{ needs.prepare.outputs.checkout_ref }}
 
       - name: Setup Ruby
-        uses: ruby/setup-ruby@v1
+        uses: ruby/setup-ruby@v1.335.0
         with:
           ruby-version: "3.4"
           bundler: none
@@ -5636,7 +5636,7 @@ jobs:
         with:
           config-directory: .ai-rulez
       - name: Install uv
-        uses: astral-sh/setup-uv@v10.3.0
+        uses: astral-sh/setup-uv@v10.3.2
         with:
           python-version: "3.13"
       # ~keep The bundle carries its own version (plugin/.ai-rulez/config.toml [plugin].version),
@@ -5827,7 +5827,7 @@ jobs:
         uses: xberg-io/actions/verify-ai-rulez-plugin@v1
         with:
           version-sync-script: scripts/sync_plugin_version.py
-      - uses: astral-sh/setup-uv@v10.3.0
+      - uses: astral-sh/setup-uv@v10.3.2
         with:
           python-version: "3.13"
       - name: Read the verified Hermes version
