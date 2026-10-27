@@ -279,7 +279,7 @@ For CI pipelines, cache the parser directory between runs:
 
 ```yaml title="GitHub Actions"
 - name: Cache tree-sitter parsers
-  uses: actions/cache@v4
+  uses: actions/cache@v6
   with:
     path: ~/.cache/tree-sitter-language-pack
     key: tslp-parsers-${{ hashFiles('requirements.txt') }}

@@ -329,7 +329,7 @@ Pre-download parsers and cache them between runs:
   run: cargo install ts-pack-cli
 
 - name: Cache parsers
-  uses: actions/cache@v4
+  uses: actions/cache@v6
   with:
     path: ~/.cache/tree-sitter-language-pack
     key: tslp-${{ hashFiles('language-pack.toml') }}

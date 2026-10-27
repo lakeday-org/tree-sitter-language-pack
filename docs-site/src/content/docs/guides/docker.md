@@ -66,7 +66,7 @@ jobs:
     container:
       image: ghcr.io/xberg-io/tree-sitter-language-pack:latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Extract structure
         run: ts-pack process src/main.py --structure
 ```
