@@ -129,7 +129,6 @@ CLAUDE.md
 .codex/
 # ~keep Ignore only the repo-root local MCP config; plugin/.mcp.json is a generated, tracked bundle.
 /.mcp.json
-.github/copilot-instructions.md
 AGENTS.md
 GEMINI.md
 
