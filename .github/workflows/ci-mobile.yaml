@@ -87,7 +87,7 @@ jobs:
   ios-check:
     name: iOS cargo check (${{ matrix.target }})
     if: github.repository == 'xberg-io/tree-sitter-language-pack' && github.actor != 'dependabot[bot]'
-    runs-on: macos-latest
+    runs-on: macos-26
     timeout-minutes: 30
     strategy:
       fail-fast: false

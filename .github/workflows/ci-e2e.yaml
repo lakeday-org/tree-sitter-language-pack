@@ -89,7 +89,7 @@ jobs:
         include:
           - os: ubuntu-latest
             label: linux-x86_64
-          - os: macos-latest
+          - os: macos-26
             label: macos-arm64
     steps:
       - name: Checkout
@@ -286,7 +286,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-latest, macos-26]
     env:
       PROJECT_ROOT: ${{ github.workspace }}
       TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json,gherkin"
@@ -338,7 +338,7 @@ jobs:
         include:
           - os: ubuntu-latest
             platform: linux-x86_64
-          - os: macos-latest
+          - os: macos-26
             platform: macos-arm64
     env:
       PROJECT_ROOT: ${{ github.workspace }}
@@ -396,7 +396,7 @@ jobs:
           - os: ubuntu-latest
             platform: linux-x86_64
             python-version: "3.14"
-          - os: macos-latest
+          - os: macos-26
             platform: macos-arm64
             python-version: "3.14"
     env:
@@ -449,7 +449,7 @@ jobs:
           - os: ubuntu-latest
             target: x86_64-unknown-linux-gnu
             platform: linux-x64
-          - os: macos-latest
+          - os: macos-26
             target: aarch64-apple-darwin
             platform: macos-arm64
     env:
@@ -509,7 +509,7 @@ jobs:
         include:
           - os: ubuntu-latest
             platform: linux-x64
-          - os: macos-latest
+          - os: macos-26
             platform: macos-arm64
     steps:
       - name: Checkout
@@ -870,7 +870,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-latest, macos-26]
     env:
       DOTNET_VERSION: "10.0.x"
       PROJECT_ROOT: ${{ github.workspace }}
@@ -923,7 +923,7 @@ jobs:
         shell: bash
         run: |
           case "${{ matrix.os }}" in
-            macos-latest) RID=osx-arm64 ;;
+            macos-26) RID=osx-arm64 ;;
             ubuntu-latest) RID=linux-x64 ;;
             *) echo "Unknown OS"; exit 1 ;;
           esac
@@ -1027,7 +1027,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-latest, macos-26]
     env:
       PROJECT_ROOT: ${{ github.workspace }}
       TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json,gherkin"
@@ -1076,7 +1076,7 @@ jobs:
           echo "PHP_CONFIG=$PHP_CONFIG_BIN" >> "$GITHUB_ENV"
 
       - name: Export macOS PHP linker flags
-        if: matrix.os == 'macos-latest'
+        if: matrix.os == 'macos-26'
         shell: bash
         run: |
           EXTRA_FLAGS="-C link-arg=-Wl,-undefined,dynamic_lookup"
@@ -1402,7 +1402,7 @@ jobs:
        needs.changes.outputs.swift == 'true' ||
        needs.changes.outputs.core == 'true')
     needs: [changes, clone-vendors, build-e2e-bundles]
-    runs-on: macos-latest
+    runs-on: macos-26
     timeout-minutes: 60
     env:
       PROJECT_ROOT: ${{ github.workspace }}

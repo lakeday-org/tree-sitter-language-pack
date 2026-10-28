@@ -69,10 +69,10 @@ jobs:
           retention-days: 1
 
   swift-test:
-    name: Swift build + test (macos-latest)
+    name: Swift build + test (macos-26)
     if: github.repository == 'xberg-io/tree-sitter-language-pack' && github.actor != 'dependabot[bot]'
     needs: [clone-vendors]
-    runs-on: macos-latest
+    runs-on: macos-26
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v7
