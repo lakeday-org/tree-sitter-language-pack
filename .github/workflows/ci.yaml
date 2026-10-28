@@ -258,6 +258,9 @@ jobs:
 
       - name: Install poly
         uses: Goldziher/poly@v0
+        with:
+          # poly 0.30.0 lints Python as 3.11+ whatever target-version says (Goldziher/poly#42). ~keep
+          version: "0.29.0"
 
       - name: Verify binding API parity
         run: alef verify
@@ -1336,6 +1339,9 @@ jobs:
 
       - name: Install poly
         uses: Goldziher/poly@v0
+        with:
+          # poly 0.30.0 lints Python as 3.11+ whatever target-version says (Goldziher/poly#42). ~keep
+          version: "0.29.0"
 
       - name: Generate Go E2E tests
         run: task go:e2e:generate
@@ -1834,6 +1840,9 @@ jobs:
 
       - name: Install poly
         uses: Goldziher/poly@v0
+        with:
+          # poly 0.30.0 lints Python as 3.11+ whatever target-version says (Goldziher/poly#42). ~keep
+          version: "0.29.0"
 
       - name: Generate Elixir E2E tests
         run: task elixir:e2e:generate
@@ -1897,6 +1906,9 @@ jobs:
 
       - name: Install poly
         uses: Goldziher/poly@v0
+        with:
+          # poly 0.30.0 lints Python as 3.11+ whatever target-version says (Goldziher/poly#42). ~keep
+          version: "0.29.0"
 
       - name: Generate C E2E tests
         run: task c:e2e:generate
