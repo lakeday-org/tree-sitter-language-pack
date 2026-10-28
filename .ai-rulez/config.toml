@@ -91,6 +91,20 @@ include_outputs = false
 [lint]
 # ~keep Alef publishes the canonical tree-sitter-language-pack MCP reference as the mcp skill.
 allow_overrides = ["claude:mcp", "python-conventions"]
+# ~keep Generated plugin bundle copies, checked through plugin/.ai-rulez and verify --plugin. Codex never lists them,
+# but AR964 counts every tracked SKILL.md copy toward its skill listing.
+ignore_paths = [
+  "plugin/.cursor-plugin/**",
+  "plugin/.hermes/**",
+  "plugin/.opencode/**",
+  "plugin/.pi/**",
+  "plugin/skills/**",
+]
+
+[lint.load_budgets]
+# ~keep AR964's 8000-char Codex skill-listing figure is unverified; the counted listing after folding the fallback
+# skills, plus about 5%. Trim skill descriptions to lower it; re-measure on every pin bump.
+codex-skill-listing = 12600
 
 # Goldziher/ai-rulez#485: ai-rulez reports generated skill copies as duplicates. ~keep
 [[lint.ignore_rules]]
@@ -118,3 +132,5 @@ reason = "The plugin bundles scripts/mcp-launch.sh at its own root; each bundle 
 [rules]
 # ~keep Glob-scoped rules stay out of AGENTS.md: rule files for Claude, path-gated skills for Codex.
 scoped_fallback = "skill"
+# ~keep One path-gated skill per directory keeps the Codex skill listing short (AR964).
+scoped_fallback_group = "directory"
