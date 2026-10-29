@@ -139,10 +139,6 @@ run = "alef test"
 description = "Run all linters via poly"
 run = "poly lint ."
 
-[tasks."lint:check"]
-description = "Run check-only linting"
-run = "poly lint ."
-
 # Gate mode: no --update-cache, so sources/license_cache.json is never written and the working
 # tree stays clean. A grammar whose repo is not already cached is resolved live via `gh api`,
 # which is what makes a newly added copyleft grammar fail here rather than pass on a stale cache.
@@ -157,7 +153,7 @@ run = "uv run --no-sync python scripts/build_grammar_notices.py --update"
 
 [tasks.check]
 description = "Run check-only validation"
-run = [{ task = "format:check" }, { task = "lint:check" }]
+run = [{ task = "format:check" }, { task = "lint" }]
 
 [tasks.format]
 description = "Format code via poly"
