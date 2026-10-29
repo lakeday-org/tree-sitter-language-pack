@@ -1,0 +1,32 @@
+# C tasks, included from mise.toml [task_config]. ~keep
+
+["c:build:ffi"]
+description = "Build FFI library for C tests"
+run = [{ task = "ffi:build" }]
+
+["c:build"]
+description = "Build FFI library (alias for build:ffi)"
+run = [{ task = "c:build:ffi" }]
+
+["c:test"]
+description = "Build and run C E2E tests"
+run = [{ task = "c:e2e:test" }]
+
+["c:clean"]
+description = "Clean C build artifacts"
+dir = "{{config_root}}/e2e/c"
+run = "rm -rf build"
+
+["c:e2e:generate"]
+description = "Generate C E2E tests from fixtures"
+run = "alef e2e generate --lang c"
+
+["c:e2e:build"]
+description = "Build C E2E tests"
+depends = ["c:build:ffi"]
+dir = "{{config_root}}/e2e/c"
+run = ["make clean", "make"]
+
+["c:e2e:test"]
+description = "Run C E2E tests"
+run = "alef test --lang c --e2e --jobs 1"

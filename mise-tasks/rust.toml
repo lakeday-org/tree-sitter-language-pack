@@ -1,0 +1,124 @@
+# Rust core tasks, included from mise.toml [task_config]. TSLP_LANGUAGES limits the grammars a build
+# compiles and TSLP_LINK_MODE selects how they link (default dynamic). ~keep
+
+["rust:install"]
+description = "Install Rust toolchain and tools"
+run = ["rustc --version", "rustup component add rustfmt clippy", { task = "rust:install:cargo-machete" }]
+
+["rust:install:cargo-machete"]
+description = "Install cargo-machete for unused dependency detection"
+run = "cargo-machete --version 2>/dev/null || cargo install --locked cargo-machete || true"
+
+["rust:build"]
+description = "Build all crates with all languages"
+env = { TSLP_LINK_MODE = "dynamic" }
+run = "cargo build {{vars.rust_workspace}}"
+
+["rust:build:dev"]
+description = "Build with a small set of languages for fast iteration"
+env = { TSLP_LANGUAGES = "{{vars.dev_languages}}", TSLP_LINK_MODE = "dynamic" }
+run = "cargo build {{vars.rust_workspace}}"
+
+["rust:build:release"]
+description = "Build in release mode (optimized)"
+env = { TSLP_LINK_MODE = "dynamic" }
+run = "cargo build {{vars.rust_workspace}} --release"
+
+["rust:test"]
+description = "Run all Rust tests"
+env = { TSLP_LANGUAGES = "{{vars.test_languages}}", TSLP_LINK_MODE = "dynamic" }
+run = ["cargo test {{vars.rust_workspace}}", { task = "rust:test:feature-gated" }]
+
+["rust:test:quick"]
+description = "Run tests with a small set of languages"
+env = { TSLP_LANGUAGES = "{{vars.dev_languages}}", TSLP_LINK_MODE = "dynamic" }
+run = ["cargo test {{vars.rust_workspace}}", { task = "rust:test:feature-gated" }]
+
+# ~keep `wire_format` and `concurrent_download` carry `required-features` in
+# ~keep crates/ts-pack-core/Cargo.toml, so the default-feature `cargo test` runs
+# ~keep above never build or run them. `wire_format` pins the serialized wire
+# ~keep shape every binding's hand-written deserializer depends on — it must run
+# ~keep on every test invocation, not just when someone remembers `--features`.
+["rust:test:feature-gated"]
+description = "Run tests gated behind non-default Cargo features (wire_format, concurrent_download)"
+env = { TSLP_LANGUAGES = "{{vars.test_languages}}", TSLP_LINK_MODE = "dynamic" }
+run = "cargo test --locked -p tree-sitter-language-pack --features test-internals,serde,config"
+
+# ~keep The scaling guard is timing-based, so it runs in release against a small static
+# ~keep grammar set (the shapes need only these) instead of the full 372-language build.
+["rust:test:split-scaling"]
+description = "Run the splitter scaling regression test and a benchmark smoke pass (release)"
+env = { TSLP_LANGUAGES = "c,csv,go,java,javascript,json,markdown,python,rust,toml,yaml", TSLP_LINK_MODE = "static" }
+run = [
+  "cargo test --locked --release -p tree-sitter-language-pack --test split_scaling process_scales_linearly -- --ignored",
+  "cargo bench --locked -p tree-sitter-language-pack --bench splitting -- --test 'split/(rust_many_fns|json_array|python_giant_class|nested_brackets)'",
+]
+
+["rust:lint"]
+description = "Auto-fix Rust code linting (cargo fmt + clippy)"
+env = { TSLP_LANGUAGES = "{{vars.dev_languages}}", TSLP_LINK_MODE = "static" }
+run = ["cargo fmt --all", "cargo clippy {{vars.rust_workspace}} --fix --allow-dirty --allow-staged -- -D warnings"]
+
+["rust:lint:check"]
+description = "Check Rust code linting without modifications"
+env = { TSLP_LANGUAGES = "{{vars.dev_languages}}", TSLP_LINK_MODE = "static" }
+run = ["cargo fmt --all -- --check", "cargo clippy {{vars.rust_workspace}} -- -D warnings"]
+
+["rust:format"]
+description = "Format all Rust code"
+run = "cargo fmt --all"
+
+["rust:format:check"]
+description = "Check Rust formatting (CI)"
+run = "cargo fmt --all -- --check"
+
+["rust:clean"]
+description = "Clean Rust build artifacts"
+run = "cargo clean"
+
+["rust:doc"]
+description = "Generate and open documentation"
+env = { TSLP_LANGUAGES = "{{vars.dev_languages}}", TSLP_LINK_MODE = "static" }
+run = "cargo doc --workspace --no-deps --exclude ts-pack-core-php --exclude ts-pack-core-wasm --open"
+
+# `cargo upgrade` without --incompatible raises requirements within their major version first,
+# which the shared deps engine's update mode does not do. ~keep
+["rust:update"]
+description = "Update Rust dependencies within current major versions (non-breaking)"
+run = [
+  "cargo upgrade",
+  "cargo update",
+  "cargo upgrade --manifest-path e2e/rust/Cargo.toml",
+  "cargo update --manifest-path e2e/rust/Cargo.toml",
+]
+
+["rust:upgrade"]
+description = "Upgrade Rust dependencies to latest versions (cross-major / breaking)"
+run = [{ task = "deps upgrade rust" }]
+
+["rust:bench"]
+description = "Run criterion benchmarks"
+env = { TSLP_LINK_MODE = "dynamic" }
+run = "cargo bench -p tree-sitter-language-pack"
+
+["rust:e2e:generate"]
+description = "Generate and format Rust E2E tests from fixtures"
+run = ["alef e2e generate --lang rust", { task = "rust:e2e:format" }]
+
+["rust:e2e:format"]
+description = "Format generated Rust E2E sources"
+run = "cargo fmt --manifest-path e2e/rust/Cargo.toml"
+
+["rust:e2e:test"]
+description = "Run Rust E2E tests"
+env = { TSLP_LANGUAGES = "mojo,nim,norg,bash" }
+run = "alef test --lang rust --e2e --jobs 1"
+
+["rust:e2e:all-grammars"]
+description = "Run Rust E2E tests with a representative set of grammars compiled statically"
+env = { TSLP_LANGUAGES = "python,rust,javascript,typescript,go,html,css,json,bash,c,cpp,java,ruby,swift,kotlin", TSLP_LINK_MODE = "static" }
+run = "cargo test --locked --manifest-path e2e/rust/Cargo.toml"
+
+["rust:e2e:verify"]
+description = "Regenerate and validate Rust E2E suite (generate + format + test)"
+run = [{ task = "rust:e2e:generate" }, { task = "rust:e2e:format" }, { task = "rust:e2e:test" }]

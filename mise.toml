@@ -20,3 +20,325 @@ jq = "1.8.2"
 actionlint = "1.7.12"
 bats = "1.14.0"
 lychee = "0.24.2"
+
+[task_config]
+includes = [
+  "mise-tasks",
+  "mise-tasks/rust.toml",
+  "mise-tasks/python.toml",
+  "mise-tasks/node.toml",
+  "mise-tasks/go.toml",
+  "mise-tasks/java.toml",
+  "mise-tasks/elixir.toml",
+  "mise-tasks/c.toml",
+  "mise-tasks/ruby.toml",
+  "mise-tasks/wasm.toml",
+  "mise-tasks/php.toml",
+  "mise-tasks/csharp.toml",
+  "mise-tasks/dart.toml",
+  "mise-tasks/kotlin-android.toml",
+  "mise-tasks/swift.toml",
+  "mise-tasks/zig.toml",
+  "mise-tasks/docs.toml",
+  "mise-tasks/version.toml",
+  "mise-tasks/plugin.toml",
+  "mise-tasks/test-apps.toml",
+]
+
+[env]
+# crates/ts-pack-core/build.rs and the binding builds locate grammars and sources from here. ~keep
+PROJECT_ROOT = "{{config_root}}"
+
+[vars]
+# Grammar sets compiled by the task namespaces; a full build compiles all 372. ~keep
+dev_languages = "python,rust,javascript,typescript,go,html,css,json"
+test_languages = "baml,c,cedar,dockerfile,dotenv,elixir,go,hcl,java,javascript,jinja2,json,just,kdl,kotlin,properties,python,ruby,rust,sql,swift,terraform,toml,tsx,typescript,typoscript,typst,xml,yaml"
+ffi_test_languages = "python,rust,javascript,typescript,go,html,css,json,mojo,nim,norg"
+rust_workspace = "--locked --workspace --exclude ts-pack-core-php --exclude ts-pack-core-wasm"
+csharp_project = "TreeSitterLanguagePack/TreeSitterLanguagePack.csproj"
+csharp_smoke_project = "TreeSitterLanguagePack.SmokeTests/TreeSitterLanguagePack.SmokeTests.csproj"
+
+# ---- Shared task bodies ------------------------------------------------------------------------
+# Repository-neutral scripts from the xberg-io/toolchains task library, at the toolchains.toml tag. ~keep
+
+[tasks."governance:hooks:install"]
+description = "Provision machine preferences and install reviewed AI governance hooks"
+file = "https://raw.githubusercontent.com/xberg-io/toolchains/v1.5.0/tasks/governance/hooks-install.sh"
+
+[tasks."alef:regenerate"]
+description = "Regenerate every alef output that carries the version"
+hide = true
+file = "https://raw.githubusercontent.com/xberg-io/toolchains/v1.5.0/tasks/alef/regenerate.sh"
+
+[tasks."alef:verify:strict"]
+description = "Run alef verify and fail on drifted frozen paths too"
+hide = true
+file = "https://raw.githubusercontent.com/xberg-io/toolchains/v1.5.0/tasks/alef/verify-strict.sh"
+
+[tasks."version:show"]
+description = "Show current version from Cargo.toml"
+file = "https://raw.githubusercontent.com/xberg-io/toolchains/v1.5.0/tasks/version/cargo.sh"
+
+# Only the ecosystems whose refresh matches the shared engine use it; the other <lang>:update and
+# <lang>:upgrade bodies (extra manifests, report steps, Maven rules) stay in their namespace. ~keep
+[tasks.deps]
+description = "Update or upgrade one ecosystem's dependencies"
+hide = true
+file = "https://raw.githubusercontent.com/xberg-io/toolchains/v1.5.0/tasks/deps/refresh.sh"
+env.DEPS_LANGS = "rust dart swift"
+env.DEPS_RUST_MANIFESTS = "e2e/rust/Cargo.toml"
+
+# ---- Entry points ------------------------------------------------------------------------------
+
+[tasks.default]
+description = "Show available tasks"
+run = "mise tasks ls"
+
+[tasks.setup]
+description = "Install all dependencies and dev tools"
+run = [
+  "mise install",
+  { task = "rust:install" },
+  { task = "python:install" },
+  "alef setup",
+  { task = "governance:hooks:install" },
+  { task = "clone:if-missing" },
+]
+
+[tasks.ai-rulez]
+description = "Generate ai-rulez configuration files (CLAUDE.md, etc.)"
+run = "ai-rulez generate"
+
+[tasks.clone]
+description = "Clone all language grammar repositories (full re-clone)"
+run = "uv run --no-sync scripts/clone_vendors.py"
+
+[tasks."clone:if-missing"]
+description = "Clone only missing language grammar repositories"
+run = 'if [ -d parsers ] && [ -n "$(ls -A parsers 2>/dev/null)" ]; then exit 0; fi; uv run --no-sync scripts/clone_vendors.py'
+
+[tasks.build]
+description = "Build Rust core crates only"
+run = [{ task = "build:core" }]
+
+[tasks."build:dev"]
+description = "Build in dev mode with a few languages for fast iteration"
+run = [{ task = "rust:build:dev" }]
+
+[tasks."build:core"]
+description = "Build Rust core crates only"
+run = [{ task = "rust:build" }]
+
+[tasks."build:all"]
+description = "Build Rust core crates and all language bindings"
+run = [{ task = "build:core" }, { task = "build:bindings" }]
+
+[tasks."build:release"]
+description = "Build Rust core crates in release mode"
+run = [{ task = "rust:build:release" }]
+
+[tasks."build:ci"]
+description = "Build Rust core crates in CI mode"
+run = [{ task = "rust:build:release" }]
+
+[tasks."build:bindings"]
+description = "Build all language bindings"
+run = [{ task = "alef:build" }]
+
+[tasks.test]
+description = "Run Rust core tests only"
+run = [{ task = "rust:test" }]
+
+[tasks."test:all"]
+description = "Run all test suites across all languages"
+run = [{ task = "test" }, "alef test", { task = "test:scripts" }]
+
+[tasks."test:scripts:lib:sync"]
+description = "Refresh the vendored Bats helper library from xberg-io/actions"
+run = "scripts/task/sync-bats-lib.sh sync"
+
+[tasks."test:scripts:lib:check"]
+description = "Fail when the vendored Bats helper library has drifted from its pinned source"
+run = "scripts/task/sync-bats-lib.sh --check"
+
+[tasks."test:bindings"]
+description = "Run binding test suites only"
+run = "alef test"
+
+[tasks."test:ci"]
+description = "Run test suites in CI mode"
+run = [{ task = "test:all" }]
+
+[tasks.lint]
+description = "Run all linters via poly"
+run = "poly lint ."
+
+[tasks."lint:check"]
+description = "Run check-only linting"
+run = "poly lint ."
+
+[tasks."lint:licenses"]
+description = "Refresh sources/license_cache.json and verify grammar licenses (writes the cache)"
+run = "uv run --no-sync python scripts/lint_grammar_licenses.py --update-cache"
+
+# Gate mode: no --update-cache, so sources/license_cache.json is never written and the working
+# tree stays clean. A grammar whose repo is not already cached is resolved live via `gh api`,
+# which is what makes a newly added copyleft grammar fail here rather than pass on a stale cache.
+# Needs an authenticated `gh`. ~keep
+[tasks."lint:licenses:check"]
+description = "Verify all grammar repositories use permissive licenses (no GPL/AGPL/copyleft)"
+run = "uv run --no-sync python scripts/lint_grammar_licenses.py"
+
+[tasks.notices]
+description = "Regenerate sources/grammar_notices.json from pinned grammar sources (needs network + authenticated gh)"
+run = "uv run --no-sync python scripts/build_grammar_notices.py --update"
+
+# Offline: validates the committed record's coverage and digests, never rewrites it. `--verify`
+# (re-fetch upstream) belongs to the release path, not the PR gate. ~keep
+[tasks."notices:check"]
+description = "Verify grammar notice coverage and license-text digests (offline, no writes)"
+run = "uv run --no-sync python scripts/build_grammar_notices.py --check"
+
+[tasks.check]
+description = "Run check-only validation"
+run = [{ task = "format:check" }, { task = "lint:check" }]
+
+[tasks.format]
+description = "Format code via poly"
+run = "poly fmt --fix ."
+
+[tasks."format:check"]
+description = "Check formatting via poly"
+run = "poly fmt --check ."
+
+[tasks.clean]
+description = "Clean all build artifacts"
+run = [{ task = "rust:clean" }, "alef clean"]
+
+[tasks.update]
+description = "Update all dependencies within current major versions (non-breaking)"
+run = [{ task = "refresh:all update" }]
+
+[tasks.upgrade]
+description = "Upgrade all dependencies to latest versions (cross-major / breaking allowed)"
+run = [{ task = "refresh:all upgrade" }]
+
+[tasks."update:grammars"]
+description = "DANGER (opt-in): re-pin ALL grammars to upstream HEAD, unreviewed — each new pin runs upstream grammar.js under Node. Review the diff before committing."
+run = "uv run --no-sync scripts/pin_vendors.py"
+
+[tasks."update:grammars:missing"]
+description = "Pin only languages missing revisions"
+run = "uv run --no-sync scripts/pin_vendors.py --only-missing"
+
+[tasks."update:grammars:check"]
+description = "Check for grammar updates against upstream (reports stale revisions without writing)"
+run = "uv run --no-sync scripts/check_grammar_updates.py"
+
+# ---- Publishing --------------------------------------------------------------------------------
+
+[tasks."publish:validate"]
+description = "Validate publish manifests are consistent"
+run = "alef publish validate"
+
+[tasks."publish:prepare"]
+description = "Prepare packages for publishing (vendor deps, stage FFI)"
+run = "alef publish prepare"
+
+[tasks."publish:build"]
+description = "Build release artifacts for all languages"
+run = "alef publish build"
+
+[tasks."publish:package"]
+description = "Package built artifacts into distributable archives"
+run = "alef publish package -o dist/"
+
+# ---- alef --------------------------------------------------------------------------------------
+
+[tasks."alef:generate"]
+description = "Regenerate all Alef-managed outputs without building"
+# ~keep `alef all` never builds the per-language artifacts that a `compile`/`typecheck`
+# `docs.snippets.validation_level` needs (only `alef build` does), so leaving validation on
+# spawns a doomed toolchain per snippet and cannot pass by construction. Discovery, the
+# reference-page audit and gap detection still run. Use `mise run alef:snippets` after
+# `alef build` when you actually want validation.
+run = "alef all --clean --skip-snippet-validation --skip-compile"
+
+[tasks."alef:verify"]
+description = "Check Alef-generated files are up to date"
+run = "alef verify --exit-code"
+
+[tasks."alef:snippets"]
+description = "Validate documentation snippets (needs built artifacts; run after alef build)"
+run = "alef snippets check"
+
+[tasks."alef:build"]
+description = "Build all language bindings"
+run = "alef build"
+
+[tasks."alef:format"]
+description = "Format Alef-managed language bindings"
+run = "alef fmt"
+
+[tasks."alef:sync"]
+description = "Sync the version to all manifests, registry test-app pins, and the plugin"
+# Delegate instead of calling `alef sync-versions` directly: the bare command misses the
+# registry test-app pins and the plugin version pin. That gap is what left the plugin pin at
+# 1.15.8 on a 1.15.9 core. ~keep
+run = [{ task = "version:sync" }]
+
+[tasks."alef:docs"]
+description = "Generate API reference documentation"
+run = "alef docs"
+
+[tasks."readme:generate"]
+description = "Generate all package READMEs"
+run = "alef readme"
+
+# ---- E2E ---------------------------------------------------------------------------------------
+
+[tasks."e2e:generate"]
+description = "Generate E2E tests for all languages from fixtures"
+run = "alef e2e generate"
+
+[tasks."e2e:build"]
+description = "Build all language bindings for E2E tests"
+run = [{ task = "alef:build" }]
+
+[tasks."e2e:test"]
+description = "Run e2e tests across all bindings (FFI built first)"
+run = "alef test --e2e --jobs 1"
+
+[tasks."e2e:all"]
+description = "Build all bindings and run all e2e tests"
+run = [{ task = "e2e:build" }, { task = "e2e:test" }]
+
+[tasks."e2e:quick"]
+description = "Quick e2e (Rust only — fastest feedback)"
+run = "alef test --lang rust --e2e --jobs 1"
+
+[tasks."e2e:verify"]
+description = "Full e2e pipeline — generate, lint, test all suites"
+run = [{ task = "e2e:generate" }, { task = "e2e:lint" }, { task = "e2e:test" }]
+
+[tasks."e2e:lint"]
+description = "Lint all generated E2E test code"
+run = [{ task = "rust:e2e:format" }]
+
+# ---- Governance and contracts ------------------------------------------------------------------
+
+[tasks."governance:check"]
+description = "Check materialized local governance outputs against shared sources"
+run = "ai-rulez generate --check --no-local --strict-config"
+
+[tasks."contract-tests:jvm-capsule"]
+description = "Run the JVM capsule-ownership contract test (contract-tests/jvm-capsule)"
+# Guards alef.toml's [crates.java.capsule_types.Language] and
+# [crates.kotlin_android.capsule_types.Language] host_destructor = "none" pins against
+# jtreesitter/ktreesitter releases that add a destructor to Language. ~keep
+dir = "contract-tests/jvm-capsule"
+run = "mvn test"
+
+[tasks."contract-tests:release-dry-mutations"]
+description = "Verify release dry runs preserve validation without publishing"
+run = "uv run --no-sync python -m unittest scripts.ci.test_release_dry_mutations -v"

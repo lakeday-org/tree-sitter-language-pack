@@ -1,0 +1,133 @@
+# Alef-managed test apps, included from mise.toml [task_config]. Each language task delegates to
+# `alef test-apps run --lang <lang>` against test_apps/<lang>. ~keep
+
+["test-apps:all"]
+description = "Run every Alef-managed test_app"
+run = [{ task = "test-apps:alef" }]
+
+["test-apps:alef"]
+description = "Run all alef-driven test_apps sequentially"
+run = "alef test-apps run -j 1"
+
+["test-apps:alef:parallel"]
+description = "Run all alef-driven test_apps in parallel (faster, noisier)"
+run = "alef test-apps run"
+
+["test-apps:rust"]
+description = "Run Rust test_app via alef"
+run = "alef test-apps run --lang rust"
+
+["test-apps:python"]
+description = "Run Python test_app via alef"
+run = "alef test-apps run --lang python"
+
+["test-apps:node"]
+description = "Run Node.js test_app via alef"
+run = "alef test-apps run --lang node"
+
+["test-apps:wasm"]
+description = "Run WASM test_app via alef"
+run = "alef test-apps run --lang wasm"
+
+["test-apps:ruby"]
+description = "Run Ruby test_app via alef"
+run = "alef test-apps run --lang ruby"
+
+["test-apps:go"]
+description = "Run Go test_app via alef"
+run = "alef test-apps run --lang go"
+
+["test-apps:java"]
+description = "Run Java test_app via alef"
+run = "alef test-apps run --lang java"
+
+["test-apps:elixir"]
+description = "Run Elixir test_app via alef"
+run = "alef test-apps run --lang elixir"
+
+["test-apps:php"]
+description = "Run PHP test_app via alef"
+run = "alef test-apps run --lang php"
+
+["test-apps:csharp"]
+description = "Run C# test_app via alef"
+run = "alef test-apps run --lang csharp"
+
+["test-apps:c"]
+description = "Run C test_app via alef"
+run = "alef test-apps run --lang c"
+
+["test-apps:dart"]
+description = "Run Dart test_app via alef"
+run = "alef test-apps run --lang dart"
+
+["test-apps:kotlin-android"]
+description = "Run Kotlin Android test_app via alef"
+run = "alef test-apps run --lang kotlin_android"
+
+["test-apps:swift"]
+description = "Run Swift test_app via alef"
+run = "alef test-apps run --lang swift"
+
+["test-apps:zig"]
+description = "Run Zig test_app via alef"
+run = "alef test-apps run --lang zig"
+
+["test-apps:check-pins"]
+description = "Fail if any test_app is pinned to a release other than the one being built"
+run = "python3 scripts/check_test_app_pins.py"
+
+["test-apps:check-release-pins"]
+description = "Validate test-app pins against real or exact virtual dry-release metadata"
+run = """\
+  python3 scripts/check_test_app_pins.py \
+  --release "${RELEASE_VERSION:?RELEASE_VERSION is required}" \
+  --dry-run "${RELEASE_DRY_RUN:?RELEASE_DRY_RUN is required}" \
+  --source-sha "${RELEASE_SOURCE_SHA:?RELEASE_SOURCE_SHA is required}" \
+  --ref "${RELEASE_REF:-}" \
+  --tag "${RELEASE_TAG:-}""""
+
+["test-apps:fix-pins"]
+description = "Repin every test_app to the version in Cargo.toml"
+run = "python3 scripts/check_test_app_pins.py --fix"
+
+["test-apps:check-zig-hashes"]
+description = "Fail if a test_apps/zig package hash does not match the tarball its URL names"
+run = "python3 scripts/sync_zig_zon_hashes.py"
+
+["test-apps:fix-zig-hashes"]
+description = "Regenerate the test_apps/zig package hashes via `zig fetch` (run after a release publishes)"
+run = "python3 scripts/sync_zig_zon_hashes.py --fix"
+
+["test-apps:prerelease:status"]
+description = "Show which test_apps can run against in-repo sources instead of a registry"
+run = "python3 scripts/prerelease_test_apps.py status"
+
+["test-apps:prerelease:verify"]
+description = "Prove each prerelease test_app resolves to in-repo sources (resolve only, no build)"
+run = "python3 scripts/prerelease_test_apps.py verify"
+
+["test-apps:prerelease:run"]
+description = "Run test_apps against in-repo sources — usable between a version bump and the publish"
+run = "python3 scripts/prerelease_test_apps.py run"
+
+["test-apps:prerelease:clean"]
+description = "Remove the .prerelease/ staging tree"
+run = "python3 scripts/prerelease_test_apps.py clean"
+
+["test-apps:homebrew"]
+description = "Run generated Bats Homebrew consumer checks"
+dir = "{{config_root}}/test_apps/homebrew"
+run = [
+  "command -v bats >/dev/null || { echo 'bats is required: mise install bats' >&2; exit 1; }",
+  "test -f homebrew.bats || { echo 'Generate the Homebrew suite with alef e2e generate --registry --lang homebrew' >&2; exit 1; }",
+  "bash run_tests.sh",
+]
+
+["test-apps:smoke"]
+description = "Alias for test-apps:all (Alef-managed full run)"
+run = [{ task = "test-apps:all" }]
+
+["test-apps:comprehensive"]
+description = "Alias for test-apps:all (Alef-managed full run)"
+run = [{ task = "test-apps:all" }]

@@ -1,0 +1,71 @@
+# Swift tasks, included from mise.toml [task_config]. Swift is not a mise tool, so each task that
+# needs it fails first when `swift` is missing. ~keep
+
+["swift:install"]
+description = "Resolve Swift package dependencies"
+dir = "{{config_root}}/packages/swift"
+run = ["command -v swift >/dev/null 2>&1", "swift package resolve"]
+
+["swift:setup"]
+description = "Setup Swift environment"
+run = [{ task = "swift:install" }]
+
+["swift:build"]
+description = "Build Swift package against swift-bridge Rust crate"
+run = [{ task = "swift:bridge release" }, "cd packages/swift && swift build"]
+
+["swift:build:dev"]
+description = "Build Swift package in debug mode"
+run = [{ task = "swift:bridge debug" }, "cd packages/swift && swift build"]
+
+# ~keep `setup-swift-bridge.sh` regenerates Sources/RustBridgeC/RustBridgeC.h,
+# Sources/RustBridge/SwiftBridgeCore.swift and
+# Sources/RustBridge/tree-sitter-language-pack-swift.swift from swift-bridge, and swift-bridge
+# writes them WITHOUT the `alef:hash:` line alef stamps on them. Committing after a Swift build
+# therefore lands three unstamped files and `alef verify` fails in CI with "Stale bindings
+# detected" while everything passes locally -- 1.19.1 lost a CI cycle to exactly that. Build
+# Swift to test it, then run `alef generate --skip-compile` before committing so the files go in
+# stamped.
+["swift:build:release"]
+description = "Build Swift package in release mode"
+run = [{ task = "swift:bridge release" }, "cd packages/swift && swift build -c release"]
+
+["swift:test"]
+description = "Run Swift tests"
+dir = "{{config_root}}/packages/swift"
+run = ["command -v swift >/dev/null 2>&1", "swift test"]
+
+["swift:lint"]
+description = "Format Swift code"
+run = ["command -v swift >/dev/null 2>&1", "swift format --in-place --recursive packages/swift/Sources"]
+
+["swift:lint:check"]
+description = "Check Swift code formatting"
+run = ["command -v swift >/dev/null 2>&1", "swift format lint --recursive packages/swift/Sources"]
+
+["swift:format"]
+description = "Format Swift code (alias for lint)"
+run = [{ task = "swift:lint" }]
+
+["swift:format:check"]
+description = "Check Swift formatting (alias for lint:check)"
+run = [{ task = "swift:lint:check" }]
+
+["swift:clean"]
+description = "Clean Swift build artifacts"
+dir = "{{config_root}}/packages/swift"
+run = ["swift package clean || true", "rm -rf .build"]
+
+# SwiftPM resolves within Package.swift version ranges and has no cross-major flow: edit the ranges
+# by hand for a major upgrade. ~keep
+["swift:update"]
+description = "Update Swift package dependencies within current major versions (non-breaking)"
+run = ["command -v swift >/dev/null 2>&1", { task = "deps update swift" }]
+
+["swift:upgrade"]
+description = "Upgrade Swift package dependencies (cross-major requires manual Package.swift edits)"
+run = ["command -v swift >/dev/null 2>&1", { task = "deps upgrade swift" }]
+
+["swift:e2e:test"]
+description = "Run Swift e2e tests"
+run = [{ task = "swift:bridge release" }, "cd e2e/swift_e2e && swift test"]
