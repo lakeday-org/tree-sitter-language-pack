@@ -10,14 +10,14 @@ Please begin by reading our AI section below, followed by the getting started gu
 
 Make sure to have [Git](https://git-scm.com/), [Rust](https://rustup.rs/) stable (via `rustup`) and a C compiler (`clang` or `gcc`) installed on your machine.
 
-1. Install [Task](https://taskfile.dev/installation/) on your machine.
+1. Install [mise](https://mise.jdx.dev/getting-started.html) on your machine and run `mise trust` in the checkout.
 2. run:
 
 ```bash
-task setup
+mise run setup
 ```
 
-This will setup the dependencies, and pre-commit hooks via `poly`.
+This will install the pinned toolchain, setup the dependencies, and pre-commit hooks via `poly`.
 
 ### Optional Dependencies
 
@@ -36,16 +36,16 @@ This will setup the dependencies, and pre-commit hooks via `poly`.
 
 ## Quick reference
 
-| Command       | What it does                          |
-| ------------- | ------------------------------------- |
-| `task setup`  | Install all dependencies (idempotent) |
-| `task clone`  | Clone the grammar sources             |
-| `task build`  | Build the grammars and bindings       |
-| `task test`   | Run all test suites                   |
-| `task lint`   | Run all linters                       |
-| `task format` | Format all code                       |
+| Command           | What it does                          |
+| ----------------- | ------------------------------------- |
+| `mise run setup`  | Install all dependencies (idempotent) |
+| `mise run clone`  | Clone the grammar sources             |
+| `mise run build`  | Build the grammars and bindings       |
+| `mise run test`   | Run all test suites                   |
+| `mise run lint`   | Run all linters                       |
+| `mise run format` | Format all code                       |
 
-For language-specific commands, use the namespace pattern: `task rust:test`, `task python:build`, `task node:format`, etc.
+For language-specific commands, use the namespace pattern: `mise run rust:test`, `mise run python:build`, `mise run node:format`, etc.
 
 ## What to keep in mind
 
@@ -87,11 +87,11 @@ plugin settings live separately in `config.plugins.toml`.
 ```sh
 ai-rulez validate --no-local
 ai-rulez generate --no-local --strict-config
-task governance:check
+mise run governance:check
 ```
 
 The final command checks the materialized local governance files, including ignored harness
-outputs. Installing governance hooks requires Python 3.11 or newer. Run `task governance:hooks:install` to install the repository's reviewed Poly hooks.
+outputs. Installing governance hooks requires Python 3.11 or newer. Run `mise run governance:hooks:install` to install the repository's reviewed Poly hooks.
 The hooks validate staged sources and verify shipped plugin artifacts where present; CI also
 validates the authored content. Shared convention modules come from `xberg-io/agent-conventions`;
 Git credentials are needed when an included repository requires access.

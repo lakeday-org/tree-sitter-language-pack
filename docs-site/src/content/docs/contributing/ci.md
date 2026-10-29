@@ -34,8 +34,8 @@ The project has 16 GitHub Actions workflows in `.github/workflows/`.
 
 Runs on push to `main` and pull requests when relevant paths change:
 `crates/**`, `packages/**`, `e2e/**`, `fixtures/**`, `sources/**`, `scripts/**`,
-`docs-site/src/snippets/**`, `docs-site/src/content/docs/reference/**`, `.task/**`,
-`Cargo.toml`, `Cargo.lock`, `Taskfile.yml`, `alef.toml`, `rust-toolchain.toml`,
+`docs-site/src/snippets/**`, `docs-site/src/content/docs/reference/**`, `mise-tasks/**`,
+`Cargo.toml`, `Cargo.lock`, `mise.toml`, `alef.toml`, `rust-toolchain.toml`,
 `pyproject.toml`, and the JS workspace manifests.
 
 This is the primary workflow that builds and tests all language bindings.

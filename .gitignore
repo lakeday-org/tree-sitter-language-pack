@@ -42,7 +42,7 @@ packages/csharp/**/runtimes/
 # Go vendored FFI artifacts
 packages/go/include/*
 !packages/go/include/ts_pack.h
-# Staging dir written by `task go:vendor` / `go run ./cmd/setup`. The leading dot
+# Staging dir written by `go run ./cmd/setup`. The leading dot
 # matters — the old `packages/go/lib/` rule matched nothing and let 203 MB of
 # compiled archives get committed. ~keep
 packages/go/.lib/

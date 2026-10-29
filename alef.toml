@@ -20,7 +20,7 @@ languages = [
 
 # ~keep These are create-once seeds whose alef template has since diverged from the copy we
 # maintain by hand. `alef verify` reports each under "frozen path(s) DRIFTED" every run, and
-# `task version:sync` greps that heading and treats a hit as fatal -- so leaving them undeclared
+# `mise run version:sync` greps that heading and treats a hit as fatal -- so leaving them undeclared
 # blocks every release. In these cases the on-disk copy is the correct one and adopting the
 # template would be a regression, which is why this is `user_owned` and not `alef adopt`:
 #
@@ -455,7 +455,7 @@ exclude = [
   "/.ai-rulez/.generated-manifest.json",
   "/plugin/.ai-rulez/.generated-manifest.json",
   # The vendored Bats helper is copied byte-identical from xberg-io/actions, whose shell is
-  # tab-indented; reformatting it here would break `task test:scripts:lib:check`. Excluded from
+  # tab-indented; reformatting it here would break `mise run test:scripts:lib:check`. Excluded from
   # discovery rather than from fmt alone because poly has no per-engine exclude -- and the file
   # is linted and formatted in the repo that owns it. ~keep
   "scripts/tests/lib/**",
@@ -877,7 +877,7 @@ exclude_functions = [
 # ~keep `.github/workflows/ci.yaml`, and `.github/workflows/publish.yaml`.
 # ~keep Do NOT mirror `WASM_DEFAULT_LANGUAGES` in `crates/ts-pack-core/build_support/definitions.rs`: that
 # ~keep constant is only build.rs's fallback for a wasm32 build that leaves `TSLP_LANGUAGES`
-# ~keep unset (the `.task/wasm.yml` path), and every e2e/CI wasm build sets it explicitly, so
+# ~keep unset (the `mise-tasks/wasm.toml` path), and every e2e/CI wasm build sets it explicitly, so
 # ~keep the constant never applies there. Mirroring it is what broke this list before —
 # ~keep it carried 48 languages against a 31-language build, so 18 grammars
 # ~keep (clojure cmake dart graphql groovy hcl ini julia make nix objc ocaml powershell
@@ -1211,7 +1211,7 @@ before = [
 command = "cd packages/swift && swift test"
 # ~keep `e2e` must point at e2e/swift_e2e, not packages/swift: when it duplicated `command`,
 # ~keep `alef test --e2e` re-ran the unit suite and never executed the 11 e2e test files, so CI
-# ~keep had to bypass alef via `task swift:e2e:test`. `e2e/swift/` is a dead orphan (a
+# ~keep had to bypass alef via `mise run swift:e2e:test`. `e2e/swift/` is a dead orphan (a
 # ~keep Package.swift with no Tests/) and is deliberately not referenced.
 e2e = "cd e2e/swift_e2e && swift test"
 

@@ -325,7 +325,7 @@ def verify_parsers_present(project_root: Path, definitions: dict[str, dict[str, 
     raise FileNotFoundError(
         f"{len(missing)} of {len(definitions)} languages have no parsers/<lang>/src/parser.c: {shown}. "
         "Refusing to generate: the ABI and query columns are read from parsers/, so a partial "
-        "checkout produces wrong values rather than an obvious failure. Run `task clone` "
+        "checkout produces wrong values rather than an obvious failure. Run `mise run clone` "
         "(full, no TSLP_LANGUAGES) and retry."
     )
 
@@ -357,7 +357,7 @@ def _grammar_abi(project_root: Path, lang_id: str) -> int:
     parser_path = project_root / "parsers" / lang_id / "src" / "parser.c"
 
     if not parser_path.is_file():
-        raise FileNotFoundError(f"{lang_id}: {parser_path} is missing; run `task clone` (full, no TSLP_LANGUAGES)")
+        raise FileNotFoundError(f"{lang_id}: {parser_path} is missing; run `mise run clone` (full, no TSLP_LANGUAGES)")
     if parser_path.stat().st_size <= ABI_EXEMPT_PARSER_BYTES:
         return DEFAULT_TARGET_ABI
     with parser_path.open("rb") as handle:

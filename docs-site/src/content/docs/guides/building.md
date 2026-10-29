@@ -135,7 +135,7 @@ The build embeds these generated files via `include!()` macros in `src/registry.
 Before building with `TSLP_LANGUAGES`, you need the parser C sources locally:
 
 ```bash
-task clone
+mise run clone
 ```
 
 This runs `scripts/clone_vendors.py`, which checks out the correct revision for each grammar into `parsers/`. The script is idempotent — already-cloned grammars do not re-clone.
@@ -172,4 +172,4 @@ cargo test -p tree-sitter-language-pack detect_language_from_extension
 cargo bench -p tree-sitter-language-pack
 ```
 
-Run `task --list` to see all available task commands including per-binding test commands.
+Run `mise tasks` to see all available task commands including per-binding test commands.

@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Development tasks run through mise (`mise run <task>`) instead of go-task, with the toolchain
+  pinned to the xberg-io/toolchains v1.5.0 baseline in `mise.toml` and `mise.lock`; task names are
+  unchanged.
+
 ### Security
 
 - Update ctutils, Tokio, and Zstandard dependencies to resolve six security advisories

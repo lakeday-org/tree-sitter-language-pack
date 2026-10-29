@@ -88,9 +88,9 @@ class Target:
 # scoping decision rather than an oversight. Adding one means producing the local artifact
 # first: these package managers resolve a built distributable, not a source tree.
 UNSUPPORTED: dict[str, str] = {
-    "node": "npm resolves a prebuilt NAPI package; needs `task node:build` output and a pnpm "
+    "node": "npm resolves a prebuilt NAPI package; needs `mise run node:build` output and a pnpm "
     "`overrides` entry pointing at the packed tarball",
-    "wasm": "npm resolves a prebuilt wasm-pack package; needs `task wasm:build` output and a "
+    "wasm": "npm resolves a prebuilt wasm-pack package; needs `mise run wasm:build` output and a "
     "pnpm `overrides` entry pointing at the packed tarball",
     "java": "Maven has no path dependency; the local equivalent is "
     "`mvn -f packages/java/pom.xml install` into ~/.m2 before the run",
@@ -99,9 +99,9 @@ UNSUPPORTED: dict[str, str] = {
     "zig": "build.zig.zon resolves a GitHub release tarball by URL and hash; the local "
     "equivalent needs the release tarball built and rehashed first",
     "c": "download_ffi.sh downloads a prebuilt FFI archive from the GitHub release; the local "
-    "equivalent is ALEF_FFI_LOCAL_DIR against `task c:build:ffi` output",
+    "equivalent is ALEF_FFI_LOCAL_DIR against `mise run c:build:ffi` output",
     "kotlin_android": "Gradle resolves a published AAR; the local equivalent is "
-    "`task kotlin-android:build` plus a mavenLocal() publish",
+    "`mise run kotlin-android:build` plus a mavenLocal() publish",
     "php": "already resolves the package from ../../crates/ts-pack-core-php via a composer "
     "psr-4 path autoload, so it never depended on packagist and needs no override",
 }

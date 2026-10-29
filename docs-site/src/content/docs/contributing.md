@@ -11,7 +11,7 @@ For CI/CD workflow details, see the [CI/CD reference](/contributing/ci/).
 
 You'll need the following tools installed:
 
-- [Task](https://taskfile.dev/) — the project task runner
+- [mise](https://mise.jdx.dev/) — the project toolchain and task runner
 - Rust stable toolchain via [rustup](https://rustup.rs/)
 - Python 3.10+ and [uv](https://docs.astral.sh/uv/)
 - Node.js 18+ and [pnpm](https://pnpm.io/)
@@ -19,42 +19,43 @@ You'll need the following tools installed:
 ## Getting started
 
 ```bash
-# Install Task (macOS)
-brew install go-task
+# Install mise (macOS)
+brew install mise
 
 # Clone the repository
 git clone https://github.com/xberg-io/tree-sitter-language-pack.git
 cd tree-sitter-language-pack
 
-# Install all language dependencies
-task setup
+# Trust the checkout's mise.toml, then install all language dependencies
+mise trust
+mise run setup
 
 # Build the Rust core
-task build
+mise run build
 
 # Run all tests
-task test
+mise run test
 ```
 
 :::tip[Linux]
 :::
 
-On Debian/Ubuntu, install Task with `apt install go-task` or download from [taskfile.dev](https://taskfile.dev/installation/).
+On Debian/Ubuntu, install mise with the [official installer](https://mise.jdx.dev/getting-started.html).
 
 ## Common tasks
 
 ```bash
-task --list          # show all available tasks
-task build           # build Rust core + bindings
-task test            # run all test suites
-task lint            # run all linters (clippy, ruff, oxlint, rubocop, …)
-task format          # auto-format all code
-task e2e:generate    # regenerate e2e test suites from fixtures
-task e2e:test        # run e2e tests
-task alef:sync       # regenerate the alef-managed bindings and docs
+mise tasks               # show all available tasks
+mise run build           # build Rust core + bindings
+mise run test            # run all test suites
+mise run lint            # run all linters (clippy, ruff, oxlint, rubocop, …)
+mise run format          # auto-format all code
+mise run e2e:generate    # regenerate e2e test suites from fixtures
+mise run e2e:test        # run e2e tests
+mise run alef:sync       # regenerate the alef-managed bindings and docs
 ```
 
-Run `task --list` to see all available tasks.
+Run `mise tasks` to see all available tasks.
 
 ## Adding a language
 
@@ -105,10 +106,10 @@ Available fields:
 
 ```bash
 # Compile the new parser
-task build
+mise run build
 
 # Run the test suite
-task test
+mise run test
 
 # Verify the parser works end-to-end
 ts-pack download mylang
@@ -118,7 +119,7 @@ ts-pack parse example.mylang --language mylang
 ### 4. Add test fixtures
 
 Add at least one fixture under `fixtures/`. Fixtures are the single source for both the e2e
-suites and the documentation snippet corpus — `task e2e:generate` renders each fixture into
+suites and the documentation snippet corpus — `mise run e2e:generate` renders each fixture into
 `docs-site/src/snippets/generated/<lang>/<category>/<id>.md` for all 14 bindings. Do not
 hand-write snippets; add a fixture instead.
 
@@ -163,8 +164,8 @@ and `assertions` is a list of typed assertion objects, not a map of booleans. Se
 Then regenerate and run e2e tests:
 
 ```bash
-task e2e:generate
-task e2e:test
+mise run e2e:generate
+mise run e2e:test
 ```
 
 ### 5. Open a pull request
@@ -177,7 +178,7 @@ task e2e:test
 1. Check the [issue tracker](https://github.com/xberg-io/tree-sitter-language-pack/issues) — the bug may already be reported.
 2. Write a **failing test** that reproduces the issue.
 3. Fix the bug in the appropriate crate.
-4. Confirm all tests pass with `task test`.
+4. Confirm all tests pass with `mise run test`.
 5. Open a PR with a clear description of the root cause and fix.
 
 ## Improving bindings
@@ -193,7 +194,7 @@ Binding changes must:
 - **Not add logic that belongs in the Rust core.** Bindings are pure translation layers.
 - **Have test coverage** in the binding's native test suite.
 - **Follow the existing API surface** — most binding surfaces are alef-generated; regenerate
-  them with `task alef:sync` rather than hand-editing generated files.
+  them with `mise run alef:sync` rather than hand-editing generated files.
 
 ## Documentation
 
@@ -202,14 +203,14 @@ Doc fixes and new guides follow the same workflow as code changes:
 1. Fork and create a branch.
 2. Edit files under `docs-site/src/content/docs/`. Runnable snippets are generated from
    `fixtures/` into `docs-site/src/snippets/generated/<lang>/` — change the fixture and
-   rerun `task e2e:generate`, never edit a generated snippet.
+   rerun `mise run e2e:generate`, never edit a generated snippet.
 3. Preview locally with `pnpm --dir docs-site dev` (the site is Astro / Starlight).
-4. Run `task lint` if you touch any scripted checks.
+4. Run `mise run lint` if you touch any scripted checks.
 5. Open a pull request.
 
 :::caution[Generated reference pages]
 Everything under `docs-site/src/content/docs/reference/` is alef-generated from the Rust
-source. Fix the doc comments upstream and run `task alef:sync` — do not edit those pages.
+source. Fix the doc comments upstream and run `mise run alef:sync` — do not edit those pages.
 :::
 
 :::tip[Quick edits]
@@ -229,9 +230,9 @@ prek install --hook-type commit-msg
 Before committing, verify these three commands pass:
 
 ```bash
-task lint     # zero warnings required
-task test     # all tests must pass
-task format   # code must be formatted
+mise run lint      # zero warnings required
+mise run test      # all tests must pass
+mise run format    # code must be formatted
 ```
 
 ## Commit style
@@ -250,12 +251,12 @@ Keep commits **small and focused**. Each commit should represent one logical cha
 
 ## Pull request checklist
 
-- [ ] `task test` passes
-- [ ] `task lint` passes (zero warnings)
+- [ ] `mise run test` passes
+- [ ] `mise run lint` passes (zero warnings)
 - [ ] New language has at least one fixture under `fixtures/`, with the regenerated snippets
       under `docs-site/src/snippets/generated/` committed alongside it
-- [ ] `task e2e:generate && task e2e:test` passes
-- [ ] `task version:sync` run if any manifest was bumped
+- [ ] `mise run e2e:generate && mise run e2e:test` passes
+- [ ] `mise run version:sync` run if any manifest was bumped
 - [ ] PR description explains the change and links related issues
 
 ## Getting help
