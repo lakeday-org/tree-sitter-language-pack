@@ -64,21 +64,21 @@ csharp_smoke_project = "TreeSitterLanguagePack.SmokeTests/TreeSitterLanguagePack
 
 [tasks."governance:hooks:install"]
 description = "Provision machine preferences and install reviewed AI governance hooks"
-file = "https://raw.githubusercontent.com/xberg-io/toolchains/v1.5.0/tasks/governance/hooks-install.sh"
+file = "https://raw.githubusercontent.com/xberg-io/toolchains/v1.5.1/tasks/governance/hooks-install.sh"
 
 [tasks."alef:regenerate"]
 description = "Regenerate every alef output that carries the version"
 hide = true
-file = "https://raw.githubusercontent.com/xberg-io/toolchains/v1.5.0/tasks/alef/regenerate.sh"
+file = "https://raw.githubusercontent.com/xberg-io/toolchains/v1.5.1/tasks/alef/regenerate.sh"
 
 [tasks."alef:verify:strict"]
 description = "Run alef verify and fail on drifted frozen paths too"
 hide = true
-file = "https://raw.githubusercontent.com/xberg-io/toolchains/v1.5.0/tasks/alef/verify-strict.sh"
+file = "https://raw.githubusercontent.com/xberg-io/toolchains/v1.5.1/tasks/alef/verify-strict.sh"
 
 [tasks."version:show"]
 description = "Show current version from Cargo.toml"
-file = "https://raw.githubusercontent.com/xberg-io/toolchains/v1.5.0/tasks/version/cargo.sh"
+file = "https://raw.githubusercontent.com/xberg-io/toolchains/v1.5.1/tasks/version/cargo.sh"
 
 # Only the ecosystems whose refresh matches the shared engine use it; the other <lang>:update and
 # <lang>:upgrade bodies (extra manifests, report steps, Maven rules) stay in their namespace. ~keep
@@ -87,8 +87,8 @@ file = "https://raw.githubusercontent.com/xberg-io/toolchains/v1.5.0/tasks/versi
 [tasks.deps]
 description = "Update or upgrade one ecosystem's dependencies"
 hide = true
-file = "https://raw.githubusercontent.com/xberg-io/toolchains/v1.5.0/tasks/deps/refresh.sh"
-env.DEPS_LANGS = "rust dart swift"
+file = "https://raw.githubusercontent.com/xberg-io/toolchains/v1.5.1/tasks/deps/refresh.sh"
+env.DEPS_LANGS = "rust dart swift zig"
 env.DEPS_RUST_MANIFESTS = "e2e/rust/Cargo.toml"
 
 # ---- Entry points ------------------------------------------------------------------------------
@@ -339,7 +339,7 @@ description = "Run the JVM capsule-ownership contract test (contract-tests/jvm-c
 # Guards alef.toml's [crates.java.capsule_types.Language] and
 # [crates.kotlin_android.capsule_types.Language] host_destructor = "none" pins against
 # jtreesitter/ktreesitter releases that add a destructor to Language. ~keep
-dir = "contract-tests/jvm-capsule"
+dir = "{{config_root}}/contract-tests/jvm-capsule"
 run = "mvn test"
 
 [tasks."contract-tests:release-dry-mutations"]

@@ -56,11 +56,7 @@ run = ["command -v zig >/dev/null 2>&1", "zig build --fetch"]
 
 ["zig:upgrade"]
 description = "Refresh build.zig.zon hashes by re-fetching every declared URL"
-dir = "{{config_root}}/packages/zig"
-run = [
-  "command -v zig >/dev/null 2>&1",
-  '''set -e; for url in $(grep '\.url' build.zig.zon | cut -d '=' -f 2 | cut -d '#' -f 1 | tr -d '",'); do echo "Updating module $url"; zig fetch --save "$url"; echo; done''',
-]
+run = ["command -v zig >/dev/null 2>&1", "mise run deps upgrade zig"]
 
 ["zig:e2e:test"]
 description = "Run Zig e2e tests against the Rust FFI shared library"
