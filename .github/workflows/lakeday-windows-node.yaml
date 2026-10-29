@@ -1,0 +1,134 @@
+name: Windows Node addon (lakeday)
+
+# Rebuilds the v1.22.1 Windows Node addons with the node.dll import removed and packs them, with
+# the other platforms' published binaries unchanged, as @lakeday/tree-sitter-language-pack.
+
+on:
+  push:
+    branches: [fix/windows-node-dll]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  UPSTREAM_VERSION: "1.22.1"
+  PACKAGE_NAME: "@lakeday/tree-sitter-language-pack"
+  PACKAGE_VERSION: "1.22.1-lakeday.1"
+
+jobs:
+  build:
+    name: Build (${{ matrix.label }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            label: win32-x64-msvc
+            napi_target: x86_64-pc-windows-msvc
+          - os: windows-11-arm
+            label: win32-arm64-msvc
+            napi_target: aarch64-pc-windows-msvc
+    steps:
+      - uses: actions/checkout@v7
+      - uses: xberg-io/actions/setup-rust@v1
+        with:
+          components: ""
+          use-sccache: "false"
+          install-llvm-cov: "false"
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+      - run: npm install -g @napi-rs/cli@3
+      - name: Build native module
+        working-directory: crates/ts-pack-core-node
+        run: napi build --release --platform --target ${{ matrix.napi_target }}
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}
+      - uses: actions/upload-artifact@v7
+        with:
+          name: node-native-${{ matrix.label }}
+          path: crates/ts-pack-core-node/*.node
+          if-no-files-found: error
+          retention-days: 14
+
+  package:
+    name: Pack npm package
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+      - name: Unpack the published upstream package
+        run: |
+          npm pack "@xberg-io/tree-sitter-language-pack@${UPSTREAM_VERSION}"
+          tar xzf xberg-io-tree-sitter-language-pack-${UPSTREAM_VERSION}.tgz
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: node-native-win32-*
+          merge-multiple: true
+          path: package
+      - name: Rename and pack
+        working-directory: package
+        run: |
+          ls -l *.node
+          node -e '
+            const fs = require("fs");
+            const p = JSON.parse(fs.readFileSync("package.json", "utf8"));
+            p.name = process.env.PACKAGE_NAME;
+            p.version = process.env.PACKAGE_VERSION;
+            p.repository = { type: "git", url: "git+https://github.com/lakeday-org/tree-sitter-language-pack.git" };
+            delete p.optionalDependencies;
+            fs.writeFileSync("package.json", JSON.stringify(p, null, 2) + "\n");
+          '
+          npm pack --pack-destination ..
+      - uses: actions/upload-artifact@v7
+        with:
+          name: npm-package
+          path: lakeday-tree-sitter-language-pack-*.tgz
+          if-no-files-found: error
+          retention-days: 30
+
+  test:
+    name: Test (${{ matrix.os }}, Node ${{ matrix.node }})
+    needs: package
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, windows-11-arm]
+        node: ["22", "24"]
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node }}
+      - uses: actions/download-artifact@v8
+        with:
+          name: npm-package
+          path: dist
+      - name: Upstream 1.22.1 fails to load here
+        run: |
+          mkdir upstream && cd upstream && npm init -y > /dev/null
+          npm install "@xberg-io/tree-sitter-language-pack@${UPSTREAM_VERSION}"
+          if node -e 'require("@xberg-io/tree-sitter-language-pack")'; then
+            echo "upstream ${UPSTREAM_VERSION} loaded, so this job does not reproduce the node.dll failure" >&2
+            exit 1
+          fi
+      - name: Install, load, and parse
+        run: |
+          mkdir fixed && cd fixed && npm init -y > /dev/null
+          npm install ../dist/lakeday-tree-sitter-language-pack-*.tgz
+          node -e '
+            const pack = require(process.env.PACKAGE_NAME);
+            console.log("languages:", pack.manifestLanguages().length);
+            const result = pack.process("def f(x):\n    return g(x)\n", { language: "python", structure: true });
+            if (!result.structure || result.structure.length === 0) throw new Error("no structure for python source");
+            console.log("structure:", JSON.stringify(result.structure.map(s => s.name)));
+            if (!pack.getLanguage("python").language) throw new Error("getLanguage returned no language");
+          '
