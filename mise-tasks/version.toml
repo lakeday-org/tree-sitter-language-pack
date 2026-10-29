@@ -27,15 +27,3 @@ run = [
   "ai-rulez generate --plugin",
   { task = "alef:verify:strict" },
 ]
-
-["version:bump:major"]
-description = "Bump major version (X.0.0) and sync"
-run = ["alef sync-versions --bump major", { task = "version:sync" }]
-
-["version:bump:minor"]
-description = "Bump minor version (0.X.0) and sync"
-run = ["alef sync-versions --bump minor", { task = "version:sync" }]
-
-["version:bump:patch"]
-description = "Bump patch version (0.0.X) and sync"
-run = ["alef sync-versions --bump patch", { task = "version:sync" }]

@@ -1,4 +1,21 @@
-baseline = "v1.5.1"
+baseline = "v1.7.0"
+task_sets = [
+  "alef",
+  "alef-bindings",
+  "alef-publish",
+  "alef-version",
+  "bats-lib",
+  "bats-suite",
+  "deps-refresh",
+  "docs-site",
+  "docs-snippets",
+  "governance",
+  "governance-check",
+  "lint-format",
+  "plugin",
+  "plugin-runtime",
+  "rust",
+]
 
 [overrides.pnpm]
 version = "12.3.4"

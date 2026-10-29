@@ -24,6 +24,7 @@ lychee = "0.24.2"
 
 [task_config]
 includes = [
+  "mise-tasks/shared.toml",
   "mise-tasks",
   "mise-tasks/rust.toml",
   "mise-tasks/python.toml",
@@ -42,7 +43,6 @@ includes = [
   "mise-tasks/zig.toml",
   "mise-tasks/docs.toml",
   "mise-tasks/version.toml",
-  "mise-tasks/plugin.toml",
   "mise-tasks/test-apps.toml",
 ]
 
@@ -51,6 +51,10 @@ includes = [
 PROJECT_ROOT = "{{config_root}}"
 # Repository specifics for the shared task sets (toolchains.toml task_sets). ~keep
 BATS_LIB_REF = "v1.29.0"
+# Only the ecosystems whose refresh matches the shared engine use it; the other <lang>:update and
+# <lang>:upgrade bodies (extra manifests, report steps, Maven rules) stay in their namespace. ~keep
+DEPS_LANGS = "rust dart swift zig"
+DEPS_RUST_MANIFESTS = "e2e/rust/Cargo.toml"
 
 [vars]
 # Grammar sets compiled by the task namespaces; a full build compiles all 372. ~keep
@@ -59,38 +63,6 @@ test_languages = "baml,c,cedar,dockerfile,dotenv,elixir,go,hcl,java,javascript,j
 ffi_test_languages = "python,rust,javascript,typescript,go,html,css,json,mojo,nim,norg"
 rust_workspace = "--locked --workspace --exclude ts-pack-core-php --exclude ts-pack-core-wasm"
 csharp_project = "TreeSitterLanguagePack/TreeSitterLanguagePack.csproj"
-
-# ---- Shared task bodies ------------------------------------------------------------------------
-# Repository-neutral scripts from the xberg-io/toolchains task library, at the toolchains.toml tag. ~keep
-
-[tasks."governance:hooks:install"]
-description = "Provision machine preferences and install reviewed AI governance hooks"
-file = "https://raw.githubusercontent.com/xberg-io/toolchains/v1.5.1/tasks/governance/hooks-install.sh"
-
-[tasks."alef:regenerate"]
-description = "Regenerate every alef output that carries the version"
-hide = true
-file = "https://raw.githubusercontent.com/xberg-io/toolchains/v1.5.1/tasks/alef/regenerate.sh"
-
-[tasks."alef:verify:strict"]
-description = "Run alef verify and fail on drifted frozen paths too"
-hide = true
-file = "https://raw.githubusercontent.com/xberg-io/toolchains/v1.5.1/tasks/alef/verify-strict.sh"
-
-[tasks."version:show"]
-description = "Show current version from Cargo.toml"
-file = "https://raw.githubusercontent.com/xberg-io/toolchains/v1.5.1/tasks/version/cargo.sh"
-
-# Only the ecosystems whose refresh matches the shared engine use it; the other <lang>:update and
-# <lang>:upgrade bodies (extra manifests, report steps, Maven rules) stay in their namespace. ~keep
-# Callers use `mise run deps <mode> <lang>`: a `{ task = "deps ..." }` reference with arguments
-# resolves this remote file as a local path and fails with exit 127. ~keep
-[tasks.deps]
-description = "Update or upgrade one ecosystem's dependencies"
-hide = true
-file = "https://raw.githubusercontent.com/xberg-io/toolchains/v1.5.1/tasks/deps/refresh.sh"
-env.DEPS_LANGS = "rust dart swift zig"
-env.DEPS_RUST_MANIFESTS = "e2e/rust/Cargo.toml"
 
 # ---- Entry points ------------------------------------------------------------------------------
 
@@ -125,22 +97,6 @@ run = [{ task = "rust:build" }]
 description = "Run Rust core tests only"
 run = [{ task = "rust:test" }]
 
-[tasks."test:scripts:lib:sync"]
-description = "Refresh the vendored Bats helper library from xberg-io/actions"
-run = "scripts/task/sync-bats-lib.sh sync"
-
-[tasks."test:scripts:lib:check"]
-description = "Fail when the vendored Bats helper library has drifted from its pinned source"
-run = "scripts/task/sync-bats-lib.sh --check"
-
-[tasks."test:bindings"]
-description = "Run binding test suites only"
-run = "alef test"
-
-[tasks.lint]
-description = "Run all linters via poly"
-run = "poly lint ."
-
 # Gate mode: no --update-cache, so sources/license_cache.json is never written and the working
 # tree stays clean. A grammar whose repo is not already cached is resolved live via `gh api`,
 # which is what makes a newly added copyleft grammar fail here rather than pass on a stale cache.
@@ -156,14 +112,6 @@ run = "uv run --no-sync python scripts/build_grammar_notices.py --update"
 [tasks.check]
 description = "Run check-only validation"
 run = [{ task = "format:check" }, { task = "lint" }]
-
-[tasks.format]
-description = "Format code via poly"
-run = "poly fmt --fix ."
-
-[tasks."format:check"]
-description = "Check formatting via poly"
-run = "poly fmt --check ."
 
 [tasks.clean]
 description = "Clean all build artifacts"
@@ -181,24 +129,6 @@ run = [{ task = "refresh:all upgrade" }]
 description = "DANGER (opt-in): re-pin ALL grammars to upstream HEAD, unreviewed — each new pin runs upstream grammar.js under Node. Review the diff before committing."
 run = "uv run --no-sync scripts/pin_vendors.py"
 
-# ---- Publishing --------------------------------------------------------------------------------
-
-[tasks."publish:validate"]
-description = "Validate publish manifests are consistent"
-run = "alef publish validate"
-
-[tasks."publish:prepare"]
-description = "Prepare packages for publishing (vendor deps, stage FFI)"
-run = "alef publish prepare"
-
-[tasks."publish:build"]
-description = "Build release artifacts for all languages"
-run = "alef publish build"
-
-[tasks."publish:package"]
-description = "Package built artifacts into distributable archives"
-run = "alef publish package -o dist/"
-
 # ---- alef --------------------------------------------------------------------------------------
 
 [tasks."alef:generate"]
@@ -209,18 +139,6 @@ description = "Regenerate all Alef-managed outputs without building"
 # reference-page audit and gap detection still run. Use `mise run alef:snippets` after
 # `alef build` when you actually want validation.
 run = "alef all --clean --skip-snippet-validation --skip-compile"
-
-[tasks."alef:verify"]
-description = "Check Alef-generated files are up to date"
-run = "alef verify --exit-code"
-
-[tasks."alef:snippets"]
-description = "Validate documentation snippets (needs built artifacts; run after alef build)"
-run = "alef snippets check"
-
-[tasks."alef:build"]
-description = "Build all language bindings"
-run = "alef build"
 
 [tasks."alef:format"]
 description = "Format Alef-managed language bindings"
@@ -243,19 +161,11 @@ run = "alef readme"
 
 # ---- E2E ---------------------------------------------------------------------------------------
 
-[tasks."e2e:generate"]
-description = "Generate E2E tests for all languages from fixtures"
-run = "alef e2e generate"
-
 [tasks."e2e:test"]
 description = "Run e2e tests across all bindings (FFI built first)"
 run = "alef test --e2e --jobs 1"
 
 # ---- Governance and contracts ------------------------------------------------------------------
-
-[tasks."governance:check"]
-description = "Check materialized local governance outputs against shared sources"
-run = "ai-rulez generate --check --no-local --strict-config"
 
 [tasks."contract-tests:release-dry-mutations"]
 description = "Verify release dry runs preserve validation without publishing"

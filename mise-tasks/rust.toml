@@ -49,17 +49,9 @@ run = [
   "cargo bench --locked -p tree-sitter-language-pack --bench splitting -- --test 'split/(rust_many_fns|json_array|python_giant_class|nested_brackets)'",
 ]
 
-["rust:format"]
-description = "Format all Rust code"
-run = "cargo fmt --all"
-
 ["rust:format:check"]
 description = "Check Rust formatting (CI)"
 run = "cargo fmt --all -- --check"
-
-["rust:clean"]
-description = "Clean Rust build artifacts"
-run = "cargo clean"
 
 # `cargo upgrade` without --incompatible raises requirements within their major version first,
 # which the shared deps engine's update mode does not do. ~keep
