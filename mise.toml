@@ -49,6 +49,8 @@ includes = [
 [env]
 # crates/ts-pack-core/build.rs and the binding builds locate grammars and sources from here. ~keep
 PROJECT_ROOT = "{{config_root}}"
+# Repository specifics for the shared task sets (toolchains.toml task_sets). ~keep
+BATS_LIB_REF = "v1.29.0"
 
 [vars]
 # Grammar sets compiled by the task namespaces; a full build compiles all 372. ~keep
