@@ -2928,7 +2928,7 @@ jobs:
       - name: Install poly
         uses: Goldziher/poly@v0
         with:
-          version: "0.31.0"
+          version: "0.31.2"
       # e2e/c/test_*.c is gitignored (.gitignore:95), so a fresh checkout of the release ref
       # contains only the Makefile, main.c and download_ffi.sh. Without regenerating them,
       # `make` dies on the alphabetically first missing category with "No rule to make
@@ -2940,15 +2940,16 @@ jobs:
 
   publish-crates:
     name: Publish Rust crates
-    needs: [
-      prepare,
-      validate-versions,
-      clone-vendors,
-      check-registries,
-      build-parser-sources,
-      e2e-rust,
-      finalize-github-release,
-    ]
+    needs:
+      [
+        prepare,
+        validate-versions,
+        clone-vendors,
+        check-registries,
+        build-parser-sources,
+        e2e-rust,
+        finalize-github-release,
+      ]
     if: >-
       ${{ !inputs.plugins-only && (always() && needs.prepare.outputs.release_crates == 'true' && needs.e2e-rust.result == 'success' && needs.validate-versions.result == 'success' && needs.clone-vendors.result == 'success' && needs.build-parser-sources.result == 'success' && needs.finalize-github-release.outputs.promoted == 'true' && (fromJson(needs.check-registries.outputs.results).cratesio != 'true' || needs.prepare.outputs.force_republish == 'true')) }}
     runs-on: ubuntu-latest

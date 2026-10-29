@@ -103,8 +103,9 @@ ignore_paths = [
 
 [lint.load_budgets]
 # ~keep AR964's 8000-char Codex skill-listing figure is unverified; the counted listing after folding the fallback
-# skills, plus about 5%. Trim skill descriptions to lower it; re-measure on every pin bump.
-codex-skill-listing = 12600
+# skills (9205 on 5.9.2), plus about 12% to stay out of AR964's 10% info band. Trim skill descriptions to
+# lower it; re-measure on every pin bump.
+codex-skill-listing = 10300
 
 # Goldziher/ai-rulez#485: ai-rulez reports generated skill copies as duplicates. ~keep
 [[lint.ignore_rules]]
