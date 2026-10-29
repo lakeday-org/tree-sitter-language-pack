@@ -1,11 +1,6 @@
 # Ruby tasks, included from mise.toml [task_config]. mise supplies the pinned Ruby, so the tasks no
 # longer initialise rbenv shims ahead of it. ~keep
 
-["ruby:deps"]
-description = "Install Ruby dependencies"
-dir = "{{config_root}}/packages/ruby"
-run = "bundle install"
-
 ["ruby:update"]
 description = "Update Ruby dependencies within current major versions (non-breaking)"
 dir = "{{config_root}}/packages/ruby"
@@ -16,56 +11,6 @@ run = ["bundle update --conservative", "bundle outdated || true"]
 description = "Upgrade Ruby dependencies to latest versions allowed by Gemfile (cross-major)"
 dir = "{{config_root}}/packages/ruby"
 run = ["bundle update --all --conservative=false", "bundle outdated || true"]
-
-["ruby:build"]
-description = "Build Ruby native extension (requires Ruby 3.2-3.4)"
-dir = "{{config_root}}/packages/ruby"
-env = { CARGO_TARGET_DIR = "{{config_root}}/crates/ts-pack-ruby/target" }
-run = "bundle exec rake compile"
-
-["ruby:test"]
-description = "Run Ruby tests"
-dir = "{{config_root}}/packages/ruby"
-run = "bundle exec rspec"
-
-["ruby:format"]
-description = "Format Ruby code"
-dir = "{{config_root}}/packages/ruby"
-run = "bundle exec rubocop -a"
-
-["ruby:format:check"]
-description = "Check Ruby formatting (CI)"
-dir = "{{config_root}}/packages/ruby"
-run = "bundle exec rubocop --format simple"
-
-["ruby:lint"]
-description = "Lint Ruby code"
-dir = "{{config_root}}/packages/ruby"
-run = "bundle exec rubocop"
-
-["ruby:lint:check"]
-description = "Check Ruby linting without modifications (CI)"
-dir = "{{config_root}}/packages/ruby"
-run = "bundle exec rubocop --format simple"
-
-["ruby:typecheck"]
-description = "Run Steep type checking"
-dir = "{{config_root}}/packages/ruby"
-run = "bundle exec steep check"
-
-["ruby:rbs-validate"]
-description = "Validate RBS type signatures"
-dir = "{{config_root}}/packages/ruby"
-run = "bundle exec rbs validate"
-
-["ruby:clean"]
-description = "Clean Ruby build artifacts"
-dir = "{{config_root}}/packages/ruby"
-run = "rm -rf tmp lib/tree_sitter_language_pack/ts_pack_ruby.* vendor/ts-pack-core vendor/Cargo.toml"
-
-["ruby:e2e:generate"]
-description = "Generate Ruby E2E tests from fixtures"
-run = "alef e2e generate --lang ruby"
 
 ["ruby:e2e:test"]
 description = "Run Ruby E2E tests"

@@ -5,36 +5,11 @@ description = "Install Elixir dependencies"
 dir = "{{config_root}}/packages/elixir"
 run = "mix deps.get"
 
-["elixir:build"]
-description = "Compile Elixir project (includes Rustler NIF)"
-dir = "{{config_root}}/packages/elixir"
-run = "mix compile"
-
 ["elixir:test"]
 description = "Run Elixir tests"
 dir = "{{config_root}}/packages/elixir"
 env = { MIX_ENV = "test" }
 run = "mix test"
-
-["elixir:format"]
-description = "Format Elixir code"
-dir = "{{config_root}}/packages/elixir"
-run = "mix format"
-
-["elixir:format:check"]
-description = "Check Elixir formatting (CI)"
-dir = "{{config_root}}/packages/elixir"
-run = "mix format --check-formatted"
-
-["elixir:lint"]
-description = "Lint Elixir code (credo, requires NIF built first)"
-dir = "{{config_root}}/packages/elixir"
-run = "mix credo --strict"
-
-["elixir:lint:check"]
-description = "Check Elixir linting without modifications (CI)"
-dir = "{{config_root}}/packages/elixir"
-run = "mix credo --strict"
 
 # Elixir requires manual mix.exs edits for major version updates. ~keep
 ["elixir:update"]
@@ -46,11 +21,6 @@ run = ["mix hex.outdated || true", "mix deps.update --all", "mix hex.outdated ||
 description = "Upgrade Elixir dependencies to latest versions (cross-major / breaking)"
 dir = "{{config_root}}/packages/elixir"
 run = ["mix hex.outdated || true", "mix deps.unlock --all", "mix deps.update --all", "mix hex.outdated || true"]
-
-["elixir:clean"]
-description = "Clean Elixir build artifacts"
-dir = "{{config_root}}/packages/elixir"
-run = "mix clean"
 
 ["elixir:e2e:generate"]
 description = "Generate Elixir E2E tests from fixtures"

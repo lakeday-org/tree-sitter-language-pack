@@ -14,7 +14,7 @@ update | upgrade) ;;
   ;;
 esac
 
-for lang in rust python node wasm ruby go java csharp php elixir dart swift zig kotlin-android; do
+for lang in rust python node ruby go java csharp php elixir dart swift zig kotlin-android; do
   echo "Running $lang:$mode..."
   mise run "$lang:$mode"
 done

@@ -12,13 +12,6 @@ run = [{ task = "docs:build" }]
 description = "Serve documentation locally with live reload"
 run = ["pnpm --dir docs-site install", "pnpm --dir docs-site dev"]
 
-["docs:lint:links"]
-description = "Check links with lychee"
-run = [
-  { task = "docs:build" },
-  'lychee --offline --config .lychee.toml --root-dir "{{config_root}}/docs-site/dist" docs-site/dist README.md',
-]
-
 ["docs:lint:prose"]
 description = "Lint prose with textlint"
 run = "npx textlint 'docs-site/src/content/docs/**/*.{md,mdx}'"
@@ -32,15 +25,6 @@ description = "List snippets filtered to specific languages (rust,python)"
 usage = 'arg "<languages>" help="Comma-separated snippet languages"'
 run = 'alef snippets list --snippets docs-site/src/snippets --languages "$usage_languages"'
 
-["docs:snippets:validate"]
-description = "Validate all documentation snippets with fixture coverage parity"
-run = "alef snippets check --strict --cache off"
-
-["docs:snippets:validate:lang"]
-description = "Validate snippets for specific languages (rust,python)"
-usage = 'arg "<languages>" help="Comma-separated snippet languages"'
-run = 'alef snippets check --strict --cache off --lang "$usage_languages"'
-
 ["docs:snippets:gaps"]
 description = "Report unreferenced snippets + missing language variants"
 run = "alef snippets gaps --snippets docs-site/src/snippets --docs docs-site/src/content/docs"
@@ -48,10 +32,6 @@ run = "alef snippets gaps --snippets docs-site/src/snippets --docs docs-site/src
 ["docs:snippets:audit"]
 description = "Audit snippet structure under docs-site/src/snippets"
 run = "alef snippets audit --snippets docs-site/src/snippets"
-
-["docs:snippets:all"]
-description = "Generate and strictly validate fixture-driven documentation snippets"
-run = ["alef e2e generate", "alef snippets check --strict --cache off"]
 
 ["docs:generate:languages"]
 description = "Generate supported languages documentation from language_definitions.json"
@@ -64,7 +44,3 @@ description = "Generate the per-grammar query-bundle README partial"
 sources = ["sources/language_definitions.json", "parsers/*/queries/*.scm"]
 outputs = ["templates/readme/partials/grammar_table.md"]
 run = "uv run --no-sync scripts/generate_grammar_table.py --mode queries --output templates/readme/partials/grammar_table.md"
-
-["docs:generate:api"]
-description = "Generate API reference docs (via alef)"
-run = "alef docs"

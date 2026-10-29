@@ -1,15 +1,6 @@
 # WASM tasks, included from mise.toml [task_config]. WASM_CC and WASM_SYSROOT override the Homebrew
 # LLVM clang and wasi-sysroot paths. ~keep
 
-["wasm:deps"]
-description = "Install WASM build tools"
-run = [
-  "rustup target add wasm32-unknown-unknown",
-  "which wasm-pack || cargo install --locked wasm-pack",
-  "brew list wasi-libc >/dev/null 2>&1 || brew install wasi-libc",
-  "brew list llvm >/dev/null 2>&1 || brew install llvm",
-]
-
 ["wasm:pack"]
 description = "Build the WASM package for one wasm-pack target"
 hide = true
@@ -19,36 +10,6 @@ run = '''CC_wasm32_unknown_unknown="${WASM_CC:-/opt/homebrew/opt/llvm/bin/clang}
 ["wasm:build"]
 description = "Build WASM package (web target)"
 run = [{ task = "wasm:pack web" }]
-
-["wasm:build:bundler"]
-description = "Build WASM package (bundler target)"
-run = [{ task = "wasm:pack bundler" }]
-
-["wasm:build:node"]
-description = "Build WASM package (Node.js target)"
-run = [{ task = "wasm:pack nodejs" }]
-
-["wasm:test"]
-description = "Run WASM tests"
-dir = "{{config_root}}/crates/ts-pack-core-wasm"
-run = "wasm-pack test --headless --firefox"
-
-["wasm:clean"]
-description = "Clean WASM build artifacts"
-dir = "{{config_root}}/crates/ts-pack-core-wasm"
-run = "rm -rf pkg target"
-
-["wasm:e2e:generate"]
-description = "Generate WASM E2E tests from fixtures"
-run = "alef e2e generate --lang wasm"
-
-["wasm:update"]
-description = "Update WASM dependencies within current major versions (non-breaking)"
-run = "echo 'WASM packages live in the pnpm workspace; node:update already refreshed packages/wasm'"
-
-["wasm:upgrade"]
-description = "Upgrade WASM dependencies to latest versions (cross-major / breaking)"
-run = "echo 'WASM packages live in the pnpm workspace; node:upgrade already refreshed packages/wasm'"
 
 ["wasm:e2e:test"]
 description = "Run WASM E2E tests"

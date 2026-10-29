@@ -1,51 +1,10 @@
 # Kotlin/Android tasks, included from mise.toml [task_config]. Gradle is not a mise tool, so each
 # task that needs it fails first when `gradle` is missing. ~keep
 
-["kotlin-android:install"]
-description = "Resolve kotlin-android gradle dependencies"
-dir = "{{config_root}}/packages/kotlin-android"
-run = ["command -v gradle >/dev/null 2>&1", "gradle dependencies --no-daemon"]
-
-["kotlin-android:setup"]
-description = "Setup kotlin-android (alias for install)"
-run = [{ task = "kotlin-android:install" }]
-
 ["kotlin-android:build"]
 description = "Build kotlin-android AAR in release mode"
 dir = "{{config_root}}/packages/kotlin-android"
 run = ["command -v gradle >/dev/null 2>&1", "gradle assembleRelease --no-daemon"]
-
-["kotlin-android:build:dev"]
-description = "Build kotlin-android AAR in debug mode"
-dir = "{{config_root}}/packages/kotlin-android"
-run = ["command -v gradle >/dev/null 2>&1", "gradle assembleDebug --no-daemon"]
-
-["kotlin-android:build:release"]
-description = "Build kotlin-android AAR in release mode (alias for build)"
-run = [{ task = "kotlin-android:build" }]
-
-["kotlin-android:lint"]
-description = "Run ktlint with autocorrect"
-dir = "{{config_root}}/packages/kotlin-android"
-run = ["command -v gradle >/dev/null 2>&1", "gradle ktlintFormat --no-daemon"]
-
-["kotlin-android:lint:check"]
-description = "Run ktlint in check-only mode"
-dir = "{{config_root}}/packages/kotlin-android"
-run = ["command -v gradle >/dev/null 2>&1", "gradle ktlintCheck --no-daemon"]
-
-["kotlin-android:format"]
-description = "Run ktlint format (alias for lint)"
-run = [{ task = "kotlin-android:lint" }]
-
-["kotlin-android:format:check"]
-description = "Run ktlint check (alias for lint:check)"
-run = [{ task = "kotlin-android:lint:check" }]
-
-["kotlin-android:clean"]
-description = "Clean kotlin-android build artifacts"
-dir = "{{config_root}}/packages/kotlin-android"
-run = ["gradle clean --no-daemon || true", "rm -rf build .gradle"]
 
 # Gradle has no built-in apply-updates: these report current vs available versions; edit
 # build.gradle(.kts) by hand to apply them. ~keep

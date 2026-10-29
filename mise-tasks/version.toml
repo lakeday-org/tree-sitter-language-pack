@@ -28,10 +28,6 @@ run = [
   { task = "alef:verify:strict" },
 ]
 
-["version:check"]
-description = "Check if versions are synchronized (dry-run)"
-run = [{ task = "version:show" }]
-
 ["version:bump:major"]
 description = "Bump major version (X.0.0) and sync"
 run = ["alef sync-versions --bump major", { task = "version:sync" }]

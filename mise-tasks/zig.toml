@@ -1,53 +1,9 @@
 # Zig tasks, included from mise.toml [task_config]. They build against the Rust FFI library with
 # the FFI test grammar set linked statically. ~keep
 
-["zig:install"]
-description = "Install Zig dependencies (build resolves zig.zon)"
-dir = "{{config_root}}/packages/zig"
-run = ["command -v zig >/dev/null 2>&1", "zig build"]
-
-["zig:setup"]
-description = "Setup Zig environment"
-run = [{ task = "zig:install" }]
-
-["zig:build"]
-description = "Build Zig package against the Rust FFI shared library"
-run = ["command -v zig >/dev/null 2>&1", { task = "ffi:build" }, "cd packages/zig && zig build"]
-
-["zig:build:dev"]
-description = "Build Zig package in debug mode"
-run = ["command -v zig >/dev/null 2>&1", { task = "ffi:build --dev" }, "cd packages/zig && zig build"]
-
-["zig:build:release"]
-description = "Build Zig package in release-fast mode"
-run = ["command -v zig >/dev/null 2>&1", { task = "ffi:build" }, "cd packages/zig && zig build -Doptimize=ReleaseFast"]
-
 ["zig:test"]
 description = "Run Zig tests against the Rust FFI shared library"
 run = ["command -v zig >/dev/null 2>&1", { task = "ffi:build" }, "cd packages/zig && zig build test"]
-
-["zig:lint"]
-description = "Format Zig code"
-dir = "{{config_root}}/packages/zig"
-run = ["command -v zig >/dev/null 2>&1", "zig fmt src test"]
-
-["zig:lint:check"]
-description = "Check Zig code formatting"
-dir = "{{config_root}}/packages/zig"
-run = ["command -v zig >/dev/null 2>&1", "zig fmt --check src"]
-
-["zig:format"]
-description = "Format Zig code (alias for lint)"
-run = [{ task = "zig:lint" }]
-
-["zig:format:check"]
-description = "Check Zig formatting (alias for lint:check)"
-run = [{ task = "zig:lint:check" }]
-
-["zig:clean"]
-description = "Clean Zig build artifacts"
-dir = "{{config_root}}/packages/zig"
-run = "rm -rf zig-cache zig-out .zig-cache"
 
 ["zig:update"]
 description = "Refresh Zig dependencies within build.zig.zon constraints (non-breaking)"

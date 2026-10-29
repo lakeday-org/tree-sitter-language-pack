@@ -19,11 +19,6 @@ description = "Build with a small set of languages for fast iteration"
 env = { TSLP_LANGUAGES = "{{vars.dev_languages}}", TSLP_LINK_MODE = "dynamic" }
 run = "cargo build {{vars.rust_workspace}}"
 
-["rust:build:release"]
-description = "Build in release mode (optimized)"
-env = { TSLP_LINK_MODE = "dynamic" }
-run = "cargo build {{vars.rust_workspace}} --release"
-
 ["rust:test"]
 description = "Run all Rust tests"
 env = { TSLP_LANGUAGES = "{{vars.test_languages}}", TSLP_LINK_MODE = "dynamic" }
@@ -54,16 +49,6 @@ run = [
   "cargo bench --locked -p tree-sitter-language-pack --bench splitting -- --test 'split/(rust_many_fns|json_array|python_giant_class|nested_brackets)'",
 ]
 
-["rust:lint"]
-description = "Auto-fix Rust code linting (cargo fmt + clippy)"
-env = { TSLP_LANGUAGES = "{{vars.dev_languages}}", TSLP_LINK_MODE = "static" }
-run = ["cargo fmt --all", "cargo clippy {{vars.rust_workspace}} --fix --allow-dirty --allow-staged -- -D warnings"]
-
-["rust:lint:check"]
-description = "Check Rust code linting without modifications"
-env = { TSLP_LANGUAGES = "{{vars.dev_languages}}", TSLP_LINK_MODE = "static" }
-run = ["cargo fmt --all -- --check", "cargo clippy {{vars.rust_workspace}} -- -D warnings"]
-
 ["rust:format"]
 description = "Format all Rust code"
 run = "cargo fmt --all"
@@ -75,11 +60,6 @@ run = "cargo fmt --all -- --check"
 ["rust:clean"]
 description = "Clean Rust build artifacts"
 run = "cargo clean"
-
-["rust:doc"]
-description = "Generate and open documentation"
-env = { TSLP_LANGUAGES = "{{vars.dev_languages}}", TSLP_LINK_MODE = "static" }
-run = "cargo doc --workspace --no-deps --exclude ts-pack-core-php --exclude ts-pack-core-wasm --open"
 
 # `cargo upgrade` without --incompatible raises requirements within their major version first,
 # which the shared deps engine's update mode does not do. ~keep
@@ -96,29 +76,7 @@ run = [
 description = "Upgrade Rust dependencies to latest versions (cross-major / breaking)"
 run = ["mise run deps upgrade rust"]
 
-["rust:bench"]
-description = "Run criterion benchmarks"
-env = { TSLP_LINK_MODE = "dynamic" }
-run = "cargo bench -p tree-sitter-language-pack"
-
-["rust:e2e:generate"]
-description = "Generate and format Rust E2E tests from fixtures"
-run = ["alef e2e generate --lang rust", { task = "rust:e2e:format" }]
-
-["rust:e2e:format"]
-description = "Format generated Rust E2E sources"
-run = "cargo fmt --manifest-path e2e/rust/Cargo.toml"
-
 ["rust:e2e:test"]
 description = "Run Rust E2E tests"
 env = { TSLP_LANGUAGES = "mojo,nim,norg,bash" }
 run = "alef test --lang rust --e2e --jobs 1"
-
-["rust:e2e:all-grammars"]
-description = "Run Rust E2E tests with a representative set of grammars compiled statically"
-env = { TSLP_LANGUAGES = "python,rust,javascript,typescript,go,html,css,json,bash,c,cpp,java,ruby,swift,kotlin", TSLP_LINK_MODE = "static" }
-run = "cargo test --locked --manifest-path e2e/rust/Cargo.toml"
-
-["rust:e2e:verify"]
-description = "Regenerate and validate Rust E2E suite (generate + format + test)"
-run = [{ task = "rust:e2e:generate" }, { task = "rust:e2e:format" }, { task = "rust:e2e:test" }]

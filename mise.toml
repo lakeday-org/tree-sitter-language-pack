@@ -57,7 +57,6 @@ test_languages = "baml,c,cedar,dockerfile,dotenv,elixir,go,hcl,java,javascript,j
 ffi_test_languages = "python,rust,javascript,typescript,go,html,css,json,mojo,nim,norg"
 rust_workspace = "--locked --workspace --exclude ts-pack-core-php --exclude ts-pack-core-wasm"
 csharp_project = "TreeSitterLanguagePack/TreeSitterLanguagePack.csproj"
-csharp_smoke_project = "TreeSitterLanguagePack.SmokeTests/TreeSitterLanguagePack.SmokeTests.csproj"
 
 # ---- Shared task bodies ------------------------------------------------------------------------
 # Repository-neutral scripts from the xberg-io/toolchains task library, at the toolchains.toml tag. ~keep
@@ -108,10 +107,6 @@ run = [
   { task = "clone:if-missing" },
 ]
 
-[tasks.ai-rulez]
-description = "Generate ai-rulez configuration files (CLAUDE.md, etc.)"
-run = "ai-rulez generate"
-
 [tasks.clone]
 description = "Clone all language grammar repositories (full re-clone)"
 run = "uv run --no-sync scripts/clone_vendors.py"
@@ -122,39 +117,11 @@ run = 'if [ -d parsers ] && [ -n "$(ls -A parsers 2>/dev/null)" ]; then exit 0; 
 
 [tasks.build]
 description = "Build Rust core crates only"
-run = [{ task = "build:core" }]
-
-[tasks."build:dev"]
-description = "Build in dev mode with a few languages for fast iteration"
-run = [{ task = "rust:build:dev" }]
-
-[tasks."build:core"]
-description = "Build Rust core crates only"
 run = [{ task = "rust:build" }]
-
-[tasks."build:all"]
-description = "Build Rust core crates and all language bindings"
-run = [{ task = "build:core" }, { task = "build:bindings" }]
-
-[tasks."build:release"]
-description = "Build Rust core crates in release mode"
-run = [{ task = "rust:build:release" }]
-
-[tasks."build:ci"]
-description = "Build Rust core crates in CI mode"
-run = [{ task = "rust:build:release" }]
-
-[tasks."build:bindings"]
-description = "Build all language bindings"
-run = [{ task = "alef:build" }]
 
 [tasks.test]
 description = "Run Rust core tests only"
 run = [{ task = "rust:test" }]
-
-[tasks."test:all"]
-description = "Run all test suites across all languages"
-run = [{ task = "test" }, "alef test", { task = "test:scripts" }]
 
 [tasks."test:scripts:lib:sync"]
 description = "Refresh the vendored Bats helper library from xberg-io/actions"
@@ -168,10 +135,6 @@ run = "scripts/task/sync-bats-lib.sh --check"
 description = "Run binding test suites only"
 run = "alef test"
 
-[tasks."test:ci"]
-description = "Run test suites in CI mode"
-run = [{ task = "test:all" }]
-
 [tasks.lint]
 description = "Run all linters via poly"
 run = "poly lint ."
@@ -179,10 +142,6 @@ run = "poly lint ."
 [tasks."lint:check"]
 description = "Run check-only linting"
 run = "poly lint ."
-
-[tasks."lint:licenses"]
-description = "Refresh sources/license_cache.json and verify grammar licenses (writes the cache)"
-run = "uv run --no-sync python scripts/lint_grammar_licenses.py --update-cache"
 
 # Gate mode: no --update-cache, so sources/license_cache.json is never written and the working
 # tree stays clean. A grammar whose repo is not already cached is resolved live via `gh api`,
@@ -195,12 +154,6 @@ run = "uv run --no-sync python scripts/lint_grammar_licenses.py"
 [tasks.notices]
 description = "Regenerate sources/grammar_notices.json from pinned grammar sources (needs network + authenticated gh)"
 run = "uv run --no-sync python scripts/build_grammar_notices.py --update"
-
-# Offline: validates the committed record's coverage and digests, never rewrites it. `--verify`
-# (re-fetch upstream) belongs to the release path, not the PR gate. ~keep
-[tasks."notices:check"]
-description = "Verify grammar notice coverage and license-text digests (offline, no writes)"
-run = "uv run --no-sync python scripts/build_grammar_notices.py --check"
 
 [tasks.check]
 description = "Run check-only validation"
@@ -229,14 +182,6 @@ run = [{ task = "refresh:all upgrade" }]
 [tasks."update:grammars"]
 description = "DANGER (opt-in): re-pin ALL grammars to upstream HEAD, unreviewed — each new pin runs upstream grammar.js under Node. Review the diff before committing."
 run = "uv run --no-sync scripts/pin_vendors.py"
-
-[tasks."update:grammars:missing"]
-description = "Pin only languages missing revisions"
-run = "uv run --no-sync scripts/pin_vendors.py --only-missing"
-
-[tasks."update:grammars:check"]
-description = "Check for grammar updates against upstream (reports stale revisions without writing)"
-run = "uv run --no-sync scripts/check_grammar_updates.py"
 
 # ---- Publishing --------------------------------------------------------------------------------
 
@@ -304,43 +249,15 @@ run = "alef readme"
 description = "Generate E2E tests for all languages from fixtures"
 run = "alef e2e generate"
 
-[tasks."e2e:build"]
-description = "Build all language bindings for E2E tests"
-run = [{ task = "alef:build" }]
-
 [tasks."e2e:test"]
 description = "Run e2e tests across all bindings (FFI built first)"
 run = "alef test --e2e --jobs 1"
-
-[tasks."e2e:all"]
-description = "Build all bindings and run all e2e tests"
-run = [{ task = "e2e:build" }, { task = "e2e:test" }]
-
-[tasks."e2e:quick"]
-description = "Quick e2e (Rust only — fastest feedback)"
-run = "alef test --lang rust --e2e --jobs 1"
-
-[tasks."e2e:verify"]
-description = "Full e2e pipeline — generate, lint, test all suites"
-run = [{ task = "e2e:generate" }, { task = "e2e:lint" }, { task = "e2e:test" }]
-
-[tasks."e2e:lint"]
-description = "Lint all generated E2E test code"
-run = [{ task = "rust:e2e:format" }]
 
 # ---- Governance and contracts ------------------------------------------------------------------
 
 [tasks."governance:check"]
 description = "Check materialized local governance outputs against shared sources"
 run = "ai-rulez generate --check --no-local --strict-config"
-
-[tasks."contract-tests:jvm-capsule"]
-description = "Run the JVM capsule-ownership contract test (contract-tests/jvm-capsule)"
-# Guards alef.toml's [crates.java.capsule_types.Language] and
-# [crates.kotlin_android.capsule_types.Language] host_destructor = "none" pins against
-# jtreesitter/ktreesitter releases that add a destructor to Language. ~keep
-dir = "{{config_root}}/contract-tests/jvm-capsule"
-run = "mvn test"
 
 [tasks."contract-tests:release-dry-mutations"]
 description = "Verify release dry runs preserve validation without publishing"

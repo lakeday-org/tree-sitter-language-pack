@@ -13,26 +13,6 @@ run = [
   "uv pip install -e packages/python",
 ]
 
-["python:format"]
-description = "Format Python code"
-run = ["uv run --no-sync ruff format", "uv run --no-sync ruff check --fix --unsafe-fixes"]
-
-["python:format:check"]
-description = "Check Python formatting (CI)"
-run = ["uv run --no-sync ruff format --check", "uv run --no-sync ruff check"]
-
-["python:lint"]
-description = "Lint Python code"
-run = ["uv run --no-sync ruff check --fix --unsafe-fixes", "uv run --no-sync ruff format"]
-
-["python:lint:check"]
-description = "Check Python linting without modifications"
-run = "uv run --no-sync ruff check"
-
-["python:clean"]
-description = "Clean Python build artifacts"
-run = "rm -rf build/ dist/ *.egg-info __pycache__"
-
 ["python:update"]
 description = "Update Python dependencies within current major versions (non-breaking)"
 run = [
@@ -47,14 +27,6 @@ run = [
   "uv pip list --outdated || true",
 ]
 
-["python:e2e:generate"]
-description = "Generate Python E2E tests from fixtures"
-run = "alef e2e generate --lang python"
-
 ["python:e2e:test"]
 description = "Run Python E2E tests"
 run = "alef test --lang python --e2e --jobs 1"
-
-["python:e2e:verify"]
-description = "Full Python E2E pipeline (generate + test)"
-run = [{ task = "python:e2e:generate" }, { task = "python:e2e:test" }]
