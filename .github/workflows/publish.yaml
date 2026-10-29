@@ -649,11 +649,19 @@ jobs:
             fi
           fi
 
+      # ~keep mise cannot lock the whole toolchain for windows-arm64 (no Temurin 25 build there),
+      # so the windows-11-arm legs keep setup-python and every other leg takes the locked mise Python.
       - name: Setup Python
+        if: matrix.os != 'windows-11-arm'
         uses: xberg-io/actions/setup-mise@v1
         with:
           install-args: python
           config-ref: ${{ github.sha }}
+      - name: Setup Python (windows-11-arm)
+        if: matrix.os == 'windows-11-arm'
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
 
       - name: Get all language names
         id: langs
@@ -1784,11 +1792,19 @@ jobs:
       - name: Install alef
         uses: xberg-io/actions/install-alef@v1
 
+      # ~keep mise cannot lock the whole toolchain for windows-arm64 (no Temurin 25 build there),
+      # so the windows-11-arm legs keep setup-python and every other leg takes the locked mise Python.
       - name: Setup Python
+        if: matrix.os != 'windows-11-arm'
         uses: xberg-io/actions/setup-mise@v1
         with:
           install-args: python
           config-ref: ${{ github.sha }}
+      - name: Setup Python (windows-11-arm)
+        if: matrix.os == 'windows-11-arm'
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
 
       - name: Get all language names
         id: langs
@@ -2012,11 +2028,19 @@ jobs:
           use-sccache: "false"
           install-llvm-cov: "false"
 
+      # ~keep mise cannot lock the whole toolchain for windows-arm64 (no Temurin 25 build there),
+      # so the windows-11-arm legs keep setup-python and every other leg takes the locked mise Python.
       - name: Setup Python
+        if: matrix.os != 'windows-11-arm'
         uses: xberg-io/actions/setup-mise@v1
         with:
           install-args: python
           config-ref: ${{ github.sha }}
+      - name: Setup Python (windows-11-arm)
+        if: matrix.os == 'windows-11-arm'
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
 
       - name: Get all language names
         id: langs
@@ -4545,11 +4569,19 @@ jobs:
           use-sccache: "false"
           install-llvm-cov: "false"
 
+      # ~keep mise cannot lock the whole toolchain for windows-arm64 (no Temurin 25 build there),
+      # so the windows-11-arm legs keep setup-python and every other leg takes the locked mise Python.
       - name: Setup Python
+        if: matrix.os != 'windows-11-arm'
         uses: xberg-io/actions/setup-mise@v1
         with:
           install-args: python
           config-ref: ${{ github.sha }}
+      - name: Setup Python (windows-11-arm)
+        if: matrix.os == 'windows-11-arm'
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
 
       - name: Get all language names
         id: langs
