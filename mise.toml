@@ -82,6 +82,8 @@ file = "https://raw.githubusercontent.com/xberg-io/toolchains/v1.5.0/tasks/versi
 
 # Only the ecosystems whose refresh matches the shared engine use it; the other <lang>:update and
 # <lang>:upgrade bodies (extra manifests, report steps, Maven rules) stay in their namespace. ~keep
+# Callers use `mise run deps <mode> <lang>`: a `{ task = "deps ..." }` reference with arguments
+# resolves this remote file as a local path and fails with exit 127. ~keep
 [tasks.deps]
 description = "Update or upgrade one ecosystem's dependencies"
 hide = true

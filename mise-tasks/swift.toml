@@ -60,11 +60,11 @@ run = ["swift package clean || true", "rm -rf .build"]
 # by hand for a major upgrade. ~keep
 ["swift:update"]
 description = "Update Swift package dependencies within current major versions (non-breaking)"
-run = ["command -v swift >/dev/null 2>&1", { task = "deps update swift" }]
+run = ["command -v swift >/dev/null 2>&1", "mise run deps update swift"]
 
 ["swift:upgrade"]
 description = "Upgrade Swift package dependencies (cross-major requires manual Package.swift edits)"
-run = ["command -v swift >/dev/null 2>&1", { task = "deps upgrade swift" }]
+run = ["command -v swift >/dev/null 2>&1", "mise run deps upgrade swift"]
 
 ["swift:e2e:test"]
 description = "Run Swift e2e tests"

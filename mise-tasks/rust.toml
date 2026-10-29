@@ -94,7 +94,7 @@ run = [
 
 ["rust:upgrade"]
 description = "Upgrade Rust dependencies to latest versions (cross-major / breaking)"
-run = [{ task = "deps upgrade rust" }]
+run = ["mise run deps upgrade rust"]
 
 ["rust:bench"]
 description = "Run criterion benchmarks"

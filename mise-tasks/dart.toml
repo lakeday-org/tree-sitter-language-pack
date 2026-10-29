@@ -56,11 +56,11 @@ run = "rm -rf .dart_tool build pubspec.lock"
 
 ["dart:update"]
 description = "Update Dart dependencies within current major versions (non-breaking)"
-run = ["command -v dart >/dev/null 2>&1", { task = "deps update dart" }]
+run = ["command -v dart >/dev/null 2>&1", "mise run deps update dart"]
 
 ["dart:upgrade"]
 description = "Upgrade Dart dependencies to latest versions (cross-major / breaking)"
-run = ["command -v dart >/dev/null 2>&1", { task = "deps upgrade dart" }]
+run = ["command -v dart >/dev/null 2>&1", "mise run deps upgrade dart"]
 
 ["dart:e2e:test"]
 description = "Run Dart e2e tests"
