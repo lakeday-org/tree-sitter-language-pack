@@ -99,7 +99,7 @@ UNSUPPORTED: dict[str, str] = {
     "zig": "build.zig.zon resolves a GitHub release tarball by URL and hash; the local "
     "equivalent needs the release tarball built and rehashed first",
     "c": "download_ffi.sh downloads a prebuilt FFI archive from the GitHub release; the local "
-    "equivalent is ALEF_FFI_LOCAL_DIR against `mise run c:build:ffi` output",
+    "equivalent is ALEF_FFI_LOCAL_DIR against `mise run ffi:build` output",
     "kotlin_android": "Gradle resolves a published AAR; the local equivalent is "
     "`mise run kotlin-android:build` plus a mavenLocal() publish",
     "php": "already resolves the package from ../../crates/ts-pack-core-php via a composer "
