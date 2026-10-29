@@ -131,17 +131,29 @@ class ReleaseDryMutationTests(unittest.TestCase):
         step = next(
             item for item in steps if item.get("name") == "Check test-app pins match the release being published"
         )
+        assert step["run"] == "mise run test-apps:check-release-pins"
+        # Run the task's own command instead of mise, so the copy needs no mise project or network,
+        # and pin that command here so the wiring stays covered. ~keep
+        task = tomllib.loads((ROOT / "mise-tasks/test-apps.toml").read_text())["test-apps:check-release-pins"]
+        command = task["run"]
+        assert " ".join(command.split()) == (
+            "python3 scripts/check_test_app_pins.py"
+            ' --release "${RELEASE_VERSION:?RELEASE_VERSION is required}"'
+            ' --dry-run "${RELEASE_DRY_RUN:?RELEASE_DRY_RUN is required}"'
+            ' --source-sha "${RELEASE_SOURCE_SHA:?RELEASE_SOURCE_SHA is required}"'
+            ' --ref "${RELEASE_REF:-}"'
+            ' --tag "${RELEASE_TAG:-}"'
+        ), command
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             checker = ROOT / "scripts/check_test_app_pins.py"
             pins = runpy.run_path(str(checker))["PINS"]
-            paths = {"Cargo.toml", "alef.toml", "mise.toml", *(pin.path for pin in pins)}
-            assert len(paths) == 20
+            paths = {"Cargo.toml", "alef.toml", *(pin.path for pin in pins)}
+            assert len(paths) == 19
             for name in paths:
                 destination = root / name
                 destination.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copy2(ROOT / name, destination)
-            shutil.copytree(ROOT / "mise-tasks", root / "mise-tasks")
             (root / "scripts").mkdir(exist_ok=True)
             shutil.copy2(ROOT / "scripts/check_test_app_pins.py", root / "scripts/check_test_app_pins.py")
             if stale:
@@ -170,11 +182,8 @@ class ReleaseDryMutationTests(unittest.TestCase):
             environment = dict(os.environ)
             environment.update({name: expand(str(value)) for name, value in step.get("env", {}).items()})
             environment["PATH"] = str(Path(sys.executable).parent) + os.pathsep + environment["PATH"]
-            # The copy is a fresh mise project: trust it, and run with the tools already on PATH. ~keep
-            environment["MISE_TRUSTED_CONFIG_PATHS"] = str(root)
-            environment["MISE_TASK_RUN_AUTO_INSTALL"] = "false"
             return subprocess.run(
-                ["bash", "-eu", "-c", expand(step["run"])],
+                ["bash", "-eu", "-c", command],
                 cwd=root,
                 env=environment,
                 capture_output=True,
