@@ -17,6 +17,7 @@ builtins = [
   "!security/least-privilege",
   "!security/input-validation",
   "!polyglot-bindings/rust-polyglot-conventions",
+  "!token-efficiency/task-runner",
   "default-commands",
   "polyglot-bindings",
 ]
