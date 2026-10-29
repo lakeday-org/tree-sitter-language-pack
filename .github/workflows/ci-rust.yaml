@@ -41,9 +41,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
       - name: Setup Node.js
-        uses: actions/setup-node@v7
+        uses: xberg-io/actions/setup-mise@v1
         with:
-          node-version: "22"
+          install-args: node
 
       - name: Install tree-sitter CLI
         run: npm install -g tree-sitter-cli@0.26.11
@@ -102,8 +102,10 @@ jobs:
           use-sccache: "false"
           install-llvm-cov: "false"
 
-      - name: Install Task
-        uses: xberg-io/actions/install-task@v1
+      - name: Setup mise
+        uses: xberg-io/actions/setup-mise@v1
+        with:
+          install: "false"
 
       - name: Install alef
         uses: xberg-io/actions/install-alef@v1
@@ -113,12 +115,12 @@ jobs:
 
       # required-features tests (wire_format, concurrent_download) aren't built by the
       # default-feature run above; wire_format pins the wire shape every binding
-      # deserializer depends on. See .task/rust.yml test:feature-gated.
+      # deserializer depends on. See rust:test:feature-gated in mise-tasks/rust.toml.
       - name: Run feature-gated tests
-        run: task rust:test:feature-gated
+        run: mise run rust:test:feature-gated
 
       - name: Run splitter scaling regression and bench smoke
-        run: task rust:test:split-scaling
+        run: mise run rust:test:split-scaling
 
       - name: Run Rust E2E tests
-        run: task rust:e2e:test
+        run: mise run rust:e2e:test

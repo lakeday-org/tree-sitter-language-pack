@@ -278,8 +278,11 @@ jobs:
 
       # A registry-mode test app pinned to an older release still installs and still passes, so it
       # gates nothing. Five were up to six releases behind before this check existed. ~keep
-      - name: Setup Task
-        uses: xberg-io/actions/install-task@v1
+      - name: Setup mise
+        uses: xberg-io/actions/setup-mise@v1
+        with:
+          install: "false"
+          config-ref: ${{ github.sha }}
 
       - name: Check test-app pins match the release being published
         env:
@@ -288,7 +291,7 @@ jobs:
           RELEASE_SOURCE_SHA: ${{ github.sha }}
           RELEASE_REF: ""
           RELEASE_TAG: ${{ inputs.tag }}
-        run: task test-apps:check-release-pins
+        run: mise run test-apps:check-release-pins
 
       # The coding-agent plugin under plugin/ carries its own version source
       # (plugin/.ai-rulez/config.toml [plugin].version) that the shared
@@ -416,7 +419,10 @@ jobs:
           free -h
 
       - name: Setup Node
-        uses: actions/setup-node@v7
+        uses: xberg-io/actions/setup-mise@v1
+        with:
+          install-args: node
+          config-ref: ${{ github.sha }}
       - name: Install tree-sitter CLI
         run: npm install -g tree-sitter-cli@0.26.11
 
@@ -644,9 +650,10 @@ jobs:
           fi
 
       - name: Setup Python
-        uses: actions/setup-python@v7
+        uses: xberg-io/actions/setup-mise@v1
         with:
-          python-version: "3.12"
+          install-args: python
+          config-ref: ${{ github.sha }}
 
       - name: Get all language names
         id: langs
@@ -790,9 +797,10 @@ jobs:
           install-llvm-cov: "false"
 
       - name: Setup Python
-        uses: actions/setup-python@v7
+        uses: xberg-io/actions/setup-mise@v1
         with:
-          python-version: "3.13"
+          install-args: python
+          config-ref: ${{ github.sha }}
 
       - name: Build sdist
         uses: xberg-io/actions/build-python-sdist@v1
@@ -931,9 +939,10 @@ jobs:
 
       - name: Install cargo-zigbuild
         if: matrix.musl
-        uses: taiki-e/install-action@v2
+        uses: xberg-io/actions/setup-mise@v1
         with:
-          tool: cargo-zigbuild
+          install-args: github:rust-cross/cargo-zigbuild
+          config-ref: ${{ github.sha }}
 
       - name: Add musl Rust target
         if: matrix.musl
@@ -1496,11 +1505,10 @@ jobs:
           ref: ${{ needs.prepare.outputs.checkout_ref }}
 
       - name: Setup Java
-        uses: actions/setup-java@v6
+        uses: xberg-io/actions/setup-mise@v1
         with:
-          distribution: "temurin"
-          java-version: "25"
-          cache: "maven"
+          install-args: java
+          config-ref: ${{ github.sha }}
 
       - name: Setup Maven
         uses: xberg-io/actions/setup-maven@v1
@@ -1777,9 +1785,10 @@ jobs:
         uses: xberg-io/actions/install-alef@v1
 
       - name: Setup Python
-        uses: actions/setup-python@v7
+        uses: xberg-io/actions/setup-mise@v1
         with:
-          python-version: "3.12"
+          install-args: python
+          config-ref: ${{ github.sha }}
 
       - name: Get all language names
         id: langs
@@ -2004,9 +2013,10 @@ jobs:
           install-llvm-cov: "false"
 
       - name: Setup Python
-        uses: actions/setup-python@v7
+        uses: xberg-io/actions/setup-mise@v1
         with:
-          python-version: "3.12"
+          install-args: python
+          config-ref: ${{ github.sha }}
 
       - name: Get all language names
         id: langs
@@ -2445,10 +2455,14 @@ jobs:
       - uses: xberg-io/actions/setup-rust@v1
         with:
           cache-key-prefix: publish-e2e-rust
-      - uses: xberg-io/actions/install-task@v1
+      - name: Setup mise
+        uses: xberg-io/actions/setup-mise@v1
+        with:
+          install: "false"
+          config-ref: ${{ github.sha }}
       - uses: xberg-io/actions/install-alef@v1
       - name: Run Rust E2E tests
-        run: task rust:e2e:test
+        run: mise run rust:e2e:test
 
   e2e-python:
     name: E2E gate — Python
@@ -2458,6 +2472,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 60
     env:
+      UV_PYTHON_PREFERENCE: only-system
       PROJECT_ROOT: ${{ github.workspace }}
       TSLP_LINK_MODE: static
       TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json,gherkin"
@@ -2478,11 +2493,12 @@ jobs:
       - uses: xberg-io/actions/setup-rust@v1
         with:
           cache-key-prefix: publish-e2e-python
-      - uses: actions/setup-python@v7
+      - name: Setup Python and uv
+        uses: xberg-io/actions/setup-mise@v1
         with:
-          python-version: "3.13"
-      - uses: astral-sh/setup-uv@v10.3.2
-      # `task python:e2e:test` goes through `alef test --lang python --e2e`, whose
+          install-args: python uv
+          config-ref: ${{ github.sha }}
+      # `mise run python:e2e:test` goes through `alef test --lang python --e2e`, whose
       # `[crates.test.python]` precondition needs `ruff` and whose `before` hook runs
       # `maturin develop` — and `maturin develop` refuses to run outside a virtualenv.
       # ci-e2e.yaml's `test-python` installs a prebuilt wheel and calls pytest directly, so
@@ -2494,10 +2510,9 @@ jobs:
           uv pip install maturin ruff
           echo "VIRTUAL_ENV=$PWD/.venv" >> "$GITHUB_ENV"
           echo "$PWD/.venv/bin" >> "$GITHUB_PATH"
-      - uses: xberg-io/actions/install-task@v1
       - uses: xberg-io/actions/install-alef@v1
       - name: Run Python E2E tests
-        run: task python:e2e:test
+        run: mise run python:e2e:test
 
   e2e-node:
     name: E2E gate — Node
@@ -2535,10 +2550,14 @@ jobs:
       # before running the same NAPI build. ~keep
       - name: Install NAPI-RS CLI
         run: npm install -g @napi-rs/cli
-      - uses: xberg-io/actions/install-task@v1
+      - name: Setup mise
+        uses: xberg-io/actions/setup-mise@v1
+        with:
+          install: "false"
+          config-ref: ${{ github.sha }}
       - uses: xberg-io/actions/install-alef@v1
       - name: Run Node E2E tests
-        run: task node:e2e:test
+        run: mise run node:e2e:test
 
   e2e-wasm:
     name: E2E gate — WASM
@@ -2573,10 +2592,14 @@ jobs:
           node-version: "22"
       - name: Install wasm-pack
         run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
-      - uses: xberg-io/actions/install-task@v1
+      - name: Setup mise
+        uses: xberg-io/actions/setup-mise@v1
+        with:
+          install: "false"
+          config-ref: ${{ github.sha }}
       - uses: xberg-io/actions/install-alef@v1
       - name: Run WASM E2E tests
-        run: task wasm:e2e:test
+        run: mise run wasm:e2e:test
 
   e2e-ruby:
     name: E2E gate — Ruby
@@ -2606,9 +2629,11 @@ jobs:
       - uses: xberg-io/actions/setup-rust@v1
         with:
           cache-key-prefix: publish-e2e-ruby
-      - uses: ruby/setup-ruby@v1.335.0
+      - name: Setup Ruby
+        uses: xberg-io/actions/setup-mise@v1
         with:
-          ruby-version: "3.4"
+          install-args: ruby
+          config-ref: ${{ github.sha }}
       # `[crates.test.ruby]`'s `before` hook runs `bundle exec rake compile` in
       # packages/ruby and its e2e command runs `bundle exec rspec` in e2e/ruby; neither
       # installs gems, so both Gemfiles have to be resolved first. ci-e2e.yaml's `test-ruby`
@@ -2619,10 +2644,9 @@ jobs:
       - name: Install Ruby E2E dependencies
         working-directory: e2e/ruby
         run: bundle install
-      - uses: xberg-io/actions/install-task@v1
       - uses: xberg-io/actions/install-alef@v1
       - name: Run Ruby E2E tests
-        run: task ruby:e2e:test
+        run: mise run ruby:e2e:test
 
   e2e-java:
     name: E2E gate — Java
@@ -2652,16 +2676,15 @@ jobs:
       - uses: xberg-io/actions/setup-rust@v1
         with:
           cache-key-prefix: publish-e2e-java
-      - uses: actions/setup-java@v6
+      - name: Setup Java
+        uses: xberg-io/actions/setup-mise@v1
         with:
-          distribution: temurin
-          java-version: "25"
-          cache: maven
+          install-args: java
+          config-ref: ${{ github.sha }}
       - uses: xberg-io/actions/setup-maven@v1
-      - uses: xberg-io/actions/install-task@v1
       - uses: xberg-io/actions/install-alef@v1
       - name: Run Java E2E tests
-        run: task java:e2e:test
+        run: mise run java:e2e:test
         env:
           MAVEN_OPTS: "--enable-native-access=ALL-UNNAMED -Dsun.misc.unsafe.memory.access=allow"
 
@@ -2697,12 +2720,16 @@ jobs:
         with:
           elixir-version: "1.17"
           otp-version: "27.2"
-      - uses: xberg-io/actions/install-task@v1
+      - name: Setup mise
+        uses: xberg-io/actions/setup-mise@v1
+        with:
+          install: "false"
+          config-ref: ${{ github.sha }}
       - uses: xberg-io/actions/install-alef@v1
       - name: Install Elixir dependencies
-        run: task elixir:deps
+        run: mise run elixir:deps
       - name: Run Elixir E2E tests
-        run: task elixir:e2e:test
+        run: mise run elixir:e2e:test
 
   e2e-php:
     name: E2E gate — PHP
@@ -2743,10 +2770,14 @@ jobs:
       - name: Install PHP E2E dependencies
         working-directory: e2e/php
         run: composer install --no-progress --prefer-dist
-      - uses: xberg-io/actions/install-task@v1
+      - name: Setup mise
+        uses: xberg-io/actions/setup-mise@v1
+        with:
+          install: "false"
+          config-ref: ${{ github.sha }}
       - uses: xberg-io/actions/install-alef@v1
       - name: Run PHP E2E tests
-        run: task php:e2e:test
+        run: mise run php:e2e:test
 
   e2e-csharp:
     name: E2E gate — C#
@@ -2779,10 +2810,14 @@ jobs:
       - uses: actions/setup-dotnet@v6
         with:
           dotnet-version: "10.0.x"
-      - uses: xberg-io/actions/install-task@v1
+      - name: Setup mise
+        uses: xberg-io/actions/setup-mise@v1
+        with:
+          install: "false"
+          config-ref: ${{ github.sha }}
       - uses: xberg-io/actions/install-alef@v1
       - name: Run C# E2E tests
-        run: task csharp:e2e:test
+        run: mise run csharp:e2e:test
 
   e2e-go:
     name: E2E gate — Go
@@ -2811,17 +2846,17 @@ jobs:
       - uses: xberg-io/actions/setup-rust@v1
         with:
           cache-key-prefix: publish-e2e-go
-      - uses: actions/setup-go@v7
+      - name: Setup Go
+        uses: xberg-io/actions/setup-mise@v1
         with:
-          go-version: "1.26"
-          cache-dependency-path: packages/go/go.sum
+          install-args: go
+          config-ref: ${{ github.sha }}
       - name: Verify go.mod placement
         run: |
           test -f packages/go/go.mod || (echo "ERROR: go.mod missing at packages/go/go.mod" && exit 1)
-      - uses: xberg-io/actions/install-task@v1
       - uses: xberg-io/actions/install-alef@v1
       - name: Run Go E2E tests
-        run: task go:e2e:test
+        run: mise run go:e2e:test
 
   e2e-cli:
     name: E2E gate — CLI
@@ -2882,7 +2917,11 @@ jobs:
       - uses: xberg-io/actions/setup-node-workspace@v1
         with:
           node-version: "22"
-      - uses: xberg-io/actions/install-task@v1
+      - name: Setup mise
+        uses: xberg-io/actions/setup-mise@v1
+        with:
+          install: "false"
+          config-ref: ${{ github.sha }}
       - name: Install ai-rulez
         uses: xberg-io/actions/setup-ai-rulez@v1
         with:
@@ -2892,7 +2931,7 @@ jobs:
       # plugin/.ai-rulez and compares byte content + BLAKE3 provenance, so it goes
       # red whenever a bundle was hand-edited or left stale. ~keep
       - name: Verify plugin bundles match source
-        run: task plugin:verify
+        run: mise run plugin:verify
 
   e2e-c:
     name: E2E gate — C FFI
@@ -2923,7 +2962,11 @@ jobs:
       - uses: xberg-io/actions/setup-rust@v1
         with:
           cache-key-prefix: publish-e2e-c
-      - uses: xberg-io/actions/install-task@v1
+      - name: Setup mise
+        uses: xberg-io/actions/setup-mise@v1
+        with:
+          install: "false"
+          config-ref: ${{ github.sha }}
       - uses: xberg-io/actions/install-alef@v1
       - name: Install poly
         uses: Goldziher/poly@v0
@@ -2934,9 +2977,9 @@ jobs:
       # `make` dies on the alphabetically first missing category with "No rule to make
       # target 'test_data_extraction.c'". ci-e2e.yaml's `test-c-ffi` generates first. ~keep
       - name: Generate C E2E tests
-        run: task c:e2e:generate
+        run: mise run c:e2e:generate
       - name: Run C E2E tests
-        run: task c:e2e:test
+        run: mise run c:e2e:test
 
   publish-crates:
     name: Publish Rust crates
@@ -3213,11 +3256,10 @@ jobs:
           ref: ${{ needs.prepare.outputs.checkout_ref }}
 
       - name: Setup Ruby
-        uses: ruby/setup-ruby@v1.335.0
+        uses: xberg-io/actions/setup-mise@v1
         with:
-          ruby-version: "3.4"
-          bundler: none
-          bundler-cache: false
+          install-args: ruby
+          config-ref: ${{ github.sha }}
 
       - name: Download Ruby gem artifacts
         uses: actions/download-artifact@v8
@@ -3745,7 +3787,7 @@ jobs:
   # Test gates for the four bindings whose e2e suites CI never executed.
   # GitHub Actions cannot express a `needs:` on a job in another workflow, so
   # the gate has to live in this workflow; these jobs re-run the same
-  # `.task/*.yml` e2e entrypoints that ci-e2e.yaml runs on PRs, against the
+  # `mise-tasks/*.toml` e2e entrypoints that ci-e2e.yaml runs on PRs, against the
   # release ref. ~keep
   e2e-dart:
     name: E2E gate — Dart
@@ -3776,9 +3818,13 @@ jobs:
         with:
           cache-key-prefix: publish-e2e-dart
       - uses: dart-lang/setup-dart@v1
-      - uses: xberg-io/actions/install-task@v1
+      - name: Setup mise
+        uses: xberg-io/actions/setup-mise@v1
+        with:
+          install: "false"
+          config-ref: ${{ github.sha }}
       - name: Run Dart E2E tests
-        run: task dart:e2e:test
+        run: mise run dart:e2e:test
 
   trigger-pubdev:
     name: Trigger pub.dev publish workflow
@@ -3943,12 +3989,16 @@ jobs:
       - uses: xberg-io/actions/setup-rust@v1
         with:
           cache-key-prefix: publish-e2e-swift
-      - uses: xberg-io/actions/install-task@v1
-      # Targets e2e/swift_e2e via .task/swift.yml. alef.toml's swift `e2e`
+      - name: Setup mise
+        uses: xberg-io/actions/setup-mise@v1
+        with:
+          install: "false"
+          config-ref: ${{ github.sha }}
+      # Targets e2e/swift_e2e via mise-tasks/swift.toml. alef.toml's swift `e2e`
       # command is a duplicate of its unit-test `command` and does not reach
       # the e2e suite. ~keep
       - name: Run Swift E2E tests
-        run: task swift:e2e:test
+        run: mise run swift:e2e:test
 
   update-swift-package-manifest:
     name: Update Swift Package.swift manifest with version and checksum
@@ -4156,14 +4206,15 @@ jobs:
       - uses: xberg-io/actions/setup-rust@v1
         with:
           cache-key-prefix: publish-e2e-zig
-      - uses: xberg-io/actions/setup-zig@v1
+      - name: Setup Zig
+        uses: xberg-io/actions/setup-mise@v1
         with:
-          version: "0.16.0"
-      - uses: xberg-io/actions/install-task@v1
+          install-args: zig
+          config-ref: ${{ github.sha }}
       # Runs e2e/zig. `packages/zig` has no test blocks, so `zig build test`
       # there passes without semantically analysing the generated module. ~keep
       - name: Run Zig E2E tests
-        run: task zig:e2e:test
+        run: mise run zig:e2e:test
 
   publish-zig:
     name: Publish Zig package metadata to GitHub Release
@@ -4235,9 +4286,11 @@ jobs:
           token: ${{ steps.app-token.outputs.token }}
           persist-credentials: true
 
-      - uses: xberg-io/actions/setup-zig@v1
+      - name: Setup Zig
+        uses: xberg-io/actions/setup-mise@v1
         with:
-          version: "0.16.0"
+          install-args: zig
+          config-ref: ${{ github.sha }}
 
       # `main` can advance past the tag while a publish runs. If it already carries a newer,
       # unpublished version every URL would 404 and there is nothing here to refresh, so skip
@@ -4312,7 +4365,7 @@ jobs:
             echo "\`main\` still declares hashes that do not match the \`v${VERSION}\` tarballs,"
             echo "and \`zig build\` in that app fails until they are regenerated."
             echo
-            echo "Fix locally with \`task test-apps:fix-zig-hashes\` and commit the result."
+            echo "Fix locally with \`mise run test-apps:fix-zig-hashes\` and commit the result."
             echo "See the step logs above for which asset or push failed."
           } >> "$GITHUB_STEP_SUMMARY"
 
@@ -4493,9 +4546,10 @@ jobs:
           install-llvm-cov: "false"
 
       - name: Setup Python
-        uses: actions/setup-python@v7
+        uses: xberg-io/actions/setup-mise@v1
         with:
-          python-version: "3.12"
+          install-args: python
+          config-ref: ${{ github.sha }}
 
       - name: Get all language names
         id: langs
@@ -5625,6 +5679,8 @@ jobs:
     environment: pypi
     permissions:
       id-token: write
+    env:
+      UV_PYTHON_PREFERENCE: only-system
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -5638,10 +5694,11 @@ jobs:
         uses: xberg-io/actions/verify-ai-rulez-plugin@v1
         with:
           config-directory: .ai-rulez
-      - name: Install uv
-        uses: astral-sh/setup-uv@v10.3.2
+      - name: Install Python and uv
+        uses: xberg-io/actions/setup-mise@v1
         with:
-          python-version: "3.13"
+          install-args: python uv
+          config-ref: ${{ github.sha }}
       # ~keep The bundle carries its own version (plugin/.ai-rulez/config.toml [plugin].version),
       # which the tag does not set. At v1.16.0 that pin was still 1.15.12, so npm was handed a
       # 1.15.12 tarball, answered 403 "cannot publish over the previously published version", and
@@ -5818,6 +5875,8 @@ jobs:
     permissions:
       contents: read
       id-token: write
+    env:
+      UV_PYTHON_PREFERENCE: only-system
     steps:
       - uses: actions/checkout@v7
         with:
@@ -5830,9 +5889,11 @@ jobs:
         uses: xberg-io/actions/verify-ai-rulez-plugin@v1
         with:
           version-sync-script: scripts/sync_plugin_version.py
-      - uses: astral-sh/setup-uv@v10.3.2
+      - name: Install Python and uv
+        uses: xberg-io/actions/setup-mise@v1
         with:
-          python-version: "3.13"
+          install-args: python uv
+          config-ref: ${{ github.sha }}
       - name: Read the verified Hermes version
         id: package
         shell: bash

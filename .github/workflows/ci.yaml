@@ -19,8 +19,8 @@ on:
       - "rust-toolchain.toml"
       - "Cargo.toml"
       - "Cargo.lock"
-      - "Taskfile.yml"
-      - ".task/**"
+      - "mise.toml"
+      - "mise-tasks/**"
       - "pyproject.toml"
       - ".clang-format"
       - "alef.toml"
@@ -56,9 +56,12 @@ jobs:
         with:
           python-version: "3.14"
           install-command: "uv sync --no-install-project --no-install-workspace"
-      - uses: xberg-io/actions/install-task@v1
+      - name: Setup mise
+        uses: xberg-io/actions/setup-mise@v1
+        with:
+          install: "false"
       - name: Test release dry-run mutation guards
-        run: task contract-tests:release-dry-mutations
+        run: mise run contract-tests:release-dry-mutations
       - name: Test NuGet packing workflow
         run: |
           uv run --no-sync python scripts/ci/test_nuget_pack.py
@@ -87,9 +90,9 @@ jobs:
           free -h
 
       - name: Setup Node.js
-        uses: actions/setup-node@v7
+        uses: xberg-io/actions/setup-mise@v1
         with:
-          node-version: "22"
+          install-args: node
 
       - name: Install tree-sitter CLI
         run: npm install -g tree-sitter-cli@0.26.11
@@ -155,9 +158,9 @@ jobs:
       # golangci-lint v2.12.2 fail typecheck on the *stdlib*, not on our code:
       # "could not import math/rand/v2 (.../rand.go:213:17: method must have no type
       # parameters)" (run 33250082407). golangci-lint embeds its own go/types, so a Go
-      # release newer than the one it was built against breaks it. Every other Go setup
-      # here already pins 1.26 (ci-e2e.yaml, publish.yaml), so linting against 1.27 was
-      # also checking a stdlib this repo never builds against. ~keep
+      # release newer than the one it was built against breaks it. The test and e2e jobs
+      # build with the mise baseline Go; only this golangci-lint run stays on 1.26 until
+      # golangci-lint supports the newer stdlib. ~keep
       go-version: "1.26"
       setup-ruby: true
       setup-dart: true
@@ -244,7 +247,7 @@ jobs:
           uv run --no-sync scripts/generate_grammar_table.py --mode queries --output "$TABLE"
 
           if ! git diff --exit-code -- "$LANGS" "$TABLE"; then
-            echo "::error::Generated grammar tables are stale. Run: task docs:generate:languages docs:generate:grammar-table"
+            echo "::error::Generated grammar tables are stale. Run: mise run docs:generate:languages && mise run docs:generate:grammar-table"
             exit 1
           fi
 
@@ -344,7 +347,7 @@ jobs:
       # Implements the generated-code policy in CLAUDE.md. The task is named
       # `e2e:generate` (CLAUDE.md's "generate:e2e" is wrong); it fans out to
       # `alef e2e generate`, which is invoked directly here to match the
-      # `alef readme` / `alef docs` steps above and avoid needing Task.
+      # `alef readme` / `alef docs` steps above and avoid needing mise.
       # The `test -d e2e` guard exists because `git diff --exit-code` against a
       # path that does not exist exits 0 and can never fail. ~keep
       - name: Check e2e freshness
@@ -357,14 +360,14 @@ jobs:
           # Ignore whitespace-only diffs — poly's formatters reflow generated
           # sources after alef emits them.
           git diff -w --ignore-blank-lines --exit-code -- e2e/ || {
-            echo "::error::Generated e2e tests are out of date. Run 'task e2e:generate' and commit."
+            echo "::error::Generated e2e tests are out of date. Run 'mise run e2e:generate' and commit."
             exit 1
           }
           # Newly generated suites show up as untracked files, which `git diff`
           # cannot see. ~keep
           untracked=$(git ls-files --others --exclude-standard -- e2e/)
           if [ -n "$untracked" ]; then
-            echo "::error::Generated e2e tests include untracked files. Run 'task e2e:generate' and commit."
+            echo "::error::Generated e2e tests include untracked files. Run 'mise run e2e:generate' and commit."
             echo "$untracked"
             exit 1
           fi
@@ -421,8 +424,10 @@ jobs:
           python-version: "3.14"
           install-command: "uv sync --no-install-project --no-install-workspace"
 
-      - name: Install Task
-        uses: xberg-io/actions/install-task@v1
+      - name: Setup mise
+        uses: xberg-io/actions/setup-mise@v1
+        with:
+          install: "false"
 
       - name: Verify grammar licenses are permissive
         env:
@@ -435,7 +440,7 @@ jobs:
             echo "::error::sources/license_cache.json missing; gate would rebuild it and self-certify"; exit 1; }
           gh auth status >/dev/null 2>&1 || {
             echo "::error::gh is not authenticated; unresolvable grammars would be silently uncheckable"; exit 1; }
-          task lint:licenses:check
+          mise run lint:licenses:check
 
       # The linter writes sources/license_cache.json only under --update-cache or when
       # the cache is absent. Both are guarded above, so any diff here means the gate
@@ -588,8 +593,10 @@ jobs:
           use-sccache: "false"
           install-llvm-cov: "false"
 
-      - name: Install Task
-        uses: xberg-io/actions/install-task@v1
+      - name: Setup mise
+        uses: xberg-io/actions/setup-mise@v1
+        with:
+          install: "false"
 
       - name: Install Alef
         uses: xberg-io/actions/install-alef@v1
@@ -599,12 +606,12 @@ jobs:
 
       # required-features tests (wire_format, concurrent_download) aren't built by the
       # default-feature run above; wire_format pins the wire shape every binding
-      # deserializer depends on. See .task/rust.yml test:feature-gated.
+      # deserializer depends on. See rust:test:feature-gated in mise-tasks/rust.toml.
       - name: Run feature-gated tests
-        run: task rust:test:feature-gated
+        run: mise run rust:test:feature-gated
 
       - name: Run Rust E2E tests
-        run: task rust:e2e:test
+        run: mise run rust:e2e:test
 
   build-ffi:
     name: Build FFI (${{ matrix.os }})
@@ -687,9 +694,9 @@ jobs:
           install-llvm-cov: "false"
 
       - name: Setup Python
-        uses: actions/setup-python@v7
+        uses: xberg-io/actions/setup-mise@v1
         with:
-          python-version: "3.12"
+          install-args: python
 
       - name: Install zstd
         shell: bash
@@ -808,9 +815,9 @@ jobs:
           install-llvm-cov: "false"
 
       - name: Setup Python
-        uses: actions/setup-python@v7
+        uses: xberg-io/actions/setup-mise@v1
         with:
-          python-version: "3.12"
+          install-args: python
 
       - name: Get all language names
         id: langs
@@ -1023,9 +1030,9 @@ jobs:
           install-llvm-cov: "false"
 
       - name: Setup Node.js
-        uses: actions/setup-node@v7
+        uses: xberg-io/actions/setup-mise@v1
         with:
-          node-version: "22"
+          install-args: node
 
       - name: Install NAPI-RS CLI
         run: npm install -g @napi-rs/cli
@@ -1226,9 +1233,9 @@ jobs:
           path: crates/ts-pack-core-wasm/pkg/nodejs/
 
       - name: Setup Node.js
-        uses: actions/setup-node@v7
+        uses: xberg-io/actions/setup-mise@v1
         with:
-          node-version: "22"
+          install-args: node
 
       - name: Install E2E dependencies
         working-directory: e2e/wasm
@@ -1309,22 +1316,18 @@ jobs:
             || (echo "ERROR: module path in go.mod is wrong" && exit 1)
 
       - name: Setup Go
-        uses: actions/setup-go@v7
+        uses: xberg-io/actions/setup-mise@v1
         with:
-          go-version: "1.26"
-          cache-dependency-path: packages/go/go.sum
-
-      - name: Install Task
-        uses: xberg-io/actions/install-task@v1
+          install-args: go
 
       - name: Run Go tests
-        run: task go:test
+        run: mise run go:test
 
       - name: Run Go lint
-        run: task go:lint
+        run: mise run go:lint
 
       - name: Check Go formatting
-        run: task go:format:check
+        run: mise run go:format:check
 
       - name: Setup Rust (for e2e generate)
         uses: xberg-io/actions/setup-rust@v1
@@ -1342,10 +1345,10 @@ jobs:
           version: "0.31.2"
 
       - name: Generate Go E2E tests
-        run: task go:e2e:generate
+        run: mise run go:e2e:generate
 
       - name: Run Go E2E tests
-        run: task go:e2e:test
+        run: mise run go:e2e:test
 
   test-java:
     name: Test Java
@@ -1399,11 +1402,9 @@ jobs:
           cp -r ffi-artifacts/crates/ts-pack-core-ffi/include/* crates/ts-pack-core-ffi/include/ 2>/dev/null || true
 
       - name: Setup Java
-        uses: actions/setup-java@v6
+        uses: xberg-io/actions/setup-mise@v1
         with:
-          distribution: "temurin"
-          java-version: "25"
-          cache: "maven"
+          install-args: java
 
       - name: Set library paths for JNI
         shell: bash
@@ -1517,9 +1518,6 @@ jobs:
           use-sccache: "true"
           cache-key-prefix: csharp-${{ matrix.os }}
           install-llvm-cov: "false"
-
-      - name: Install Task
-        uses: xberg-io/actions/install-task@v1
 
       - name: Build FFI library
         run: cargo build --locked -p ts-pack-core-ffi --release
@@ -1689,9 +1687,6 @@ jobs:
           cache-key-prefix: php-${{ matrix.os }}
           install-llvm-cov: "false"
 
-      - name: Install Task
-        uses: xberg-io/actions/install-task@v1
-
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -1798,8 +1793,10 @@ jobs:
           elixir-version: "1.17"
           otp-version: "27.2"
 
-      - name: Install Task
-        uses: xberg-io/actions/install-task@v1
+      - name: Setup mise
+        uses: xberg-io/actions/setup-mise@v1
+        with:
+          install: "false"
 
       - name: Cache Elixir dependencies
         uses: actions/cache@v6
@@ -1812,7 +1809,7 @@ jobs:
             elixir-deps-${{ runner.os }}-
 
       - name: Install Elixir dependencies
-        run: task elixir:deps
+        run: mise run elixir:deps
 
       - name: Patch Rustler --cfg flag placement
         working-directory: packages/elixir
@@ -1829,7 +1826,7 @@ jobs:
         run: mix compile --warnings-as-errors
 
       - name: Run Elixir tests
-        run: task elixir:test
+        run: mise run elixir:test
         env:
           TSLP_BUILD: "1"
 
@@ -1842,10 +1839,10 @@ jobs:
           version: "0.31.2"
 
       - name: Generate Elixir E2E tests
-        run: task elixir:e2e:generate
+        run: mise run elixir:e2e:generate
 
       - name: Run Elixir E2E tests
-        run: task elixir:e2e:test
+        run: mise run elixir:e2e:test
         env:
           TSLP_BUILD: "1"
           MIX_ENV: test
@@ -1895,8 +1892,10 @@ jobs:
           use-sccache: "false"
           install-llvm-cov: "false"
 
-      - name: Install Task
-        uses: xberg-io/actions/install-task@v1
+      - name: Setup mise
+        uses: xberg-io/actions/setup-mise@v1
+        with:
+          install: "false"
 
       - name: Install alef
         uses: xberg-io/actions/install-alef@v1
@@ -1907,7 +1906,7 @@ jobs:
           version: "0.31.2"
 
       - name: Generate C E2E tests
-        run: task c:e2e:generate
+        run: mise run c:e2e:generate
 
       - name: Build and run C E2E tests
-        run: task c:e2e:test
+        run: mise run c:e2e:test

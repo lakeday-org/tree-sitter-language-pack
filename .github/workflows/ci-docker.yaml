@@ -30,23 +30,18 @@ jobs:
     name: Build Docker image & test all grammars
     runs-on: ubuntu-latest
     timeout-minutes: 45
+    env:
+      UV_PYTHON_PREFERENCE: only-system
     steps:
       - name: Checkout
         uses: actions/checkout@v7
         with:
           fetch-depth: 1
 
-      - name: Setup Python
-        uses: actions/setup-python@v7
+      - name: Setup Python, uv and Node.js (for tree-sitter-cli)
+        uses: xberg-io/actions/setup-mise@v1
         with:
-          python-version: "3.13"
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v10.3.2
-      - name: Setup Node.js (for tree-sitter-cli)
-        uses: actions/setup-node@v7
-        with:
-          node-version: "22"
+          install-args: python uv node
 
       - name: Install tree-sitter-cli
         run: npm install -g tree-sitter-cli@0.26.11

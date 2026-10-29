@@ -44,9 +44,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
       - name: Setup Node.js
-        uses: actions/setup-node@v7
+        uses: xberg-io/actions/setup-mise@v1
         with:
-          node-version: "22"
+          install-args: node
 
       - name: Install tree-sitter CLI
         run: npm install -g tree-sitter-cli@0.26.11
@@ -109,9 +109,9 @@ jobs:
           install-llvm-cov: "false"
 
       - name: Setup Python
-        uses: actions/setup-python@v7
+        uses: xberg-io/actions/setup-mise@v1
         with:
-          python-version: "3.12"
+          install-args: python
 
       - name: Install zstd
         shell: bash
@@ -473,9 +473,9 @@ jobs:
           install-llvm-cov: "false"
 
       - name: Setup Node.js
-        uses: actions/setup-node@v7
+        uses: xberg-io/actions/setup-mise@v1
         with:
-          node-version: "22"
+          install-args: node
 
       - name: Install NAPI-RS CLI
         run: npm install -g @napi-rs/cli
@@ -643,9 +643,9 @@ jobs:
           path: crates/ts-pack-core-wasm/pkg/nodejs/
 
       - name: Setup Node.js
-        uses: actions/setup-node@v7
+        uses: xberg-io/actions/setup-mise@v1
         with:
-          node-version: "22"
+          install-args: node
 
       - name: Install E2E dependencies
         working-directory: e2e/wasm
@@ -712,22 +712,18 @@ jobs:
             || (echo "ERROR: module path in go.mod is wrong" && exit 1)
 
       - name: Setup Go
-        uses: actions/setup-go@v7
+        uses: xberg-io/actions/setup-mise@v1
         with:
-          go-version: "1.26"
-          cache-dependency-path: packages/go/go.sum
-
-      - name: Install Task
-        uses: xberg-io/actions/install-task@v1
+          install-args: go
 
       - name: Run Go tests
-        run: task go:test
+        run: mise run go:test
 
       - name: Run Go lint
-        run: task go:lint
+        run: mise run go:lint
 
       - name: Check Go formatting
-        run: task go:format:check
+        run: mise run go:format:check
 
       - name: Setup Rust (for e2e generate)
         uses: xberg-io/actions/setup-rust@v1
@@ -745,10 +741,10 @@ jobs:
           version: "0.31.2"
 
       - name: Generate Go E2E tests
-        run: task go:e2e:generate
+        run: mise run go:e2e:generate
 
       - name: Run Go E2E tests
-        run: task go:e2e:test
+        run: mise run go:e2e:test
 
   test-java:
     name: Test Java
@@ -805,11 +801,9 @@ jobs:
         run: python scripts/ci/build_libtree_sitter.py
 
       - name: Setup Java
-        uses: actions/setup-java@v6
+        uses: xberg-io/actions/setup-mise@v1
         with:
-          distribution: "temurin"
-          java-version: "25"
-          cache: "maven"
+          install-args: java
 
       - name: Set library paths for JNI
         shell: bash
@@ -897,9 +891,6 @@ jobs:
           use-sccache: "true"
           cache-key-prefix: csharp-${{ matrix.os }}
           install-llvm-cov: "false"
-
-      - name: Install Task
-        uses: xberg-io/actions/install-task@v1
 
       - name: Build FFI library
         run: cargo build -p ts-pack-core-ffi --release
@@ -1054,9 +1045,6 @@ jobs:
           cache-key-prefix: php-${{ matrix.os }}
           install-llvm-cov: "false"
 
-      - name: Install Task
-        uses: xberg-io/actions/install-task@v1
-
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -1146,8 +1134,10 @@ jobs:
           elixir-version: "1.17"
           otp-version: "27.2"
 
-      - name: Install Task
-        uses: xberg-io/actions/install-task@v1
+      - name: Setup mise
+        uses: xberg-io/actions/setup-mise@v1
+        with:
+          install: "false"
 
       - name: Cache Elixir dependencies
         uses: actions/cache@v6
@@ -1160,7 +1150,7 @@ jobs:
             elixir-deps-${{ runner.os }}-
 
       - name: Install Elixir dependencies
-        run: task elixir:deps
+        run: mise run elixir:deps
 
       - name: Patch Rustler --cfg flag placement
         working-directory: packages/elixir
@@ -1177,7 +1167,7 @@ jobs:
         run: mix compile --warnings-as-errors
 
       - name: Run Elixir tests
-        run: task elixir:test
+        run: mise run elixir:test
         env:
           TSLP_BUILD: "1"
 
@@ -1190,14 +1180,14 @@ jobs:
           version: "0.31.2"
 
       - name: Generate Elixir E2E tests
-        run: task elixir:e2e:generate
+        run: mise run elixir:e2e:generate
 
       - name: Install Elixir E2E dependencies
         working-directory: e2e/elixir
         run: mix deps.get
 
       - name: Run Elixir E2E tests
-        run: task elixir:e2e:test
+        run: mise run elixir:e2e:test
         env:
           TSLP_BUILD: "1"
           MIX_ENV: test
@@ -1254,8 +1244,10 @@ jobs:
           use-sccache: "false"
           install-llvm-cov: "false"
 
-      - name: Install Task
-        uses: xberg-io/actions/install-task@v1
+      - name: Setup mise
+        uses: xberg-io/actions/setup-mise@v1
+        with:
+          install: "false"
 
       - name: Install alef
         uses: xberg-io/actions/install-alef@v1
@@ -1266,10 +1258,10 @@ jobs:
           version: "0.31.2"
 
       - name: Generate C E2E tests
-        run: task c:e2e:generate
+        run: mise run c:e2e:generate
 
       - name: Build and run C E2E tests
-        run: task c:e2e:test
+        run: mise run c:e2e:test
 
   test-dart:
     name: Test Dart
@@ -1311,15 +1303,17 @@ jobs:
 
       - name: Setup Dart
         uses: dart-lang/setup-dart@v1
-      - name: Install Task
-        uses: xberg-io/actions/install-task@v1
+      - name: Setup mise
+        uses: xberg-io/actions/setup-mise@v1
+        with:
+          install: "false"
 
       # e2e/dart depends on packages/dart by path, and packages/dart/lib is
       # alef-generated and committed, so no flutter_rust_bridge codegen run is
       # needed here — `dart:e2e:test` builds the Rust cdylib and runs the
       # generated suite under e2e/dart. ~keep
       - name: Run Dart E2E tests
-        run: task dart:e2e:test
+        run: mise run dart:e2e:test
 
   test-kotlin-android:
     name: Test Kotlin Android
@@ -1428,17 +1422,19 @@ jobs:
           cache-key-prefix: e2e-swift
           install-llvm-cov: "false"
 
-      - name: Install Task
-        uses: xberg-io/actions/install-task@v1
+      - name: Setup mise
+        uses: xberg-io/actions/setup-mise@v1
+        with:
+          install: "false"
 
       # `alef.toml` sets the swift `e2e` command byte-identical to its unit-test
       # `command` (`cd packages/swift && swift test`), so `alef test --e2e` never
-      # reaches the e2e suite. `.task/swift.yml:104` is the only invocation that
-      # actually runs `e2e/swift_e2e`, so this job goes through Task.
+      # reaches the e2e suite. `mise-tasks/swift.toml` swift:e2e:test is the only invocation that
+      # actually runs `e2e/swift_e2e`, so this job goes through mise.
       # `e2e/swift/` is a dead orphan (Package.swift with no Tests/) and is not
       # referenced here. ~keep
       - name: Run Swift E2E tests
-        run: task swift:e2e:test
+        run: mise run swift:e2e:test
 
   test-zig:
     name: Test Zig
@@ -1479,15 +1475,12 @@ jobs:
           install-llvm-cov: "false"
 
       - name: Setup Zig
-        uses: xberg-io/actions/setup-zig@v1
+        uses: xberg-io/actions/setup-mise@v1
         with:
-          version: "0.16.0"
-
-      - name: Install Task
-        uses: xberg-io/actions/install-task@v1
+          install-args: zig
 
       # `zig:e2e:test` runs `e2e/zig`'s suite. `packages/zig` deliberately has
       # no test blocks, so `zig build test` there is a no-op that never
       # semantically analyses the generated module — it is not a substitute. ~keep
       - name: Run Zig E2E tests
-        run: task zig:e2e:test
+        run: mise run zig:e2e:test

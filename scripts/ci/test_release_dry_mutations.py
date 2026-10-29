@@ -13,6 +13,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
+import tomllib
 import yaml
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -110,12 +111,12 @@ class ReleaseDryMutationTests(unittest.TestCase):
     def test_contract_runs_in_the_existing_ci_job(self) -> None:
         workflow = yaml.safe_load((ROOT / ".github/workflows/ci.yaml").read_text())
         steps = workflow["jobs"]["nuget-pack-contract"]["steps"]
-        assert sum(step.get("run") == "task contract-tests:release-dry-mutations" for step in steps) == 1
-        assert any(step.get("uses", "").startswith("xberg-io/actions/install-task@") for step in steps)
-        tasks = yaml.safe_load((ROOT / ".task/contract-tests.yml").read_text())["tasks"]
-        assert tasks["release-dry-mutations"]["cmds"] == [
+        assert sum(step.get("run") == "mise run contract-tests:release-dry-mutations" for step in steps) == 1
+        assert any(step.get("uses", "").startswith("xberg-io/actions/setup-mise@") for step in steps)
+        tasks = tomllib.loads((ROOT / "mise.toml").read_text())["tasks"]
+        assert tasks["contract-tests:release-dry-mutations"]["run"] == (
             "uv run --no-sync python -m unittest scripts.ci.test_release_dry_mutations -v"
-        ]
+        )
 
     def run_test_app_pin_step(
         self,
@@ -134,13 +135,13 @@ class ReleaseDryMutationTests(unittest.TestCase):
             root = Path(directory)
             checker = ROOT / "scripts/check_test_app_pins.py"
             pins = runpy.run_path(str(checker))["PINS"]
-            paths = {"Cargo.toml", "alef.toml", "Taskfile.yml", *(pin.path for pin in pins)}
+            paths = {"Cargo.toml", "alef.toml", "mise.toml", *(pin.path for pin in pins)}
             assert len(paths) == 20
             for name in paths:
                 destination = root / name
                 destination.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copy2(ROOT / name, destination)
-            shutil.copytree(ROOT / ".task", root / ".task")
+            shutil.copytree(ROOT / "mise-tasks", root / "mise-tasks")
             (root / "scripts").mkdir(exist_ok=True)
             shutil.copy2(ROOT / "scripts/check_test_app_pins.py", root / "scripts/check_test_app_pins.py")
             if stale:
@@ -169,6 +170,9 @@ class ReleaseDryMutationTests(unittest.TestCase):
             environment = dict(os.environ)
             environment.update({name: expand(str(value)) for name, value in step.get("env", {}).items()})
             environment["PATH"] = str(Path(sys.executable).parent) + os.pathsep + environment["PATH"]
+            # The copy is a fresh mise project: trust it, and run with the tools already on PATH. ~keep
+            environment["MISE_TRUSTED_CONFIG_PATHS"] = str(root)
+            environment["MISE_TASK_RUN_AUTO_INSTALL"] = "false"
             return subprocess.run(
                 ["bash", "-eu", "-c", expand(step["run"])],
                 cwd=root,
